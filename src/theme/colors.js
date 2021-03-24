@@ -8,6 +8,11 @@ export const black = {
   200: "#E0E0E0"
 };
 
+export const blue = {
+  100: "#21686C",
+  200: "#6BC4A6"
+};
+
 export const yellow = {
   100: "#FECE00"
 };
@@ -22,9 +27,4 @@ export const orange = {
 
 export const green = {
   100: "#005236"
-};
-
-export const blue = {
-  100: "#21686C",
-  200: "#6BC4A6"
 };

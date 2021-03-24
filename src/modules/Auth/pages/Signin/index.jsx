@@ -1,14 +1,15 @@
 import React from "react";
 import { Helmet } from "react-helmet";
+import SigninStyle from "./style";
 
 export function Signin() {
   return (
-    <div className="App">
+    <SigninStyle>
       <Helmet>
         <title>Sign in</title>
       </Helmet>
-      <p>Welcome</p>
-    </div>
+      <h1>Sign In</h1>
+    </SigninStyle>
   );
 }
 

@@ -1,32 +1,37 @@
 import React from "react";
-import { testActions } from "store/test";
 import { connect } from "react-redux";
+import { testActions } from "store/test";
 import { selectors as testSelectors } from "store/test";
 import { themeActions } from "store/theme";
 import { Helmet } from "react-helmet";
+import TestPageStyle from "./style";
 
-export function TestPage({ testActions, toggleDarkMode, test }) {
+export function TestPage({ testActions, toggleDarkMode, test, users }) {
   return (
-    <div className="App">
+    <TestPageStyle>
       <Helmet>
         <title>RPL - Onboarding</title>
       </Helmet>
-      <button onClick={toggleDarkMode}>Toggle Mode</button>
       <header>
-        <p>
-          Welcome to <code>Onboarding</code> edit and save to reload.
-        </p>
-        <p className="App-link" onClick={() => testActions}>
-          Test API Connection
-        </p>
-        {test ? <p>WORKED!</p> : null}
+        <button onClick={toggleDarkMode}>Toggle Mode</button>
       </header>
-    </div>
+      <section>
+        <h1>
+          Welcome to <code>Main</code>.
+        </h1>
+        <h3 className="App-link" onClick={() => testActions}>
+          Test API Connection
+        </h3>
+        <button onClick={testActions}>TEST</button>
+        <p>{test === 1 ? "WORKED!" : test === -1 ? "FAILED" : ""}</p>
+      </section>
+    </TestPageStyle>
   );
 }
 
 const mapStateToProps = state => ({
-  test: testSelectors.test(state)
+  test: testSelectors.test(state),
+  users: testSelectors.users(state)
 });
 
 const mapDispatchToProps = {

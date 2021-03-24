@@ -7,9 +7,6 @@ const GlobalStyles = createGlobalStyle`
     html {
         box-sizing: border-box;
         font-size: 62.5%;
-        @media only screen and (max-width: 600px) {
-            /*font-size: 12.5%;*/
-        }
         @media only screen and (min-width: 600px) {
             font-size: 25%;
         }
@@ -24,12 +21,11 @@ const GlobalStyles = createGlobalStyle`
         }
     }
     *, *:before, *:after {
-        box-sizing: inherit;
-        /*
-        -webkit-transition: all 0.20s ease-in-out;
-        -moz-transition: all 0.20s ease-in-out;
-        -ms-transition: all 0.20s ease-in-out;
-        -o-transition: all 0.20s ease-in-out; */
+        box-sizing: border-box;
+        /* -webkit-transition: all 0.30s ease-in-out;
+        -moz-transition: all 0.30s ease-in-out;
+        -ms-transition: all 0.30s ease-in-out;
+        -o-transition: all 0.30s ease-in-out; */
     }
     body {
         background: ${({ theme }) => theme.backgroundColor};
@@ -44,38 +40,28 @@ const GlobalStyles = createGlobalStyle`
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
-
     p {
         font-size: ${typeScale.bodyText1};
-        line-height: 9.1rem;
-        margin: 0;
-
-        @media only screen and (max-width: 600px) {
-            line-height: 5.664rem;
-            font-size: ${typeScale.header3};
-        }
+        color: ${({ theme }) => theme.textHeader};
     }
-
     h1, h2, h3, h4, h5 {
         font-family: ${primaryFont};
         font-weight: 400;
-        margin: 0;
+        color: ${({ theme }) => theme.textHeader};
     }
-
     h1 {
-        line-height: 13.0rem;
+        margin-bottom: 4.0rem;
+        line-height: 4.3rem;
         font-size: ${typeScale.header1};
-
-        @media only screen and (max-width: 600px) {
-            line-height: 8.496rem;
-            font-size: ${typeScale.bodyText1};
-        }
     }
-
     h2 {
-        line-height: 13.8rem;
+        margin-bottom: 2.0rem;
+        line-height: 2.8rem;
         font-size: ${typeScale.header2};
     }
+    h3 {font-size: ${typeScale.header3};}
+    h4 {font-size: ${typeScale.header4};}
+    h5 {font-size: ${typeScale.header5};}
 `;
 
 export default GlobalStyles;

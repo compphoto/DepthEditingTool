@@ -1,5 +1,4 @@
-import { white, black, yellow, brown, orange, green, blue } from "./colors";
-import { primaryFont } from "./typography";
+import { white, black } from "./colors";
 
 export const lightTheme = {
   backgroundColor: white[100],
