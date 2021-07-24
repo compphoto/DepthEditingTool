@@ -5,8 +5,9 @@ import { connect } from "react-redux";
 import { lightTheme, darkTheme } from "theme";
 import { selectors as themeSelectors } from "store/theme";
 import history from "routes/history";
-import { authRoutes } from "routes/routes-list";
+import { authRoutes, defaultRoute } from "routes/routes-list";
 import PublicRoute from "routes/publicroute";
+import PrivateRoute from "routes/privateroute";
 import Error from "components/Error";
 import Loading from "components/Loading";
 import Authorization from "modules/Auth";
@@ -38,7 +39,7 @@ class App extends Component {
           <Router history={history}>
             <Switch>
               <PublicRoute restricted path={[authRoutes.signIn]} exact component={Authorization} />
-              <PublicRoute restricted path="/" component={Main} />
+              <PrivateRoute path={defaultRoute} component={Main} />
               <Redirect to={authRoutes.signIn} />
             </Switch>
           </Router>

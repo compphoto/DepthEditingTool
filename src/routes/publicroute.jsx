@@ -1,11 +1,10 @@
 import React from "react";
 import { Route, Redirect } from "react-router";
+import { getAccessToken } from "utils/localStorage";
 
 const PublicRoute = ({ component: Component, restricted, ...rest }) => (
   <Route {...rest}>
-    {props =>
-      localStorage.getItem("token") && restricted ? <Redirect to={props.location} /> : <Component {...props} />
-    }
+    {props => (getAccessToken() && restricted ? <Redirect to={props.location} /> : <Component {...props} />)}
   </Route>
 );
 
