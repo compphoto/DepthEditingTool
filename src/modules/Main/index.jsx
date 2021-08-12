@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
 import { privateRoutes } from "routes/routes-list";
-import Loading from "../../components/Loading";
+import Loading from "components/Loading";
 const TestPage = React.lazy(() => import("./pages/TestPage"));
 
 const Main = () => (
