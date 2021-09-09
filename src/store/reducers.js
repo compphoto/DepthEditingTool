@@ -1,12 +1,8 @@
 import { combineReducers } from "redux";
-import { authReducer } from "./auth";
 import { testReducer } from "./test";
-import { themeReducer } from "./theme";
 
 const appReducer = combineReducers({
-  auth: authReducer,
-  test: testReducer,
-  theme: themeReducer
+  test: testReducer
 });
 
 const rootReducer = (state, action) => {
