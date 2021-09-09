@@ -37,13 +37,15 @@ const SidePaneStyle = styled.div`
     }
   }
   .tools-ext {
-    position: relative;
     width: 360px;
     height: 100%;
     z-index: 10px;
     background: #2b2c2f;
     color: #7e838e;
     padding: 16px 24px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: width 0.1s ease-in-out;
     .tool-ext {
       display: flex;
       flex-direction: column;

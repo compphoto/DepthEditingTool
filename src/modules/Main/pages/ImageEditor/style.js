@@ -7,9 +7,12 @@ const ImageEditorStyle = styled.div`
   display: flex;
   flex-direction: column;
   header {
+    height: 56px;
     background-color: #1e1f22;
     color: #fff;
     padding: 10px 15px;
+    display: flex;
+    align-items: center;
     .nav-bar {
       display: flex;
       justify-content: space-between;
@@ -26,10 +29,11 @@ const ImageEditorStyle = styled.div`
     }
   }
   section {
-    flex: 1;
+    height: calc(100vh - 110px);
     display: flex;
   }
   footer {
+    height: 54px;
     background-color: #333334;
     color: #fff;
     padding: 15px 15px;

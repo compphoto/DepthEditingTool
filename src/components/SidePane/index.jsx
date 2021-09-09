@@ -161,16 +161,18 @@ export default function SidePane() {
         ))}
       </div>
       {activeTool === -1 ? null : (
-        <div className="tools-ext">
-          {activeTool === 0 ? adjust() : activeTool === 1 ? effect() : activeTool === 2 ? text() : null}
-          <Button
-            onClick={() => {
-              toggleTool(-1);
-            }}
-            className="toggle-button"
-          >
-            {activeTool === -1 ? <MdKeyboardArrowRight /> : <MdKeyboardArrowLeft />}
-          </Button>
+        <div style={{ position: "relative" }}>
+          <div className="tools-ext">
+            {activeTool === 0 ? adjust() : activeTool === 1 ? effect() : activeTool === 2 ? text() : null}
+            <Button
+              onClick={() => {
+                toggleTool(-1);
+              }}
+              className="toggle-button"
+            >
+              {activeTool === -1 ? <MdKeyboardArrowRight /> : <MdKeyboardArrowLeft />}
+            </Button>
+          </div>
         </div>
       )}
     </SidePaneStyle>
