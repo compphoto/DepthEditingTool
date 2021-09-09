@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, UncontrolledCollapse, CardBody, Card } from "reactstrap";
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import { MdKeyboardArrowLeft } from "react-icons/md";
 
 export default function SidePane() {
   const [activeTool, setActiveTool] = useState(0);
@@ -170,7 +170,7 @@ export default function SidePane() {
               }}
               className="toggle-button"
             >
-              {activeTool === -1 ? <MdKeyboardArrowRight /> : <MdKeyboardArrowLeft />}
+              <MdKeyboardArrowLeft />
             </Button>
           </div>
         </div>
