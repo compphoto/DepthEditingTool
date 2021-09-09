@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "reactstrap";
+import { Button, UncontrolledCollapse, CardBody, Card } from "reactstrap";
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
@@ -10,13 +10,139 @@ export default function SidePane() {
     setActiveTool(index);
   };
   const adjust = () => {
-    return "Adjust";
+    return (
+      <>
+        <div className="tool-ext mt-4 w-100">
+          <p className="mb-3 text-white">Size</p>
+          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-crop-toggler">
+            Crop
+          </Button>
+          <UncontrolledCollapse toggler="#adjust-crop-toggler">
+            <Card>
+              <CardBody>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
+                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
+                Minus, alias.
+              </CardBody>
+            </Card>
+          </UncontrolledCollapse>
+          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-rotate-toggler">
+            Rotate
+          </Button>
+          <UncontrolledCollapse toggler="#adjust-rotate-toggler">
+            <Card>
+              <CardBody>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
+                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
+                Minus, alias.
+              </CardBody>
+            </Card>
+          </UncontrolledCollapse>
+          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-resize-toggler">
+            Resize
+          </Button>
+          <UncontrolledCollapse toggler="#adjust-resize-toggler">
+            <Card>
+              <CardBody>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
+                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
+                Minus, alias.
+              </CardBody>
+            </Card>
+          </UncontrolledCollapse>
+        </div>
+      </>
+    );
   };
   const effect = () => {
-    return "Effect";
+    return (
+      <>
+        <div className="tool-ext mt-4 w-100">
+          <p className="mb-3 text-white">Size</p>
+          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-crop-toggler">
+            Crop
+          </Button>
+          <UncontrolledCollapse toggler="#adjust-crop-toggler">
+            <Card>
+              <CardBody>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
+                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
+                Minus, alias.
+              </CardBody>
+            </Card>
+          </UncontrolledCollapse>
+          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-rotate-toggler">
+            Rotate
+          </Button>
+          <UncontrolledCollapse toggler="#adjust-rotate-toggler">
+            <Card>
+              <CardBody>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
+                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
+                Minus, alias.
+              </CardBody>
+            </Card>
+          </UncontrolledCollapse>
+          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-resize-toggler">
+            Resize
+          </Button>
+          <UncontrolledCollapse toggler="#adjust-resize-toggler">
+            <Card>
+              <CardBody>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
+                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
+                Minus, alias.
+              </CardBody>
+            </Card>
+          </UncontrolledCollapse>
+        </div>
+      </>
+    );
   };
   const text = () => {
-    return "Text";
+    return (
+      <>
+        <div className="tool-ext mt-4 w-100">
+          <p className="mb-3 text-white">Size</p>
+          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-crop-toggler">
+            Crop
+          </Button>
+          <UncontrolledCollapse toggler="#adjust-crop-toggler">
+            <Card>
+              <CardBody>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
+                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
+                Minus, alias.
+              </CardBody>
+            </Card>
+          </UncontrolledCollapse>
+          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-rotate-toggler">
+            Rotate
+          </Button>
+          <UncontrolledCollapse toggler="#adjust-rotate-toggler">
+            <Card>
+              <CardBody>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
+                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
+                Minus, alias.
+              </CardBody>
+            </Card>
+          </UncontrolledCollapse>
+          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-resize-toggler">
+            Resize
+          </Button>
+          <UncontrolledCollapse toggler="#adjust-resize-toggler">
+            <Card>
+              <CardBody>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
+                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
+                Minus, alias.
+              </CardBody>
+            </Card>
+          </UncontrolledCollapse>
+        </div>
+      </>
+    );
   };
   return (
     <SidePaneStyle>

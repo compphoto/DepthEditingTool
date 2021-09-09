@@ -44,10 +44,14 @@ const SidePaneStyle = styled.div`
     background: #2b2c2f;
     color: #7e838e;
     padding: 16px 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
+    .tool-ext {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      .dropdown-button {
+        width: 100%;
+      }
+    }
     .toggle-button {
       width: 14px;
       height: 80px;
