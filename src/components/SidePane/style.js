@@ -98,48 +98,14 @@ const SidePaneStyle = styled.div`
     }
   }
   .tool-ext-active {
-    animation: slide-in 0.5s forwards;
-    -webkit-animation: slide-in 0.5s forwards;
+    left: 100%;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
   }
   .tool-ext-inactive {
-    animation: slide-out 0.5s forwards;
-    -webkit-animation: slide-out 0.5s forwards;
-  }
-
-  @keyframes slide-in {
-    from {
-      left: -398%;
-    }
-    to {
-      left: 100%;
-    }
-  }
-
-  @-webkit-keyframes slide-in {
-    from {
-      left: -398%;
-    }
-    to {
-      left: 100%;
-    }
-  }
-
-  @keyframes slide-out {
-    from {
-      left: 100%;
-    }
-    to {
-      left: -398%;
-    }
-  }
-
-  @-webkit-keyframes slide-out {
-    from {
-      left: 100%;
-    }
-    to {
-      left: -398%;
-    }
+    left: -398%;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
   }
 `;
 

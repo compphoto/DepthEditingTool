@@ -6,48 +6,14 @@ const MainPaneStyle = styled.div`
   background: #f0f1f2;
   overflow: hidden;
   .main-expand {
-    animation: expand 0.5s forwards;
-    -webkit-animation: expand 0.5s forwards;
+    margin-left: 0;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
   }
   .main-shrink {
-    animation: shrink 0.5s forwards;
-    -webkit-animation: shrink 0.5s forwards;
-  }
-
-  @keyframes expand {
-    from {
-      margin-left: 360px;
-    }
-    to {
-      margin-left: 0;
-    }
-  }
-
-  @-webkit-keyframes expand {
-    from {
-      margin-left: 360px;
-    }
-    to {
-      margin-left: 0;
-    }
-  }
-
-  @keyframes shrink {
-    from {
-      margin-left: 0;
-    }
-    to {
-      margin-left: 360px;
-    }
-  }
-
-  @-webkit-keyframes shrink {
-    from {
-      margin-left: 0;
-    }
-    to {
-      margin-left: 360px;
-    }
+    margin-left: 360px;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
   }
 `;
 
