@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import { connect } from "react-redux";
+import { toolExtActions } from "store/toolext";
+import { selectors as toolExtSelectors } from "store/toolext";
 import { Button, UncontrolledCollapse, CardBody, Card } from "reactstrap";
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
-import { MdKeyboardArrowLeft } from "react-icons/md";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
-export default function SidePane() {
+export function SidePane({ toolExtOpen, toolExtActions }) {
   const [activeTool, setActiveTool] = useState(0);
   const toggleTool = index => {
     setActiveTool(index);
@@ -160,21 +163,24 @@ export default function SidePane() {
           </div>
         ))}
       </div>
-      {activeTool === -1 ? null : (
-        <div style={{ position: "relative" }}>
-          <div className="tools-ext">
-            {activeTool === 0 ? adjust() : activeTool === 1 ? effect() : activeTool === 2 ? text() : null}
-            <Button
-              onClick={() => {
-                toggleTool(-1);
-              }}
-              className="toggle-button"
-            >
-              <MdKeyboardArrowLeft />
-            </Button>
-          </div>
+      <div className={toolExtOpen ? "tools-ext tool-ext-active" : "tools-ext tool-ext-inactive"}>
+        <div className="tools-ext-elements">
+          {activeTool === 0 ? adjust() : activeTool === 1 ? effect() : activeTool === 2 ? text() : null}
+          <Button onClick={toolExtActions} className="toggle-button">
+            {toolExtOpen ? <MdKeyboardArrowLeft /> : <MdKeyboardArrowRight />}
+          </Button>
         </div>
-      )}
+      </div>
     </SidePaneStyle>
   );
 }
+
+const mapStateToProps = state => ({
+  toolExtOpen: toolExtSelectors.toolExtOpen(state)
+});
+
+const mapDispatchToProps = {
+  toolExtActions: toolExtActions.toggleToolExt
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SidePane);
