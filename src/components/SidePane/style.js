@@ -4,8 +4,8 @@ import styled from "styled-components";
 const SidePaneStyle = styled.div`
   display: flex;
   position: relative;
+  width: 72px;
   .tools {
-    width: 72px;
     height: 100%;
     background: #1e1f22;
     display: flex;

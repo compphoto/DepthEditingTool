@@ -6,7 +6,7 @@ import MainPaneStyle from "./style";
 export function MainPane({ toolExtOpen }) {
   return (
     <MainPaneStyle>
-      <div className={toolExtOpen ? "main-shrink" : "main-expand"}>
+      <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
         <h1>TEST</h1>
       </div>
     </MainPaneStyle>
