@@ -1,3 +1,3 @@
 export const types = {
-  TOGGLETOOLEXT: "TOGGLETOOLEXT"
+  TOGGLE_TOOL_EXT: "TOGGLE_TOOL_EXT"
 };

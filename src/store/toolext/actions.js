@@ -1,5 +1,5 @@
 import { types } from "./constants";
 
 export const toolExtActions = {
-  toggleToolExt: () => ({ type: types.TOGGLETOOLEXT })
+  toggleToolExt: () => ({ type: types.TOGGLE_TOOL_EXT })
 };
