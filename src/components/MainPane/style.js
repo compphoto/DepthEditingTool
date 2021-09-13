@@ -3,13 +3,19 @@ import styled from "styled-components";
 
 const MainPaneStyle = styled.div`
   background: #f0f1f2;
-  overflow: hidden;
-  width: 100%;
+  width: calc(100% - 72px);
   .main {
+    overflow: hidden;
     height: 100%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    img {
+      max-height: 95%;
+      max-width: 95%;
+      cursor: pointer;
+    }
   }
   .main-expand {
     margin-left: 0;
