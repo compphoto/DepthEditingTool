@@ -22,13 +22,16 @@ export function ImageEditor({ testActions, test }) {
           <div className="nav-bar">
             <div className="nav-intro">
               <h4>Image Editor</h4>
-              <Button size="sm" color="default" className="mx-5">
-                <AiOutlinePlus className="mb-1" /> Open Image
-              </Button>
+              <input id="upload-image" type="file" accept="image/png, image/gif, image/jpeg, image/jpg" multiple />
+              <label htmlFor="upload-image">
+                <div className="btn btn-default mx-5" size="sm" color="default">
+                  <AiOutlinePlus className="mb-1" /> Open Image
+                </div>
+              </label>
             </div>
             <div>
               <Button size="sm" color="secondary" className="mx-3">
-                Free Trial
+                GitHub
               </Button>
               <Button size="sm" color="primary">
                 <RiDownloadLine className="mb-1" /> Download
