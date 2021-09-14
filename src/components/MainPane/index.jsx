@@ -67,7 +67,8 @@ export function MainPane({
             >
               <img className="side-bar-img" src={getImageUrl(file)} />
               <div
-                onClick={() => {
+                onClick={e => {
+                  e.stopPropagation();
                   removeItem(key);
                 }}
                 className="remove-img"

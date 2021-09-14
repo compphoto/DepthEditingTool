@@ -18,11 +18,7 @@ export const uploadImageReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         files: newFiles,
-        activeImage: newFiles.length
-          ? payload === state.activeImage
-            ? state.activeImage - 1
-            : state.activeImage
-          : null
+        activeImage: newFiles.length ? (payload <= state.activeImage ? state.activeImage - 1 : state.activeImage) : null
       };
     case types.SELECT_ACTIVE_IMAGE:
       return {
