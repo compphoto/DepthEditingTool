@@ -33,7 +33,7 @@ export function MainPane({
 
   const onHandleChange = e => {
     handleChange(e);
-    e.target.files = null;
+    e.target.value = null;
   };
 
   return (
