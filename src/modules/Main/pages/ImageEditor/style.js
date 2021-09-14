@@ -22,14 +22,6 @@ const ImageEditorStyle = styled.div`
         h4 {
           margin: 0;
         }
-        input {
-          display: none;
-        }
-        label {
-          .btn-default {
-            color: #fff;
-          }
-        }
       }
     }
   }
