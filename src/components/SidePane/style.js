@@ -58,6 +58,7 @@ const SidePaneStyle = styled.div`
         }
       }
       .toggle-button {
+        z-index: 1000;
         width: 14px;
         height: 80px;
         cursor: pointer;

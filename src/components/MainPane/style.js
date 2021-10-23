@@ -13,11 +13,6 @@ const MainPaneStyle = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    img {
-      max-height: 95%;
-      max-width: 95%;
-      cursor: pointer;
-    }
   }
   .main-expand {
     margin-left: 0;

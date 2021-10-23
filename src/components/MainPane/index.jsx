@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "reactstrap";
-import { AiOutlinePlus } from "react-icons/ai";
-import { RiDeleteBin5Fill } from "react-icons/ri";
 import { connect } from "react-redux";
 import { uploadImageActions } from "store/uploadimage";
 import { selectors as toolExtSelectors } from "store/toolext";
 import { selectors as uploadImageSelectors } from "store/uploadimage";
+import { Button } from "reactstrap";
+import { AiOutlinePlus } from "react-icons/ai";
+import { RiDeleteBin5Fill } from "react-icons/ri";
+import { ThreeDViewer } from "components/ThreeDViewer";
 import MainPaneStyle from "./style";
 
 export function MainPane({
@@ -39,7 +40,8 @@ export function MainPane({
   return (
     <MainPaneStyle>
       <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
-        <img src={displayImage} />
+        {/* <img src={displayImage} /> */}
+        <ThreeDViewer />
       </div>
       <div className="main-side-bar">
         <div className="main-side-bar-header">
