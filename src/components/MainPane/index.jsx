@@ -44,41 +44,86 @@ export function MainPane({
         <ThreeDViewer />
       </div>
       <div className="main-side-bar">
-        <div className="main-side-bar-header">
-          <input
-            id="upload-image"
-            type="file"
-            onChange={onHandleChange}
-            accept="image/png, image/gif, image/jpeg, image/jpg"
-            multiple
-          />
-          <label htmlFor="upload-image">
-            <div className="btn btn-default">
-              <AiOutlinePlus className="mb-1" /> Import
+        <div className="main-side-bar-body">
+          <div className="main-side-bar-container">
+            <p className="main-side-bar-container-text">RGB Image</p>
+            <div className="main-side-bar-header">
+              <input
+                id="upload-image"
+                type="file"
+                onChange={onHandleChange}
+                accept="image/png, image/gif, image/jpeg, image/jpg"
+                multiple
+              />
+              <label htmlFor="upload-image">
+                <div className="btn btn-default">
+                  <AiOutlinePlus className="mb-1" /> Import
+                </div>
+              </label>
             </div>
-          </label>
-        </div>
-        <div className="main-side-bar-content">
-          {files.map((file, key) => (
-            <div
-              key={key}
-              onClick={() => {
-                selectActiveImage(key);
-              }}
-              className={activeImage === key ? "main-side-bar-img main-side-bar-img-active" : "main-side-bar-img"}
-            >
-              <img className="side-bar-img" src={getImageUrl(file)} />
-              <div
-                onClick={e => {
-                  e.stopPropagation();
-                  removeItem(key);
-                }}
-                className="remove-img"
-              >
-                <RiDeleteBin5Fill />
-              </div>
+            <div className="main-side-bar-content">
+              {files.map((file, key) => (
+                <div
+                  key={key}
+                  onClick={() => {
+                    selectActiveImage(key);
+                  }}
+                  className={activeImage === key ? "main-side-bar-img main-side-bar-img-active" : "main-side-bar-img"}
+                >
+                  <img className="side-bar-img" src={getImageUrl(file)} />
+                  <div
+                    onClick={e => {
+                      e.stopPropagation();
+                      removeItem(key);
+                    }}
+                    className="remove-img"
+                  >
+                    <RiDeleteBin5Fill />
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+          <div className="main-side-bar-divider" tabIndex="-1"></div>
+          <div className="main-side-bar-container">
+            <p className="main-side-bar-container-text">Depth Image</p>
+            <div className="main-side-bar-header">
+              <input
+                id="upload-image"
+                type="file"
+                onChange={onHandleChange}
+                accept="image/png, image/gif, image/jpeg, image/jpg"
+                multiple
+              />
+              <label htmlFor="upload-image">
+                <div className="btn btn-default">
+                  <AiOutlinePlus className="mb-1" /> Import
+                </div>
+              </label>
+            </div>
+            <div className="main-side-bar-content">
+              {files.map((file, key) => (
+                <div
+                  key={key}
+                  onClick={() => {
+                    selectActiveImage(key);
+                  }}
+                  className={activeImage === key ? "main-side-bar-img main-side-bar-img-active" : "main-side-bar-img"}
+                >
+                  <img className="side-bar-img" src={getImageUrl(file)} />
+                  <div
+                    onClick={e => {
+                      e.stopPropagation();
+                      removeItem(key);
+                    }}
+                    className="remove-img"
+                  >
+                    <RiDeleteBin5Fill />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
         <div className="main-side-bar-footer">
           <p>{`${activeImage !== null ? activeImage + 1 : 0}/${files.length}`}</p>
