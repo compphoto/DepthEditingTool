@@ -34,21 +34,21 @@ export function ThreeDViewer({}) {
           <pointLight position={[0, 4, 4]} />
           {/* <spotLight color={0xffa95c} intensity={4} position={[-50, 50, 50]} />
           <hemisphereLight color={0xffeeb1} groundColor={0x080820} intensity={4} /> */}
-          <mesh scale={0.3}>
+          <mesh scale={0.6}>
             <planeBufferGeometry args={[2, 2, 2000, 2000]} />
             <meshStandardMaterial
               side={DoubleSide}
               map={colorMap}
               displacementMap={displacementMap}
-              displacementScale={3}
+              displacementScale={2}
             />
           </mesh>
           <OrbitControls
-            autoRotate
-            // enableZoom={false}
-            // enablePan={false}
-            // minPolarAngle={Math.PI / 2.8}
-            // maxPolarAngle={Math.PI / 2.8}
+          // autoRotate
+          // enableZoom={false}
+          // enablePan={false}
+          // minPolarAngle={Math.PI / 2.8}
+          // maxPolarAngle={Math.PI / 2.8}
           />
           {/* <EffectComposer>
             <ToneMapping middleGrey={middleGrey} maxLuminance={maxLuminance} />
