@@ -34,8 +34,19 @@ export function MainPane({ toolExtOpen, handleChange, rgbImage, depthImage, remo
   return (
     <MainPaneStyle>
       <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
+        <div className="main-row">
+          <div className="main-column">
+            <div className="box rbg-box"></div>
+            <div className="box depth-box"></div>
+          </div>
+          <div className="main-column">
+            <div className="box histogram-box"></div>
+            <div className="box threeD-box">
+              <ThreeDViewer />
+            </div>
+          </div>
+        </div>
         {/* <img src={displayImage} /> */}
-        <ThreeDViewer />
       </div>
       <div className="main-side-bar">
         <div className="main-side-bar-body">

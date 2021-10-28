@@ -1,5 +1,4 @@
 import styled from "styled-components";
-// #2b2c2f
 
 const MainPaneStyle = styled.div`
   background: #f0f1f2;
@@ -13,6 +12,41 @@ const MainPaneStyle = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 10px;
+    .main-row {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      .main-column {
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: 10px;
+        .box {
+          background-color: #fff;
+          margin: 10px;
+        }
+        .rbg-box {
+          height: 50%;
+          width: 100%;
+        }
+        .depth-box {
+          height: 50%;
+          width: 100%;
+        }
+        .histogram-box {
+          height: 50%;
+          width: 100%;
+        }
+        .threeD-box {
+          height: 50%;
+          width: 100%;
+        }
+      }
+    }
   }
   .main-expand {
     margin-left: 0;
