@@ -9,28 +9,22 @@ import { RiDeleteBin5Fill } from "react-icons/ri";
 import { ThreeDViewer } from "components/ThreeDViewer";
 import MainPaneStyle from "./style";
 
-export function MainPane({
-  toolExtOpen,
-  handleChange,
-  files,
-  selectActiveImage,
-  activeImage,
-  removeItem,
-  removeAllItem
-}) {
+export function MainPane({ toolExtOpen, handleChange, rgbImage, depthImage, removeItem, removeAllItem }) {
   const [displayImage, setDisplayImage] = useState();
   const getImageUrl = file => {
-    return URL.createObjectURL(file);
-  };
-  useEffect(() => {
-    if (!files[activeImage]) {
-      setDisplayImage(undefined);
-      return;
+    if (file) {
+      return URL.createObjectURL(file);
     }
-    const objectUrl = URL.createObjectURL(files[activeImage]);
-    setDisplayImage(objectUrl);
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [activeImage, files]);
+  };
+  // useEffect(() => {
+  //   if (!files[activeImage]) {
+  //     setDisplayImage(undefined);
+  //     return;
+  //   }
+  //   const objectUrl = URL.createObjectURL(files[activeImage]);
+  //   setDisplayImage(objectUrl);
+  //   return () => URL.revokeObjectURL(objectUrl);
+  // }, [activeImage, files]);
 
   const onHandleChange = e => {
     handleChange(e);
@@ -49,39 +43,29 @@ export function MainPane({
             <p className="main-side-bar-container-text">RGB Image</p>
             <div className="main-side-bar-header">
               <input
-                id="upload-image"
+                id="upload-rgb-image"
                 type="file"
+                name="rgbImage"
                 onChange={onHandleChange}
                 accept="image/png, image/gif, image/jpeg, image/jpg"
-                multiple
               />
-              <label htmlFor="upload-image">
+              <label htmlFor="upload-rgb-image">
                 <div className="btn btn-default">
                   <AiOutlinePlus className="mb-1" /> Import
                 </div>
               </label>
             </div>
-            <div className="main-side-bar-content">
-              {files.map((file, key) => (
-                <div
-                  key={key}
-                  onClick={() => {
-                    selectActiveImage(key);
-                  }}
-                  className={activeImage === key ? "main-side-bar-img main-side-bar-img-active" : "main-side-bar-img"}
-                >
-                  <img className="side-bar-img" src={getImageUrl(file)} />
-                  <div
-                    onClick={e => {
-                      e.stopPropagation();
-                      removeItem(key);
-                    }}
-                    className="remove-img"
-                  >
-                    <RiDeleteBin5Fill />
-                  </div>
-                </div>
-              ))}
+            <div style={rgbImage ? { display: "block" } : { display: "none" }} className="main-side-bar-img">
+              <img className="side-bar-img" src={getImageUrl(rgbImage)} />
+              <div
+                onClick={e => {
+                  e.stopPropagation();
+                  removeItem("rgbImage");
+                }}
+                className="remove-img"
+              >
+                <RiDeleteBin5Fill />
+              </div>
             </div>
           </div>
           <div className="main-side-bar-divider" tabIndex="-1"></div>
@@ -89,44 +73,33 @@ export function MainPane({
             <p className="main-side-bar-container-text">Depth Image</p>
             <div className="main-side-bar-header">
               <input
-                id="upload-image"
+                id="upload-depth-image"
                 type="file"
+                name="depthImage"
                 onChange={onHandleChange}
                 accept="image/png, image/gif, image/jpeg, image/jpg"
-                multiple
               />
-              <label htmlFor="upload-image">
+              <label htmlFor="upload-depth-image">
                 <div className="btn btn-default">
                   <AiOutlinePlus className="mb-1" /> Import
                 </div>
               </label>
             </div>
-            <div className="main-side-bar-content">
-              {files.map((file, key) => (
-                <div
-                  key={key}
-                  onClick={() => {
-                    selectActiveImage(key);
-                  }}
-                  className={activeImage === key ? "main-side-bar-img main-side-bar-img-active" : "main-side-bar-img"}
-                >
-                  <img className="side-bar-img" src={getImageUrl(file)} />
-                  <div
-                    onClick={e => {
-                      e.stopPropagation();
-                      removeItem(key);
-                    }}
-                    className="remove-img"
-                  >
-                    <RiDeleteBin5Fill />
-                  </div>
-                </div>
-              ))}
+            <div style={depthImage ? { display: "block" } : { display: "none" }} className="main-side-bar-img">
+              <img className="side-bar-img" src={getImageUrl(depthImage)} />
+              <div
+                onClick={e => {
+                  e.stopPropagation();
+                  removeItem("depthImage");
+                }}
+                className="remove-img"
+              >
+                <RiDeleteBin5Fill />
+              </div>
             </div>
           </div>
         </div>
         <div className="main-side-bar-footer">
-          <p>{`${activeImage !== null ? activeImage + 1 : 0}/${files.length}`}</p>
           <Button onClick={removeAllItem} size="sm" color="default">
             <RiDeleteBin5Fill className="mb-1" /> Clear All
           </Button>
@@ -138,13 +111,12 @@ export function MainPane({
 
 const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
-  files: uploadImageSelectors.files(state),
-  activeImage: uploadImageSelectors.activeImage(state)
+  rgbImage: uploadImageSelectors.rgbImage(state),
+  depthImage: uploadImageSelectors.depthImage(state)
 });
 
 const mapDispatchToProps = {
   handleChange: uploadImageActions.handleChange,
-  selectActiveImage: uploadImageActions.selectActiveImage,
   removeItem: uploadImageActions.removeItem,
   removeAllItem: uploadImageActions.removeAllItem
 };
