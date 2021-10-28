@@ -26,8 +26,12 @@ const MainPaneStyle = styled.div`
         align-items: center;
         margin: 10px;
         .box {
-          background-color: #fff;
+          background-color: #d9dadd;
           margin: 10px;
+          canvas {
+            height: 100%;
+            width: 100%;
+          }
         }
         .rbg-box {
           height: 50%;
