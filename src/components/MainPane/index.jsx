@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { connect } from "react-redux";
 import { uploadImageActions } from "store/uploadimage";
 import { selectors as toolExtSelectors } from "store/toolext";
@@ -9,22 +9,27 @@ import { RiDeleteBin5Fill } from "react-icons/ri";
 import { ThreeDViewer } from "components/ThreeDViewer";
 import MainPaneStyle from "./style";
 
-export function MainPane({ toolExtOpen, handleChange, rgbImage, depthImage, removeItem, removeAllItem }) {
-  const [displayImage, setDisplayImage] = useState();
+export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl, removeItem, removeAllItem }) {
+  const rgbImageRef = useRef(null);
+  const depthImageRef = useRef(null);
+
   const getImageUrl = file => {
     if (file) {
       return URL.createObjectURL(file);
     }
   };
-  // useEffect(() => {
-  //   if (!files[activeImage]) {
-  //     setDisplayImage(undefined);
-  //     return;
-  //   }
-  //   const objectUrl = URL.createObjectURL(files[activeImage]);
-  //   setDisplayImage(objectUrl);
-  //   return () => URL.revokeObjectURL(objectUrl);
-  // }, [activeImage, files]);
+
+  useEffect(() => {
+    const rgbCanvas = rgbImageRef.current;
+    const rbgContext = rgbCanvas.getContext("2d");
+    const rgbImage = new Image();
+    const objectUrl = getImageUrl(rgbImageUrl);
+    rgbImage.src = objectUrl;
+    rgbImage.onload = () => {
+      rbgContext.drawImage(rgbImage, 0, 0, 250, 150);
+    };
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [rgbImageUrl]);
 
   const onHandleChange = e => {
     handleChange(e);
@@ -36,7 +41,9 @@ export function MainPane({ toolExtOpen, handleChange, rgbImage, depthImage, remo
       <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
         <div className="main-row">
           <div className="main-column">
-            <div className="box rbg-box"></div>
+            <div className="box rbg-box">
+              <canvas ref={rgbImageRef}></canvas>
+            </div>
             <div className="box depth-box"></div>
           </div>
           <div className="main-column">
@@ -66,8 +73,8 @@ export function MainPane({ toolExtOpen, handleChange, rgbImage, depthImage, remo
                 </div>
               </label>
             </div>
-            <div style={rgbImage ? { display: "block" } : { display: "none" }} className="main-side-bar-img">
-              <img className="side-bar-img" src={getImageUrl(rgbImage)} />
+            <div style={rgbImageUrl ? { display: "block" } : { display: "none" }} className="main-side-bar-img">
+              <img className="side-bar-img" src={getImageUrl(rgbImageUrl)} />
               <div
                 onClick={e => {
                   e.stopPropagation();
@@ -96,8 +103,8 @@ export function MainPane({ toolExtOpen, handleChange, rgbImage, depthImage, remo
                 </div>
               </label>
             </div>
-            <div style={depthImage ? { display: "block" } : { display: "none" }} className="main-side-bar-img">
-              <img className="side-bar-img" src={getImageUrl(depthImage)} />
+            <div style={depthImageUrl ? { display: "block" } : { display: "none" }} className="main-side-bar-img">
+              <img className="side-bar-img" src={getImageUrl(depthImageUrl)} />
               <div
                 onClick={e => {
                   e.stopPropagation();
@@ -122,8 +129,8 @@ export function MainPane({ toolExtOpen, handleChange, rgbImage, depthImage, remo
 
 const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
-  rgbImage: uploadImageSelectors.rgbImage(state),
-  depthImage: uploadImageSelectors.depthImage(state)
+  rgbImageUrl: uploadImageSelectors.rgbImage(state),
+  depthImageUrl: uploadImageSelectors.depthImage(state)
 });
 
 const mapDispatchToProps = {
