@@ -21,15 +21,59 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
 
   useEffect(() => {
     const rgbCanvas = rgbImageRef.current;
-    const rbgContext = rgbCanvas.getContext("2d");
+    const rgbContext = rgbCanvas.getContext("2d");
     const rgbImage = new Image();
     const objectUrl = getImageUrl(rgbImageUrl);
     rgbImage.src = objectUrl;
     rgbImage.onload = () => {
-      rbgContext.drawImage(rgbImage, 0, 0, 250, 150);
+      let hRatio = rgbCanvas.width / rgbImage.naturalWidth;
+      let vRatio = rgbCanvas.height / rgbImage.naturalHeight;
+      let ratio = Math.min(hRatio, vRatio);
+      let centerShift_x = (rgbCanvas.width - rgbImage.naturalWidth * ratio) / 2;
+      let centerShift_y = (rgbCanvas.height - rgbImage.naturalHeight * ratio) / 2;
+      rgbContext.imageSmoothingEnabled = false;
+      rgbContext.drawImage(
+        rgbImage,
+        0,
+        0,
+        rgbImage.naturalWidth,
+        rgbImage.naturalHeight,
+        centerShift_x,
+        centerShift_y,
+        rgbImage.naturalWidth * ratio,
+        rgbImage.naturalHeight * ratio
+      );
     };
     return () => URL.revokeObjectURL(objectUrl);
   }, [rgbImageUrl]);
+
+  useEffect(() => {
+    const depthCanvas = depthImageRef.current;
+    const depthContext = depthCanvas.getContext("2d");
+    const depthImage = new Image();
+    const objectUrl = getImageUrl(depthImageUrl);
+    depthImage.src = objectUrl;
+    depthImage.onload = () => {
+      let hRatio = depthCanvas.width / depthImage.naturalWidth;
+      let vRatio = depthCanvas.height / depthImage.naturalHeight;
+      let ratio = Math.min(hRatio, vRatio);
+      let centerShift_x = (depthCanvas.width - depthImage.naturalWidth * ratio) / 2;
+      let centerShift_y = (depthCanvas.height - depthImage.naturalHeight * ratio) / 2;
+      depthContext.imageSmoothingEnabled = false;
+      depthContext.drawImage(
+        depthImage,
+        0,
+        0,
+        depthImage.naturalWidth,
+        depthImage.naturalHeight,
+        centerShift_x,
+        centerShift_y,
+        depthImage.naturalWidth * ratio,
+        depthImage.naturalHeight * ratio
+      );
+    };
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [depthImageUrl]);
 
   const onHandleChange = e => {
     handleChange(e);
@@ -41,19 +85,20 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
       <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
         <div className="main-row">
           <div className="main-column">
-            <div className="box rbg-box">
-              <canvas ref={rgbImageRef}></canvas>
+            <div className="box rgb-box">
+              <canvas height="352" width="521" ref={rgbImageRef}></canvas>
             </div>
-            <div className="box depth-box"></div>
+            <div className="box depth-box">
+              <canvas height="352" width="521" ref={depthImageRef}></canvas>
+            </div>
           </div>
           <div className="main-column">
             <div className="box histogram-box"></div>
             <div className="box threeD-box">
-              <ThreeDViewer />
+              <ThreeDViewer rgbImageUrl={rgbImageUrl} depthImageUrl={depthImageUrl} />
             </div>
           </div>
         </div>
-        {/* <img src={displayImage} /> */}
       </div>
       <div className="main-side-bar">
         <div className="main-side-bar-body">
