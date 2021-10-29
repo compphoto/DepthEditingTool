@@ -1,17 +1,25 @@
-import React, { Suspense } from "react";
-import { Canvas, useLoader } from "@react-three/fiber";
-import { OrbitControls, Stage } from "@react-three/drei";
+import React, { Suspense, useEffect, useState } from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
 import { ToneMapping, EffectComposer } from "@react-three/postprocessing";
 import { useControls } from "leva";
 import { TextureLoader } from "three/src/loaders/TextureLoader";
+import { DoubleSide } from "three";
 import ThreeDViewerStyle from "./style";
 
 import RGBImage from "assets/images/jpg/rgb1.png";
 import DepthImage from "assets/images/jpg/depth1.png";
-import { DoubleSide } from "three";
 
-export function ThreeDViewer({}) {
-  const [colorMap, displacementMap] = useLoader(TextureLoader, [RGBImage, DepthImage]);
+const getImageUrl = file => {
+  if (file) {
+    return URL.createObjectURL(file);
+  }
+  return;
+};
+
+export function ThreeDViewer({ rgbImageUrl, depthImageUrl }) {
+  const [colorMap, setColorMap] = useState(false);
+  const [displacementMap, setDisplacementMap] = useState(false);
   const { middleGrey, maxLuminance } = useControls({
     middleGrey: {
       min: 0,
@@ -26,6 +34,17 @@ export function ThreeDViewer({}) {
       step: 1
     }
   });
+
+  useEffect(() => {
+    let colorMap = new TextureLoader().setCrossOrigin("").load(getImageUrl(rgbImageUrl));
+    setColorMap(colorMap);
+  }, [rgbImageUrl]);
+
+  useEffect(() => {
+    let displacementMap = new TextureLoader().setCrossOrigin("").load(getImageUrl(rgbImageUrl));
+    setDisplacementMap(displacementMap);
+  }, [depthImageUrl]);
+
   return (
     <ThreeDViewerStyle>
       <Canvas camera={{ fov: 75, near: 0.1, far: 100, position: [0, 0, 2] }}>
@@ -44,11 +63,11 @@ export function ThreeDViewer({}) {
             />
           </mesh>
           <OrbitControls
-          // autoRotate
-          // enableZoom={false}
-          // enablePan={false}
-          // minPolarAngle={Math.PI / 2.8}
-          // maxPolarAngle={Math.PI / 2.8}
+            autoRotate
+            // enableZoom={false}
+            // enablePan={false}
+            // minPolarAngle={Math.PI / 2.8}
+            // maxPolarAngle={Math.PI / 2.8}
           />
           {/* <EffectComposer>
             <ToneMapping middleGrey={middleGrey} maxLuminance={maxLuminance} />
