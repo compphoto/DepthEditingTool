@@ -63,11 +63,11 @@ export function ThreeDViewer({ rgbImageUrl, depthImageUrl }) {
             />
           </mesh>
           <OrbitControls
-            autoRotate
-            // enableZoom={false}
-            // enablePan={false}
-            // minPolarAngle={Math.PI / 2.8}
-            // maxPolarAngle={Math.PI / 2.8}
+          // autoRotate
+          // enableZoom={false}
+          // enablePan={false}
+          // minPolarAngle={Math.PI / 2.8}
+          // maxPolarAngle={Math.PI / 2.8}
           />
           {/* <EffectComposer>
             <ToneMapping middleGrey={middleGrey} maxLuminance={maxLuminance} />
