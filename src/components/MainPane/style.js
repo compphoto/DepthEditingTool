@@ -28,12 +28,13 @@ const MainPaneStyle = styled.div`
         .box {
           background-color: #d9dadd;
           margin: 10px;
-          canvas {
-            height: 100%;
-            width: 100%;
-          }
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow-y: hidden;
+          overflow-x: hidden;
         }
-        .rbg-box {
+        .rgb-box {
           height: 50%;
           width: 100%;
         }
