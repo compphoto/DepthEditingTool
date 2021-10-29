@@ -93,10 +93,10 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
             </div>
           </div>
           <div className="main-column">
-            <div className="box histogram-box"></div>
             <div className="box threeD-box">
               <ThreeDViewer rgbImageUrl={rgbImageUrl} depthImageUrl={depthImageUrl} />
             </div>
+            <div className="box histogram-box"></div>
           </div>
         </div>
       </div>

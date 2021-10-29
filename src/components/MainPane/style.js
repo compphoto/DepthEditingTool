@@ -42,11 +42,11 @@ const MainPaneStyle = styled.div`
           height: 50%;
           width: 100%;
         }
-        .histogram-box {
+        .threeD-box {
           height: 50%;
           width: 100%;
         }
-        .threeD-box {
+        .histogram-box {
           height: 50%;
           width: 100%;
         }
