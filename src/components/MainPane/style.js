@@ -19,7 +19,6 @@ const MainPaneStyle = styled.div`
       display: flex;
       justify-content: space-between;
       .main-column {
-        width: 50%;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -43,13 +42,19 @@ const MainPaneStyle = styled.div`
           width: 100%;
         }
         .threeD-box {
-          height: 50%;
+          height: 60%;
           width: 100%;
         }
         .histogram-box {
-          height: 50%;
+          height: 40%;
           width: 100%;
         }
+      }
+      .main-column-2d {
+        width: 40%;
+      }
+      .main-column-3d {
+        width: 60%;
       }
     }
   }

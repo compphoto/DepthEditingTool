@@ -84,7 +84,7 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
     <MainPaneStyle>
       <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
         <div className="main-row">
-          <div className="main-column">
+          <div className="main-column main-column-2d">
             <div className="box rgb-box">
               <canvas height="352" width="521" ref={rgbImageRef}></canvas>
             </div>
@@ -92,7 +92,7 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
               <canvas height="352" width="521" ref={depthImageRef}></canvas>
             </div>
           </div>
-          <div className="main-column">
+          <div className="main-column main-column-3d">
             <div className="box threeD-box">
               <ThreeDViewer rgbImageUrl={rgbImageUrl} depthImageUrl={depthImageUrl} />
             </div>
