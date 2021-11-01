@@ -41,7 +41,7 @@ export function ThreeDViewer({ rgbImageUrl, depthImageUrl }) {
   }, [rgbImageUrl]);
 
   useEffect(() => {
-    let displacementMap = new TextureLoader().setCrossOrigin("").load(getImageUrl(rgbImageUrl));
+    let displacementMap = new TextureLoader().setCrossOrigin("").load(getImageUrl(depthImageUrl));
     setDisplacementMap(displacementMap);
   }, [depthImageUrl]);
 
