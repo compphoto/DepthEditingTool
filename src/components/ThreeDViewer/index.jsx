@@ -6,16 +6,7 @@ import { useControls } from "leva";
 import { TextureLoader } from "three/src/loaders/TextureLoader";
 import { DoubleSide } from "three";
 import ThreeDViewerStyle from "./style";
-
-import RGBImage from "assets/images/jpg/rgb1.png";
-import DepthImage from "assets/images/jpg/depth1.png";
-
-const getImageUrl = file => {
-  if (file) {
-    return URL.createObjectURL(file);
-  }
-  return;
-};
+import { getImageUrl } from "utils/getImageFromFile";
 
 export function ThreeDViewer({ rgbImageUrl, depthImageUrl }) {
   const [colorMap, setColorMap] = useState(false);
