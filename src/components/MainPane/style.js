@@ -42,19 +42,19 @@ const MainPaneStyle = styled.div`
           width: 100%;
         }
         .threeD-box {
-          height: 60%;
+          height: 50%;
           width: 100%;
         }
         .histogram-box {
-          height: 40%;
+          height: 50%;
           width: 100%;
         }
       }
       .main-column-2d {
-        width: 40%;
+        width: 50%;
       }
       .main-column-3d {
-        width: 60%;
+        width: 50%;
       }
     }
   }

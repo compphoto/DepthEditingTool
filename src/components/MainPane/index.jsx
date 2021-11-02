@@ -9,13 +9,72 @@ import { RiDeleteBin5Fill } from "react-icons/ri";
 import { ThreeDViewer } from "components/ThreeDViewer";
 import MainPaneStyle from "./style";
 
+const getImageUrl = file => {
+  if (file) {
+    return URL.createObjectURL(file);
+  }
+};
+
+const getImageData = img => {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  context.drawImage(img, 0, 0);
+  return context.getImageData(0, 0, img.naturalWidth, img.naturalHeight);
+};
+
 export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl, removeItem, removeAllItem }) {
   const rgbImageRef = useRef(null);
   const depthImageRef = useRef(null);
+  const histRef = useRef(null);
 
-  const getImageUrl = file => {
-    if (file) {
-      return URL.createObjectURL(file);
+  const processImage = histImage => {
+    const src = new Uint32Array(histImage.data.buffer);
+
+    let histBrightness = new Array(256).fill(0);
+    for (let i = 0; i < src.length; i++) {
+      let r = src[i] & 0xff;
+      let g = (src[i] >> 8) & 0xff;
+      let b = (src[i] >> 16) & 0xff;
+      histBrightness[r]++;
+      histBrightness[g]++;
+      histBrightness[b]++;
+    }
+
+    let maxBrightness = 0;
+    for (let i = 1; i < 256; i++) {
+      if (maxBrightness < histBrightness[i]) {
+        maxBrightness = histBrightness[i];
+      }
+    }
+
+    const histCanvas = histRef.current;
+    const histContext = histCanvas.getContext("2d");
+    let guideHeight = 8;
+    let startY = histCanvas.height - guideHeight;
+    let dx = histCanvas.width / 256;
+    let dy = startY / maxBrightness;
+    histContext.lineWidth = dx;
+    histContext.fillStyle = "#fff";
+    histContext.fillRect(0, 0, histCanvas.width, histCanvas.height);
+
+    for (let i = 0; i < 256; i++) {
+      let x = i * dx;
+      // Value
+      histContext.strokeStyle = "#000000";
+      histContext.beginPath();
+      histContext.moveTo(x, startY);
+      histContext.lineTo(x, startY - histBrightness[i] * dy);
+      histContext.closePath();
+      histContext.stroke();
+      // Guide
+      histContext.strokeStyle = "rgb(" + i + ", " + i + ", " + i + ")";
+      histContext.beginPath();
+      histContext.moveTo(x, startY);
+      histContext.lineTo(x, histCanvas.height);
+      histContext.closePath();
+      histContext.stroke();
     }
   };
 
@@ -75,6 +134,20 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
     return () => URL.revokeObjectURL(objectUrl);
   }, [depthImageUrl]);
 
+  useEffect(() => {
+    if (!depthImageUrl) {
+      return;
+    }
+
+    const histImage = new Image();
+    const objectUrl = getImageUrl(depthImageUrl);
+    histImage.src = objectUrl;
+    histImage.onload = () => {
+      processImage(getImageData(histImage));
+    };
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [depthImageUrl]);
+
   const onHandleChange = e => {
     handleChange(e);
     e.target.value = null;
@@ -96,7 +169,9 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
             <div className="box threeD-box">
               <ThreeDViewer rgbImageUrl={rgbImageUrl} depthImageUrl={depthImageUrl} />
             </div>
-            <div className="box histogram-box"></div>
+            <div className="box histogram-box">
+              <canvas height="200" width="300" ref={histRef}></canvas>
+            </div>
           </div>
         </div>
       </div>
