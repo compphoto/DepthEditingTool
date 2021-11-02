@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import * as d3 from "d3";
 import { connect } from "react-redux";
 import { uploadImageActions } from "store/uploadimage";
 import { selectors as toolExtSelectors } from "store/toolext";
@@ -21,61 +22,90 @@ const getImageData = img => {
   canvas.width = img.naturalWidth;
   canvas.height = img.naturalHeight;
   context.drawImage(img, 0, 0);
-  return context.getImageData(0, 0, img.naturalWidth, img.naturalHeight);
+  const src = new Uint32Array(context.getImageData(0, 0, img.naturalWidth, img.naturalHeight).data.buffer);
+  let histBrightness = new Array(256).fill(0);
+  for (let i = 0; i < src.length; i++) {
+    let r = src[i] & 0xff;
+    let g = (src[i] >> 8) & 0xff;
+    let b = (src[i] >> 16) & 0xff;
+    histBrightness[r]++;
+    histBrightness[g]++;
+    histBrightness[b]++;
+  }
+  return histBrightness;
 };
 
 export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl, removeItem, removeAllItem }) {
   const rgbImageRef = useRef(null);
   const depthImageRef = useRef(null);
   const histRef = useRef(null);
+  let yAxis = false;
 
-  const processImage = histImage => {
-    const src = new Uint32Array(histImage.data.buffer);
-
-    let histBrightness = new Array(256).fill(0);
-    for (let i = 0; i < src.length; i++) {
-      let r = src[i] & 0xff;
-      let g = (src[i] >> 8) & 0xff;
-      let b = (src[i] >> 16) & 0xff;
-      histBrightness[r]++;
-      histBrightness[g]++;
-      histBrightness[b]++;
+  const processImage = histBrightness => {
+    let W = 800;
+    let H = W / 2;
+    const svg = d3.select("#hist-svg");
+    const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+    const width = W - margin.left - margin.right;
+    const height = H - margin.top - margin.bottom;
+    let q = histRef.current;
+    q.style.width = W;
+    q.style.height = H;
+    if (yAxis) {
+      d3.selectAll("g.y-axis").remove();
+      yAxis = false;
     }
 
-    let maxBrightness = 0;
-    for (let i = 1; i < 256; i++) {
-      if (maxBrightness < histBrightness[i]) {
-        maxBrightness = histBrightness[i];
+    function graphComponent(histData) {
+      d3.selectAll(".histogram").remove();
+      var data = histData.map((key, value) => {
+        return { freq: value, idx: +key };
+      });
+      var x = d3
+        .scaleLinear()
+        .range([0, width])
+        .domain([
+          0,
+          d3.max(data, d => {
+            return d.idx;
+          })
+        ]);
+      var y = d3
+        .scaleLinear()
+        .range([height, 0])
+        .domain([
+          0,
+          d3.max(data, d => {
+            return d.freq;
+          })
+        ]);
+      var g = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
+      if (!yAxis) {
+        yAxis = true;
+        g.append("g")
+          .attr("class", "y-axis")
+          .attr("transform", "translate(" + -5 + ",0)")
+          .call(d3.axisLeft(y).ticks(10).tickSizeInner(10).tickSizeOuter(2));
       }
+      g.selectAll(".histogram")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("class", "histogram")
+        .attr("fill", "gray")
+        .attr("x", d => {
+          return x(d.idx);
+        })
+        .attr("y", d => {
+          return y(d.freq);
+        })
+        .attr("width", 2)
+        .attr("opacity", 0.8)
+        .attr("height", d => {
+          return height - y(d.freq);
+        });
     }
-
-    const histCanvas = histRef.current;
-    const histContext = histCanvas.getContext("2d");
-    let guideHeight = 8;
-    let startY = histCanvas.height - guideHeight;
-    let dx = histCanvas.width / 256;
-    let dy = startY / maxBrightness;
-    histContext.lineWidth = dx;
-    histContext.fillStyle = "#fff";
-    histContext.fillRect(0, 0, histCanvas.width, histCanvas.height);
-
-    for (let i = 0; i < 256; i++) {
-      let x = i * dx;
-      // Value
-      histContext.strokeStyle = "#000000";
-      histContext.beginPath();
-      histContext.moveTo(x, startY);
-      histContext.lineTo(x, startY - histBrightness[i] * dy);
-      histContext.closePath();
-      histContext.stroke();
-      // Guide
-      histContext.strokeStyle = "rgb(" + i + ", " + i + ", " + i + ")";
-      histContext.beginPath();
-      histContext.moveTo(x, startY);
-      histContext.lineTo(x, histCanvas.height);
-      histContext.closePath();
-      histContext.stroke();
-    }
+    graphComponent(histBrightness);
   };
 
   useEffect(() => {
@@ -135,10 +165,6 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
   }, [depthImageUrl]);
 
   useEffect(() => {
-    if (!depthImageUrl) {
-      return;
-    }
-
     const histImage = new Image();
     const objectUrl = getImageUrl(depthImageUrl);
     histImage.src = objectUrl;
@@ -170,7 +196,7 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
               <ThreeDViewer rgbImageUrl={rgbImageUrl} depthImageUrl={depthImageUrl} />
             </div>
             <div className="box histogram-box">
-              <canvas height="200" width="300" ref={histRef}></canvas>
+              <svg id="hist-svg" width="1" height="1" ref={histRef}></svg>
             </div>
           </div>
         </div>
