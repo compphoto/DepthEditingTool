@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import * as d3 from "d3";
 import { connect } from "react-redux";
 import { uploadImageActions } from "store/uploadimage";
 import { selectors as toolExtSelectors } from "store/toolext";
@@ -91,13 +92,18 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
   }, [depthImageUrl]);
 
   useEffect(() => {
-    const histImage = new Image();
-    const objectUrl = getImageUrl(depthImageUrl);
-    histImage.src = objectUrl;
-    histImage.onload = () => {
-      processImage(histRef, getImageData(histImage));
-    };
-    return () => URL.revokeObjectURL(objectUrl);
+    if (depthImageUrl === null) {
+      d3.selectAll(".histogram").remove();
+      d3.selectAll("g.y-axis").remove();
+    } else {
+      const histImage = new Image();
+      const objectUrl = getImageUrl(depthImageUrl);
+      histImage.src = objectUrl;
+      histImage.onload = () => {
+        processImage(histRef, getImageData(histImage));
+      };
+      return () => URL.revokeObjectURL(objectUrl);
+    }
   }, [depthImageUrl]);
 
   const onHandleChange = e => {
