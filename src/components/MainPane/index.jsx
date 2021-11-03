@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { connect } from "react-redux";
 import { uploadImageActions } from "store/uploadimage";
 import { selectors as toolExtSelectors } from "store/toolext";
@@ -15,61 +15,79 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
   const rgbImageRef = useRef(null);
   const depthImageRef = useRef(null);
   const histRef = useRef(null);
+  const [prevRbgSize, setPrevRbgSize] = useState({ width: null, height: null });
+  const [prevDepthSize, setPrevDepthSize] = useState({ width: null, height: null });
 
   useEffect(() => {
     const rgbCanvas = rgbImageRef.current;
     const rgbContext = rgbCanvas.getContext("2d");
-    const rgbImage = new Image();
-    const objectUrl = getImageUrl(rgbImageUrl);
-    rgbImage.src = objectUrl;
-    rgbImage.onload = () => {
-      let hRatio = rgbCanvas.width / rgbImage.naturalWidth;
-      let vRatio = rgbCanvas.height / rgbImage.naturalHeight;
-      let ratio = Math.min(hRatio, vRatio);
-      let centerShift_x = (rgbCanvas.width - rgbImage.naturalWidth * ratio) / 2;
-      let centerShift_y = (rgbCanvas.height - rgbImage.naturalHeight * ratio) / 2;
-      rgbContext.imageSmoothingEnabled = false;
-      rgbContext.drawImage(
-        rgbImage,
-        0,
-        0,
-        rgbImage.naturalWidth,
-        rgbImage.naturalHeight,
-        centerShift_x,
-        centerShift_y,
-        rgbImage.naturalWidth * ratio,
-        rgbImage.naturalHeight * ratio
-      );
-    };
-    return () => URL.revokeObjectURL(objectUrl);
+    if (rgbImageUrl === null) {
+      rgbContext.clearRect(0, 0, prevRbgSize.width, prevRbgSize.height);
+    } else {
+      const rgbImage = new Image();
+      const objectUrl = getImageUrl(rgbImageUrl);
+      rgbImage.src = objectUrl;
+      rgbImage.onload = () => {
+        let hRatio = rgbCanvas.width / rgbImage.naturalWidth;
+        let vRatio = rgbCanvas.height / rgbImage.naturalHeight;
+        let ratio = Math.min(hRatio, vRatio);
+        let centerShift_x = (rgbCanvas.width - rgbImage.naturalWidth * ratio) / 2;
+        let centerShift_y = (rgbCanvas.height - rgbImage.naturalHeight * ratio) / 2;
+        rgbContext.imageSmoothingEnabled = false;
+        rgbContext.clearRect(0, 0, prevRbgSize.width, prevRbgSize.height);
+        rgbContext.drawImage(
+          rgbImage,
+          0,
+          0,
+          rgbImage.naturalWidth,
+          rgbImage.naturalHeight,
+          centerShift_x,
+          centerShift_y,
+          rgbImage.naturalWidth * ratio,
+          rgbImage.naturalHeight * ratio
+        );
+        setPrevRbgSize(prevState => ({ ...prevState, width: rgbImage.naturalWidth, height: rgbImage.naturalHeight }));
+      };
+      return () => URL.revokeObjectURL(objectUrl);
+    }
   }, [rgbImageUrl]);
 
   useEffect(() => {
     const depthCanvas = depthImageRef.current;
     const depthContext = depthCanvas.getContext("2d");
-    const depthImage = new Image();
-    const objectUrl = getImageUrl(depthImageUrl);
-    depthImage.src = objectUrl;
-    depthImage.onload = () => {
-      let hRatio = depthCanvas.width / depthImage.naturalWidth;
-      let vRatio = depthCanvas.height / depthImage.naturalHeight;
-      let ratio = Math.min(hRatio, vRatio);
-      let centerShift_x = (depthCanvas.width - depthImage.naturalWidth * ratio) / 2;
-      let centerShift_y = (depthCanvas.height - depthImage.naturalHeight * ratio) / 2;
-      depthContext.imageSmoothingEnabled = false;
-      depthContext.drawImage(
-        depthImage,
-        0,
-        0,
-        depthImage.naturalWidth,
-        depthImage.naturalHeight,
-        centerShift_x,
-        centerShift_y,
-        depthImage.naturalWidth * ratio,
-        depthImage.naturalHeight * ratio
-      );
-    };
-    return () => URL.revokeObjectURL(objectUrl);
+    if (depthImageUrl === null) {
+      depthContext.clearRect(0, 0, prevDepthSize.width, prevDepthSize.height);
+    } else {
+      const depthImage = new Image();
+      const objectUrl = getImageUrl(depthImageUrl);
+      depthImage.src = objectUrl;
+      depthImage.onload = () => {
+        let hRatio = depthCanvas.width / depthImage.naturalWidth;
+        let vRatio = depthCanvas.height / depthImage.naturalHeight;
+        let ratio = Math.min(hRatio, vRatio);
+        let centerShift_x = (depthCanvas.width - depthImage.naturalWidth * ratio) / 2;
+        let centerShift_y = (depthCanvas.height - depthImage.naturalHeight * ratio) / 2;
+        depthContext.imageSmoothingEnabled = false;
+        depthContext.clearRect(0, 0, prevDepthSize.width, prevDepthSize.height);
+        depthContext.drawImage(
+          depthImage,
+          0,
+          0,
+          depthImage.naturalWidth,
+          depthImage.naturalHeight,
+          centerShift_x,
+          centerShift_y,
+          depthImage.naturalWidth * ratio,
+          depthImage.naturalHeight * ratio
+        );
+        setPrevDepthSize(prevState => ({
+          ...prevState,
+          width: depthImage.naturalWidth,
+          height: depthImage.naturalHeight
+        }));
+      };
+      return () => URL.revokeObjectURL(objectUrl);
+    }
   }, [depthImageUrl]);
 
   useEffect(() => {
