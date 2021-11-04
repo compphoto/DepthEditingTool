@@ -11,38 +11,37 @@ import { ThreeDViewer } from "components/ThreeDViewer";
 import MainPaneStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
 import { getImageData, processImage } from "utils/drawHistogram";
+import { drawCanvasImage } from "utils/canvasUtils";
 
-export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl, removeItem, removeAllItem }) {
+export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange, removeItem, removeAllItem }) {
   const rgbImageRef = useRef(null);
   const depthImageRef = useRef(null);
   const histRef = useRef(null);
   const [prevRbgSize, setPrevRbgSize] = useState({ width: null, height: null });
   const [prevDepthSize, setPrevDepthSize] = useState({ width: null, height: null });
-  const inMemRgbCanvas = document.createElement("canvas");
-  const inMemRgbCtx = inMemRgbCanvas.getContext("2d");
+
+  const loadedRgbImageRef = useRef(null);
+  const loadedDepthImageRef = useRef(null);
+  const setLoadedRgbImage = rgbImage => {
+    loadedRgbImageRef.current = rgbImage;
+  };
+  const setLoadedDepthImage = depthImage => {
+    loadedDepthImageRef.current = depthImage;
+  };
 
   const handleResize = () => {
-    let rgbCanvas = rgbImageRef.current;
-    let rgbContext = rgbCanvas.getContext("2d");
-
-    inMemRgbCanvas.width = rgbCanvas.width;
-    inMemRgbCanvas.height = rgbCanvas.height;
-    inMemRgbCtx.drawImage(rgbCanvas, 0, 0);
+    const rgbCanvas = rgbImageRef.current;
+    const rgbContext = rgbCanvas.getContext("2d");
+    const depthCanvas = depthImageRef.current;
+    const depthContext = depthCanvas.getContext("2d");
 
     rgbCanvas.width = (window.innerWidth / 1200) * 521;
     rgbCanvas.height = (window.innerHeight / 900) * 352;
+    depthCanvas.width = (window.innerWidth / 1200) * 521;
+    depthCanvas.height = (window.innerHeight / 900) * 352;
 
-    rgbContext.drawImage(
-      inMemRgbCanvas,
-      0,
-      0,
-      inMemRgbCanvas.width,
-      inMemRgbCanvas.height,
-      0,
-      0,
-      rgbCanvas.width,
-      rgbCanvas.height
-    );
+    loadedRgbImageRef.current && drawCanvasImage(loadedRgbImageRef.current, rgbCanvas, rgbContext);
+    loadedDepthImageRef.current && drawCanvasImage(loadedDepthImageRef.current, depthCanvas, depthContext);
   };
 
   const onHandleChange = e => {
@@ -60,24 +59,8 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
       const objectUrl = getImageUrl(rgbImageUrl);
       rgbImage.src = objectUrl;
       rgbImage.onload = () => {
-        let hRatio = rgbCanvas.width / rgbImage.naturalWidth;
-        let vRatio = rgbCanvas.height / rgbImage.naturalHeight;
-        let ratio = Math.min(hRatio, vRatio);
-        let centerShift_x = (rgbCanvas.width - rgbImage.naturalWidth * ratio) / 2;
-        let centerShift_y = (rgbCanvas.height - rgbImage.naturalHeight * ratio) / 2;
-        rgbContext.imageSmoothingEnabled = false;
-        rgbContext.clearRect(0, 0, prevRbgSize.width, prevRbgSize.height);
-        rgbContext.drawImage(
-          rgbImage,
-          0,
-          0,
-          rgbImage.naturalWidth,
-          rgbImage.naturalHeight,
-          centerShift_x,
-          centerShift_y,
-          rgbImage.naturalWidth * ratio,
-          rgbImage.naturalHeight * ratio
-        );
+        setLoadedRgbImage(rgbImage);
+        drawCanvasImage(rgbImage, rgbCanvas, rgbContext);
         setPrevRbgSize(prevState => ({ ...prevState, width: rgbImage.naturalWidth, height: rgbImage.naturalHeight }));
       };
       return () => URL.revokeObjectURL(objectUrl);
@@ -94,24 +77,8 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
       const objectUrl = getImageUrl(depthImageUrl);
       depthImage.src = objectUrl;
       depthImage.onload = () => {
-        let hRatio = depthCanvas.width / depthImage.naturalWidth;
-        let vRatio = depthCanvas.height / depthImage.naturalHeight;
-        let ratio = Math.min(hRatio, vRatio);
-        let centerShift_x = (depthCanvas.width - depthImage.naturalWidth * ratio) / 2;
-        let centerShift_y = (depthCanvas.height - depthImage.naturalHeight * ratio) / 2;
-        depthContext.imageSmoothingEnabled = false;
-        depthContext.clearRect(0, 0, prevDepthSize.width, prevDepthSize.height);
-        depthContext.drawImage(
-          depthImage,
-          0,
-          0,
-          depthImage.naturalWidth,
-          depthImage.naturalHeight,
-          centerShift_x,
-          centerShift_y,
-          depthImage.naturalWidth * ratio,
-          depthImage.naturalHeight * ratio
-        );
+        setLoadedDepthImage(depthImage);
+        drawCanvasImage(depthImage, depthCanvas, depthContext);
         setPrevDepthSize(prevState => ({
           ...prevState,
           width: depthImage.naturalWidth,
