@@ -18,6 +18,37 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
   const histRef = useRef(null);
   const [prevRbgSize, setPrevRbgSize] = useState({ width: null, height: null });
   const [prevDepthSize, setPrevDepthSize] = useState({ width: null, height: null });
+  const inMemRgbCanvas = document.createElement("canvas");
+  const inMemRgbCtx = inMemRgbCanvas.getContext("2d");
+
+  const handleResize = () => {
+    let rgbCanvas = rgbImageRef.current;
+    let rgbContext = rgbCanvas.getContext("2d");
+
+    inMemRgbCanvas.width = rgbCanvas.width;
+    inMemRgbCanvas.height = rgbCanvas.height;
+    inMemRgbCtx.drawImage(rgbCanvas, 0, 0);
+
+    rgbCanvas.width = (window.innerWidth / 1200) * 521;
+    rgbCanvas.height = (window.innerHeight / 900) * 352;
+
+    rgbContext.drawImage(
+      inMemRgbCanvas,
+      0,
+      0,
+      inMemRgbCanvas.width,
+      inMemRgbCanvas.height,
+      0,
+      0,
+      rgbCanvas.width,
+      rgbCanvas.height
+    );
+  };
+
+  const onHandleChange = e => {
+    handleChange(e);
+    e.target.value = null;
+  };
 
   useEffect(() => {
     const rgbCanvas = rgbImageRef.current;
@@ -106,10 +137,10 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
     }
   }, [depthImageUrl]);
 
-  const onHandleChange = e => {
-    handleChange(e);
-    e.target.value = null;
-  };
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <MainPaneStyle>
@@ -117,10 +148,18 @@ export function MainPane({ toolExtOpen, handleChange, rgbImageUrl, depthImageUrl
         <div className="main-row">
           <div className="main-column main-column-2d">
             <div className="box rgb-box">
-              <canvas height="352" width="521" ref={rgbImageRef}></canvas>
+              <canvas
+                width={(window.innerWidth / 1200) * 521}
+                height={(window.innerHeight / 900) * 352}
+                ref={rgbImageRef}
+              ></canvas>
             </div>
             <div className="box depth-box">
-              <canvas height="352" width="521" ref={depthImageRef}></canvas>
+              <canvas
+                width={(window.innerWidth / 1200) * 521}
+                height={(window.innerHeight / 900) * 352}
+                ref={depthImageRef}
+              ></canvas>
             </div>
           </div>
           <div className="main-column main-column-3d">
