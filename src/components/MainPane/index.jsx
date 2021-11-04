@@ -31,17 +31,21 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
 
   const handleResize = () => {
     const rgbCanvas = rgbImageRef.current;
-    const rgbContext = rgbCanvas.getContext("2d");
     const depthCanvas = depthImageRef.current;
-    const depthContext = depthCanvas.getContext("2d");
+    if (rgbCanvas && depthCanvas) {
+      const rgbContext = rgbCanvas.getContext("2d");
+      const depthContext = depthCanvas.getContext("2d");
 
-    rgbCanvas.width = (window.innerWidth / 1200) * 521;
-    rgbCanvas.height = (window.innerHeight / 900) * 352;
-    depthCanvas.width = (window.innerWidth / 1200) * 521;
-    depthCanvas.height = (window.innerHeight / 900) * 352;
+      rgbCanvas.width = (window.innerWidth / 1200) * 521;
+      rgbCanvas.height = (window.innerHeight / 900) * 352;
+      depthCanvas.width = (window.innerWidth / 1200) * 521;
+      depthCanvas.height = (window.innerHeight / 900) * 352;
 
-    loadedRgbImageRef.current && drawCanvasImage(loadedRgbImageRef.current, rgbCanvas, rgbContext);
-    loadedDepthImageRef.current && drawCanvasImage(loadedDepthImageRef.current, depthCanvas, depthContext);
+      loadedRgbImageRef.current && drawCanvasImage(loadedRgbImageRef.current, rgbCanvas, rgbContext);
+      loadedDepthImageRef.current && drawCanvasImage(loadedDepthImageRef.current, depthCanvas, depthContext);
+    } else {
+      return;
+    }
   };
 
   const onHandleChange = e => {
@@ -163,6 +167,7 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
                 onClick={e => {
                   e.stopPropagation();
                   removeItem("rgbImage");
+                  loadedRgbImageRef.current = null;
                 }}
                 className="remove-img"
               >
@@ -193,6 +198,7 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
                 onClick={e => {
                   e.stopPropagation();
                   removeItem("depthImage");
+                  loadedDepthImageRef.current = null;
                 }}
                 className="remove-img"
               >
