@@ -36,6 +36,9 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
       const rgbContext = rgbCanvas.getContext("2d");
       const depthContext = depthCanvas.getContext("2d");
 
+      rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
+      depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
+
       rgbCanvas.width = (window.innerWidth / 1200) * 521;
       rgbCanvas.height = (window.innerHeight / 900) * 352;
       depthCanvas.width = (window.innerWidth / 1200) * 521;
@@ -65,7 +68,7 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
       rgbImage.onload = () => {
         setLoadedRgbImage(rgbImage);
         drawCanvasImage(rgbImage, rgbCanvas, rgbContext);
-        setPrevRbgSize(prevState => ({ ...prevState, width: rgbImage.naturalWidth, height: rgbImage.naturalHeight }));
+        setPrevRbgSize(prevState => ({ ...prevState, width: rgbCanvas.width, height: rgbCanvas.height }));
       };
       return () => URL.revokeObjectURL(objectUrl);
     }
@@ -85,8 +88,8 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
         drawCanvasImage(depthImage, depthCanvas, depthContext);
         setPrevDepthSize(prevState => ({
           ...prevState,
-          width: depthImage.naturalWidth,
-          height: depthImage.naturalHeight
+          width: depthCanvas.width,
+          height: depthCanvas.height
         }));
       };
       return () => URL.revokeObjectURL(objectUrl);
@@ -208,7 +211,15 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
           </div>
         </div>
         <div className="main-side-bar-footer">
-          <Button onClick={removeAllItem} size="sm" color="default">
+          <Button
+            onClick={() => {
+              removeAllItem();
+              loadedRgbImageRef.current = null;
+              loadedDepthImageRef.current = null;
+            }}
+            size="sm"
+            color="default"
+          >
             <RiDeleteBin5Fill className="mb-1" /> Clear All
           </Button>
         </div>
