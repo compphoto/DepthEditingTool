@@ -22,6 +22,7 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
 
   const loadedRgbImageRef = useRef(null);
   const loadedDepthImageRef = useRef(null);
+
   const setLoadedRgbImage = rgbImage => {
     loadedRgbImageRef.current = rgbImage;
   };
@@ -39,10 +40,10 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
       rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
       depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
 
-      rgbCanvas.width = (window.innerWidth / 1200) * 521;
-      rgbCanvas.height = (window.innerHeight / 900) * 352;
-      depthCanvas.width = (window.innerWidth / 1200) * 521;
-      depthCanvas.height = (window.innerHeight / 900) * 352;
+      rgbCanvas.width = (window.innerWidth / 1500) * 521;
+      rgbCanvas.height = (window.innerHeight / 1200) * 352;
+      depthCanvas.width = (window.innerWidth / 1500) * 521;
+      depthCanvas.height = (window.innerHeight / 1200) * 352;
 
       loadedRgbImageRef.current && drawCanvasImage(loadedRgbImageRef.current, rgbCanvas, rgbContext);
       loadedDepthImageRef.current && drawCanvasImage(loadedDepthImageRef.current, depthCanvas, depthContext);
@@ -116,6 +117,34 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const boundingBox = useRef(null);
+
+  const pick = (event, depthCanvas, depthContext) => {
+    const box = boundingBox.current;
+    var x = event.layerX;
+    var y = event.layerY;
+    if (box) {
+      depthContext.beginPath();
+      depthContext.globalAlpha = 0.2;
+      depthContext.fillStyle = "blue";
+      depthContext.fillRect(Math.min(box.x, x), Math.min(box.y, y), Math.abs(x - box.x), Math.abs(y - box.y));
+      boundingBox.current = null;
+    } else {
+      depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
+      depthContext.globalAlpha = 1;
+      loadedDepthImageRef.current && drawCanvasImage(loadedDepthImageRef.current, depthCanvas, depthContext);
+      boundingBox.current = { x, y };
+    }
+  };
+
+  useEffect(() => {
+    const depthCanvas = depthImageRef.current;
+    const depthContext = depthCanvas.getContext("2d");
+    depthCanvas.addEventListener("click", function (event) {
+      pick(event, depthCanvas, depthContext);
+    });
+  }, []);
+
   return (
     <MainPaneStyle>
       <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
@@ -123,15 +152,15 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
           <div className="main-column main-column-2d">
             <div className="box rgb-box">
               <canvas
-                width={(window.innerWidth / 1200) * 521}
-                height={(window.innerHeight / 900) * 352}
+                width={(window.innerWidth / 1500) * 521}
+                height={(window.innerHeight / 1200) * 352}
                 ref={rgbImageRef}
               ></canvas>
             </div>
             <div className="box depth-box">
               <canvas
-                width={(window.innerWidth / 1200) * 521}
-                height={(window.innerHeight / 900) * 352}
+                width={(window.innerWidth / 1500) * 521}
+                height={(window.innerHeight / 1200) * 352}
                 ref={depthImageRef}
               ></canvas>
             </div>
