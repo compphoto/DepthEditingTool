@@ -20,6 +20,8 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
   const [prevRbgSize, setPrevRbgSize] = useState({ width: null, height: null });
   const [prevDepthSize, setPrevDepthSize] = useState({ width: null, height: null });
 
+  const depthImageDimension = useRef([0, 0, 0, 0]);
+
   const loadedRgbImageRef = useRef(null);
   const loadedDepthImageRef = useRef(null);
 
@@ -46,7 +48,9 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
       depthCanvas.height = (window.innerHeight / 1200) * 352;
 
       loadedRgbImageRef.current && drawCanvasImage(loadedRgbImageRef.current, rgbCanvas, rgbContext);
-      loadedDepthImageRef.current && drawCanvasImage(loadedDepthImageRef.current, depthCanvas, depthContext);
+      if (loadedDepthImageRef.current) {
+        depthImageDimension.current = drawCanvasImage(loadedDepthImageRef.current, depthCanvas, depthContext);
+      }
     } else {
       return;
     }
@@ -86,7 +90,7 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
       depthImage.src = objectUrl;
       depthImage.onload = () => {
         setLoadedDepthImage(depthImage);
-        drawCanvasImage(depthImage, depthCanvas, depthContext);
+        depthImageDimension.current = drawCanvasImage(depthImage, depthCanvas, depthContext);
         setPrevDepthSize(prevState => ({
           ...prevState,
           width: depthCanvas.width,
@@ -124,10 +128,15 @@ export function MainPane({ toolExtOpen, rgbImageUrl, depthImageUrl, handleChange
     var x = event.layerX;
     var y = event.layerY;
     if (box) {
+      let [image_x1, image_y1, image_x2, image_y2] = depthImageDimension.current;
       depthContext.beginPath();
       depthContext.globalAlpha = 0.2;
       depthContext.fillStyle = "blue";
-      depthContext.fillRect(Math.min(box.x, x), Math.min(box.y, y), Math.abs(x - box.x), Math.abs(y - box.y));
+      let new_x = Math.max(Math.min(box.x, x), image_x1);
+      let new_y = Math.max(Math.min(box.y, y), image_y1);
+      let new_w = Math.min(Math.max(box.x, x), image_x2) - new_x;
+      let new_h = Math.min(Math.max(box.y, y), image_y2) - new_y;
+      depthContext.fillRect(new_x, new_y, new_w, new_h);
       boundingBox.current = null;
     } else {
       depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
