@@ -2,15 +2,21 @@ import { types } from "./constants";
 
 const initialState = {
   rgbImage: null,
-  depthImage: null
+  depthImage: null,
+  threeDepthImage: null
 };
 
-export const uploadImageReducer = (state = initialState, { type, payload }) => {
+export const imageReducer = (state = initialState, { type, payload }) => {
   switch (type) {
     case types.HANDLE_CHANGE:
       return {
         ...state,
         [payload.name]: payload.files[0]
+      };
+    case types.SET_THREE_DEPTH_IMAGE:
+      return {
+        ...state,
+        threeDepthImage: payload
       };
     case types.REMOVE_ITEM:
       return {

@@ -11,20 +11,20 @@ import { getImageUrl } from "utils/getImageFromFile";
 export function ThreeDViewer({ rgbImageUrl, depthImageUrl }) {
   const [colorMap, setColorMap] = useState(false);
   const [displacementMap, setDisplacementMap] = useState(false);
-  const { middleGrey, maxLuminance } = useControls({
-    middleGrey: {
-      min: 0,
-      max: 1,
-      value: 0.6,
-      step: 0.1
-    },
-    maxLuminance: {
-      min: 0,
-      max: 64,
-      value: 16,
-      step: 1
-    }
-  });
+  // const { middleGrey, maxLuminance } = useControls({
+  //   middleGrey: {
+  //     min: 0,
+  //     max: 1,
+  //     value: 0.6,
+  //     step: 0.1
+  //   },
+  //   maxLuminance: {
+  //     min: 0,
+  //     max: 64,
+  //     value: 16,
+  //     step: 1
+  //   }
+  // });
 
   useEffect(() => {
     let colorMap = new TextureLoader().setCrossOrigin("").load(getImageUrl(rgbImageUrl));
@@ -32,7 +32,8 @@ export function ThreeDViewer({ rgbImageUrl, depthImageUrl }) {
   }, [rgbImageUrl]);
 
   useEffect(() => {
-    let displacementMap = new TextureLoader().setCrossOrigin("").load(getImageUrl(depthImageUrl));
+    console.warn("got here");
+    let displacementMap = new TextureLoader().setCrossOrigin("").load(depthImageUrl);
     setDisplacementMap(displacementMap);
   }, [depthImageUrl]);
 
