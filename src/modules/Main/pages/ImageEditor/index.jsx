@@ -1,12 +1,16 @@
 import React from "react";
+import { connect } from "react-redux";
+import { imageActions } from "store/image";
+import { selectors as imageSelectors } from "store/image";
 import { Helmet } from "react-helmet";
 import { Container, Button } from "reactstrap";
 import { RiDownloadLine } from "react-icons/ri";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
+import { cloneCanvas, canvasToImage } from "utils/canvasUtils";
 
-export function ImageEditor() {
+export function ImageEditor({ mainDepthCanvas, tempDepthCanvas, initImage }) {
   return (
     <ImageEditorStyle>
       <Helmet>
@@ -19,10 +23,24 @@ export function ImageEditor() {
               <h4>Image Editor</h4>
             </div>
             <div>
-              <Button size="sm" color="secondary" className="mx-3">
-                GitHub
+              <Button
+                onClick={() => {
+                  initImage({ mainDepthCanvas: cloneCanvas(tempDepthCanvas) });
+                }}
+                size="sm"
+                color="secondary"
+                className="mx-3"
+              >
+                Save
               </Button>
-              <Button size="sm" color="primary">
+              <Button
+                onClick={() => {
+                  let image = canvasToImage(mainDepthCanvas);
+                  window.location.href = image;
+                }}
+                size="sm"
+                color="primary"
+              >
                 <RiDownloadLine className="mb-1" /> Download
               </Button>
             </div>
@@ -38,4 +56,13 @@ export function ImageEditor() {
   );
 }
 
-export default ImageEditor;
+const mapStateToProps = state => ({
+  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
+  tempDepthCanvas: imageSelectors.tempDepthCanvas(state)
+});
+
+const mapDispatchToProps = {
+  initImage: imageActions.initImage
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ImageEditor);

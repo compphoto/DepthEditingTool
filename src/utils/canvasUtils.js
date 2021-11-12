@@ -38,14 +38,16 @@ export const drawCanvasImage = (image, canvas, context) => {
 };
 
 export const editBoundingArea = (boundingBox, context) => {
-  const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
-  const src = imageData.data;
-  for (let i = 0; i < src.length; i += 4) {
-    src[i] += 100;
-    src[i + 1] += 100;
-    src[i + 2] += 100;
+  if (boundingBox && context) {
+    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
+    const src = imageData.data;
+    for (let i = 0; i < src.length; i += 4) {
+      src[i] += 100;
+      src[i + 1] += 100;
+      src[i + 2] += 100;
+    }
+    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
   }
-  context.putImageData(imageData, boundingBox[0], boundingBox[1]);
 };
 
 export const cropCanvas = (oldCanvas, boundingBox) => {

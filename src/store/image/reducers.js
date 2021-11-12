@@ -6,8 +6,9 @@ const initialState = {
   loadedRgbImage: null,
   loadedDepthImage: null,
   mainDepthCanvas: null, // use canvas to image to convert to image
-  rgbImageDimension: [0, 0, 0, 0],
-  depthImageDimension: [0, 0, 0, 0],
+  tempDepthCanvas: null, // global reference to depth canvas
+  rgbImageDimension: null,
+  depthImageDimension: null,
   prevRgbSize: { width: null, height: null },
   prevDepthSize: { width: null, height: null },
   tools: {
@@ -16,7 +17,7 @@ const initialState = {
   },
   parameters: {
     croppedCanvasImage: null,
-    croppedeArea: [0, 0, 0, 0]
+    croppedeArea: null
   }
 };
 
@@ -80,11 +81,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         loadedRgbImage: null,
         loadedDepthImage: null,
         mainDepthCanvas: null, // use canvas to image to convert to image
-        rgbImageDimension: [0, 0, 0, 0],
-        depthImageDimension: [0, 0, 0, 0],
+        rgbImageDimension: null,
+        depthImageDimension: null,
         parameters: {
           croppedCanvasImage: null,
-          croppedeArea: [0, 0, 0, 0]
+          croppedeArea: null
         }
       };
       return {
