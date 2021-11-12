@@ -33,7 +33,8 @@ class MainPane extends Component {
   }
   componentDidUpdate(prevProps, prevState) {
     let { rgbImageRef, depthImageRef } = this;
-    let { rgbImageUrl, depthImageUrl, prevRgbSize, prevDepthSize, tools, parameters, initImage } = this.props;
+    let { rgbImageUrl, depthImageUrl, mainDepthCanvas, prevRgbSize, prevDepthSize, tools, parameters, initImage } =
+      this.props;
     if (prevProps.rgbImageUrl !== rgbImageUrl) {
       let rgbCanvas = rgbImageRef.current;
       let rgbContext = rgbCanvas.getContext("2d");
@@ -81,29 +82,23 @@ class MainPane extends Component {
       }
     }
     if (prevProps.tools.depth !== tools.depth) {
+      let depthCanvas = depthImageRef.current;
+      let depthContext = depthCanvas.getContext("2d");
       if (tools.depth) {
-        let depthCanvas = depthImageRef.current;
-        let depthContext = depthCanvas.getContext("2d");
-        depthCanvas.addEventListener("click", event => {
-          this.drawBoundingBox(event, depthCanvas, depthContext);
-        });
+        depthCanvas.addEventListener("click", this.drawBoundingBox);
       } else {
-        let depthCanvas = this.depthImageRef.current;
-        let depthContext = depthCanvas.getContext("2d");
-        depthCanvas.removeEventListener("click", event => {
-          this.drawBoundingBox(event, depthCanvas, depthContext);
-        });
+        depthCanvas.removeEventListener("click", this.drawBoundingBox);
+        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
+        depthContext.globalAlpha = 1;
+        depthContext.drawImage(mainDepthCanvas, 0, 0);
       }
     }
   }
   componentWillUnmount() {
-    window.removeEventListener("resize", this.handleResize);
-    URL.revokeObjectURL(objectUrl);
     let depthCanvas = this.depthImageRef.current;
-    let depthContext = depthCanvas.getContext("2d");
-    depthCanvas.removeEventListener("click", event => {
-      this.drawBoundingBox(event, depthCanvas, depthContext);
-    });
+    window.removeEventListener("resize", this.handleResize);
+    depthCanvas.removeEventListener("click", this.drawBoundingBox);
+    URL.revokeObjectURL(objectUrl);
   }
   onHandleChange = e => {
     this.props.handleChange(e);
@@ -145,9 +140,11 @@ class MainPane extends Component {
       return;
     }
   };
-  drawBoundingBox = (event, depthCanvas, depthContext) => {
+  drawBoundingBox = event => {
     let { initBoundingBox } = this.state;
     let { mainDepthCanvas, depthImageDimension, storeParameters } = this.props;
+    let depthCanvas = this.depthImageRef.current;
+    let depthContext = depthCanvas.getContext("2d");
     if (mainDepthCanvas) {
       let x = event.layerX;
       let y = event.layerY;
