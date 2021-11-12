@@ -296,17 +296,6 @@ class MainPane extends Component {
           <div className="main-side-bar-footer">
             <Button
               onClick={() => {
-                if (mainDepthCanvas) {
-                  selectTool("depth");
-                }
-              }}
-              size="sm"
-              color="default"
-            >
-              Select Depth
-            </Button>
-            <Button
-              onClick={() => {
                 if (tempDepthCanvas) {
                   let depthCanvas = depthImageRef.current;
                   let depthContext = depthCanvas.getContext("2d");

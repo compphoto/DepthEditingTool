@@ -58,6 +58,36 @@ const SidePaneStyle = styled.div`
         }
         .tool-ext-card {
           background: transparent;
+          .tool-ext-card-body {
+            display: flex;
+            flex-wrap: wrap;
+            .card-tool {
+              flex-shrink: 0;
+              width: 72px;
+              height: 72px;
+              color: #7e838e;
+              font-size: 12px;
+              line-height: 1rem;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              cursor: pointer;
+              padding: 2px;
+              svg {
+                margin-bottom: 0.25rem;
+                width: 1.5rem;
+                height: 1.5rem;
+              }
+              &:hover {
+                color: #fff;
+              }
+            }
+            .card-tool-active {
+              background: #2b2c2f;
+              color: #fff;
+            }
+          }
         }
       }
       .toggle-button {

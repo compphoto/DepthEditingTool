@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
 import { toolExtActions } from "store/toolext";
+import { imageActions } from "store/image";
 import { selectors as toolExtSelectors } from "store/toolext";
+import { selectors as imageSelectors } from "store/image";
 import { Button, UncontrolledCollapse, CardBody, Card } from "reactstrap";
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import { MdCrop, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
-export function SidePane({ toolExtOpen, toolExtActions }) {
+export function SidePane({ toolExtOpen, toolExtActions, mainDepthCanvas, tools, selectTool }) {
   const [activeTool, setActiveTool] = useState(0);
   const toggleTool = index => {
     setActiveTool(index);
@@ -20,12 +22,20 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
           <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="depth-area-toggler">
             Select Area
           </Button>
-          <UncontrolledCollapse toggler="#depth-area-toggler">
+          <UncontrolledCollapse style={{ width: "100%" }} toggler="#depth-area-toggler">
             <Card className="tool-ext-card">
-              <CardBody>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
-                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
-                Minus, alias.
+              <CardBody className="tool-ext-card-body">
+                <div
+                  onClick={() => {
+                    if (mainDepthCanvas) {
+                      selectTool("depth");
+                    }
+                  }}
+                  className={tools.depth && mainDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
+                >
+                  <MdCrop />
+                  Draw
+                </div>
               </CardBody>
             </Card>
           </UncontrolledCollapse>
@@ -34,7 +44,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
           </Button>
           <UncontrolledCollapse toggler="#depth-rotate-toggler">
             <Card className="tool-ext-card">
-              <CardBody>
+              <CardBody className="tool-ext-card-body">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
                 Minus, alias.
@@ -46,7 +56,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
           </Button>
           <UncontrolledCollapse toggler="#depth-resize-toggler">
             <Card className="tool-ext-card">
-              <CardBody>
+              <CardBody className="tool-ext-card-body">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
                 Minus, alias.
@@ -60,7 +70,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
           </Button>
           <UncontrolledCollapse toggler="#adjust-crop-toggler">
             <Card className="tool-ext-card">
-              <CardBody>
+              <CardBody className="tool-ext-card-body">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
                 Minus, alias.
@@ -72,7 +82,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
           </Button>
           <UncontrolledCollapse toggler="#adjust-rotate-toggler">
             <Card className="tool-ext-card">
-              <CardBody>
+              <CardBody className="tool-ext-card-body">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
                 Minus, alias.
@@ -84,7 +94,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
           </Button>
           <UncontrolledCollapse toggler="#adjust-resize-toggler">
             <Card className="tool-ext-card">
-              <CardBody>
+              <CardBody className="tool-ext-card-body">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
                 Minus, alias.
@@ -105,7 +115,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
           </Button>
           <UncontrolledCollapse toggler="#adjust-crop-toggler">
             <Card className="tool-ext-card">
-              <CardBody>
+              <CardBody className="tool-ext-card-body">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
                 Minus, alias.
@@ -117,7 +127,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
           </Button>
           <UncontrolledCollapse toggler="#adjust-rotate-toggler">
             <Card className="tool-ext-card">
-              <CardBody>
+              <CardBody className="tool-ext-card-body">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
                 Minus, alias.
@@ -129,7 +139,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
           </Button>
           <UncontrolledCollapse toggler="#adjust-resize-toggler">
             <Card className="tool-ext-card">
-              <CardBody>
+              <CardBody className="tool-ext-card-body">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
                 Minus, alias.
@@ -150,7 +160,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
           </Button>
           <UncontrolledCollapse toggler="#adjust-crop-toggler">
             <Card className="tool-ext-card">
-              <CardBody>
+              <CardBody className="tool-ext-card-body">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
                 Minus, alias.
@@ -162,7 +172,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
           </Button>
           <UncontrolledCollapse toggler="#adjust-rotate-toggler">
             <Card className="tool-ext-card">
-              <CardBody>
+              <CardBody className="tool-ext-card-body">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
                 Minus, alias.
@@ -174,7 +184,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
           </Button>
           <UncontrolledCollapse toggler="#adjust-resize-toggler">
             <Card className="tool-ext-card">
-              <CardBody>
+              <CardBody className="tool-ext-card-body">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
                 Minus, alias.
@@ -214,11 +224,14 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
 }
 
 const mapStateToProps = state => ({
-  toolExtOpen: toolExtSelectors.toolExtOpen(state)
+  toolExtOpen: toolExtSelectors.toolExtOpen(state),
+  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
+  tools: imageSelectors.tools(state)
 });
 
 const mapDispatchToProps = {
-  toolExtActions: toolExtActions.toggleToolExt
+  toolExtActions: toolExtActions.toggleToolExt,
+  selectTool: imageActions.selectTool
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SidePane);
