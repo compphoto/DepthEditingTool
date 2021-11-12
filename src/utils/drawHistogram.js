@@ -3,10 +3,10 @@ import * as d3 from "d3";
 export const getImageData = img => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
-  canvas.width = img.naturalWidth;
-  canvas.height = img.naturalHeight;
+  canvas.width = img.width;
+  canvas.height = img.height;
   context.drawImage(img, 0, 0);
-  const src = context.getImageData(0, 0, img.naturalWidth, img.naturalHeight).data;
+  const src = context.getImageData(0, 0, img.width, img.height).data;
   let histBrightness = new Array(256).fill(0);
   for (let i = 0; i < src.length; i += 4) {
     let r = src[i];

@@ -16,12 +16,50 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
     return (
       <>
         <div className="tool-ext mt-4 w-100">
-          <p className="mb-3 text-white">Size</p>
+          <p className="mb-3 text-white">Depth</p>
+          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="depth-area-toggler">
+            Select Area
+          </Button>
+          <UncontrolledCollapse toggler="#depth-area-toggler">
+            <Card className="tool-ext-card">
+              <CardBody>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
+                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
+                Minus, alias.
+              </CardBody>
+            </Card>
+          </UncontrolledCollapse>
+          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="depth-rotate-toggler">
+            Rotate
+          </Button>
+          <UncontrolledCollapse toggler="#depth-rotate-toggler">
+            <Card className="tool-ext-card">
+              <CardBody>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
+                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
+                Minus, alias.
+              </CardBody>
+            </Card>
+          </UncontrolledCollapse>
+          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="depth-resize-toggler">
+            Resize
+          </Button>
+          <UncontrolledCollapse toggler="#depth-resize-toggler">
+            <Card className="tool-ext-card">
+              <CardBody>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
+                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
+                Minus, alias.
+              </CardBody>
+            </Card>
+          </UncontrolledCollapse>
+
+          {/* <p className="my-3 text-white">Size</p>
           <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-crop-toggler">
             Crop
           </Button>
           <UncontrolledCollapse toggler="#adjust-crop-toggler">
-            <Card>
+            <Card className="tool-ext-card">
               <CardBody>
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
@@ -33,7 +71,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
             Rotate
           </Button>
           <UncontrolledCollapse toggler="#adjust-rotate-toggler">
-            <Card>
+            <Card className="tool-ext-card">
               <CardBody>
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
@@ -45,14 +83,14 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
             Resize
           </Button>
           <UncontrolledCollapse toggler="#adjust-resize-toggler">
-            <Card>
+            <Card className="tool-ext-card">
               <CardBody>
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
                 Minus, alias.
               </CardBody>
             </Card>
-          </UncontrolledCollapse>
+          </UncontrolledCollapse> */}
         </div>
       </>
     );
@@ -66,7 +104,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
             Crop
           </Button>
           <UncontrolledCollapse toggler="#adjust-crop-toggler">
-            <Card>
+            <Card className="tool-ext-card">
               <CardBody>
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
@@ -78,7 +116,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
             Rotate
           </Button>
           <UncontrolledCollapse toggler="#adjust-rotate-toggler">
-            <Card>
+            <Card className="tool-ext-card">
               <CardBody>
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
@@ -90,7 +128,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
             Resize
           </Button>
           <UncontrolledCollapse toggler="#adjust-resize-toggler">
-            <Card>
+            <Card className="tool-ext-card">
               <CardBody>
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
@@ -111,7 +149,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
             Crop
           </Button>
           <UncontrolledCollapse toggler="#adjust-crop-toggler">
-            <Card>
+            <Card className="tool-ext-card">
               <CardBody>
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
@@ -123,7 +161,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
             Rotate
           </Button>
           <UncontrolledCollapse toggler="#adjust-rotate-toggler">
-            <Card>
+            <Card className="tool-ext-card">
               <CardBody>
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
@@ -135,7 +173,7 @@ export function SidePane({ toolExtOpen, toolExtActions }) {
             Resize
           </Button>
           <UncontrolledCollapse toggler="#adjust-resize-toggler">
-            <Card>
+            <Card className="tool-ext-card">
               <CardBody>
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
                 porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!

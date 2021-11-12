@@ -15,6 +15,7 @@ const initialState = {
     depth: false
   },
   parameters: {
+    croppedCanvasImage: null,
     croppedeArea: [0, 0, 0, 0]
   }
 };
@@ -78,6 +79,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           depth: false
         },
         parameters: {
+          croppedCanvasImage: null,
           croppedeArea: [0, 0, 0, 0]
         }
       };

@@ -47,3 +47,20 @@ export const editBoundingArea = (boundingBox, context) => {
   }
   context.putImageData(imageData, boundingBox[0], boundingBox[1]);
 };
+
+export const cropCanvas = (oldCanvas, boundingBox) => {
+  var newCanvas = document.createElement("canvas");
+  var context = newCanvas.getContext("2d");
+  context.drawImage(
+    oldCanvas,
+    boundingBox[0],
+    boundingBox[1],
+    boundingBox[2],
+    boundingBox[3],
+    0,
+    0,
+    boundingBox[2],
+    boundingBox[3]
+  );
+  return newCanvas;
+};

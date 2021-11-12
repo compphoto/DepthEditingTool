@@ -11,7 +11,7 @@ import { ThreeDViewer } from "components/ThreeDViewer";
 import MainPaneStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
 import { getImageData, processImage } from "utils/drawHistogram";
-import { cloneCanvas, editBoundingArea, drawCanvasImage, canvasToImage } from "utils/canvasUtils";
+import { cloneCanvas, editBoundingArea, drawCanvasImage, canvasToImage, cropCanvas } from "utils/canvasUtils";
 
 let objectUrl = null;
 
@@ -33,7 +33,7 @@ class MainPane extends Component {
   }
   componentDidUpdate(prevProps, prevState) {
     let { rgbImageRef, depthImageRef } = this;
-    let { rgbImageUrl, depthImageUrl, prevRgbSize, prevDepthSize, tools, initImage } = this.props;
+    let { rgbImageUrl, depthImageUrl, prevRgbSize, prevDepthSize, tools, parameters, initImage } = this.props;
     if (prevProps.rgbImageUrl !== rgbImageUrl) {
       let rgbCanvas = rgbImageRef.current;
       let rgbContext = rgbCanvas.getContext("2d");
@@ -73,15 +73,11 @@ class MainPane extends Component {
             prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height }
           });
         };
-
-        let histImage = new Image();
-        objectUrl = getImageUrl(depthImageUrl);
-        histImage.src = objectUrl;
-        histImage.onload = () => {
-          if (this.histRef.current) {
-            processImage(this.histRef.current, getImageData(histImage));
-          }
-        };
+      }
+    }
+    if (prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage) {
+      if (parameters.croppedCanvasImage && this.histRef.current) {
+        processImage(this.histRef.current, getImageData(parameters.croppedCanvasImage));
       }
     }
     if (prevProps.tools.depth !== tools.depth) {
@@ -165,8 +161,9 @@ class MainPane extends Component {
         let new_w = Math.min(Math.max(initBoundingBox.x, x), image_x2) - new_x;
         let new_h = Math.min(Math.max(initBoundingBox.y, y), image_y2) - new_y;
         depthContext.fillRect(new_x, new_y, new_w, new_h);
+        let croppedArea = [new_x, new_y, new_w, new_h];
         this.setState({ initBoundingBox: null }, () => {
-          storeParameters({ croppedeArea: [new_x, new_y, new_w, new_h] });
+          storeParameters({ croppedCanvasImage: cropCanvas(depthCanvas, croppedArea), croppedeArea: croppedArea });
         });
       } else {
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);

@@ -56,6 +56,9 @@ const SidePaneStyle = styled.div`
         .dropdown-button {
           width: 100%;
         }
+        .tool-ext-card {
+          background: transparent;
+        }
       }
       .toggle-button {
         z-index: 1000;
