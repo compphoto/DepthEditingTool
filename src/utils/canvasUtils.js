@@ -1,5 +1,6 @@
 export const canvasToImage = canvas => {
-  return canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+  if (canvas) return canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+  return null;
 };
 
 export const cloneCanvas = oldCanvas => {

@@ -1,5 +1,13 @@
 export const selectors = {
-  rgbImage: state => state.image.rgbImage,
-  depthImage: state => state.image.depthImage,
-  threeDepthImage: state => state.image.threeDepthImage
+  rgbImageUrl: state => state.image.rgbImageUrl,
+  depthImageUrl: state => state.image.depthImageUrl,
+  loadedRgbImage: state => state.image.loadedRgbImage,
+  loadedDepthImage: state => state.image.loadedDepthImage,
+  mainDepthCanvas: state => state.image.mainDepthCanvas,
+  rgbImageDimension: state => state.image.rgbImageDimension,
+  depthImageDimension: state => state.image.depthImageDimension,
+  prevRgbSize: state => state.image.prevRgbSize,
+  prevDepthSize: state => state.image.prevDepthSize,
+  tools: state => state.image.tools,
+  parameters: state => state.image.parameters
 };

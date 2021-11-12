@@ -64,7 +64,7 @@ const MainPaneStyle = styled.div`
     -webkit-transition: all 0.5s;
   }
   .main-shrink {
-    margin-left: 360px;
+    margin-left: 300px;
     transition: all 0.5s;
     -webkit-transition: all 0.5s;
   }

@@ -41,7 +41,7 @@ const SidePaneStyle = styled.div`
   .tools-ext {
     position: absolute;
     height: 100%;
-    width: 360px;
+    width: 300px;
     background: #2b2c2f;
     color: #7e838e;
     .tools-ext-elements {
@@ -88,7 +88,7 @@ const SidePaneStyle = styled.div`
     -webkit-transition: all 0.5s;
   }
   .tool-ext-inactive {
-    left: -398%;
+    left: -320%;
     transition: all 0.5s;
     -webkit-transition: all 0.5s;
   }

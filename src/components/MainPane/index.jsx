@@ -25,58 +25,57 @@ class MainPane extends Component {
   state = {
     windowWidth: window.innerWidth,
     windowHeight: window.innerHeight,
-    loadedRgbImage: null,
-    loadedDepthImage: null, // Original Depth Image (Used for Resizing)
-    mainDepthCanvas: null, // Initial Scaled Depth Image Canvas (Used for resetting depth image canvas to last saved canvas)
-    depthImageDimension: [0, 0, 0, 0],
-    initBoundingBox: null,
-    croppedeArea: [0, 0, 0, 0],
-    prevRgbSize: { width: null, height: null },
-    prevDepthSize: { width: null, height: null },
-    selectDepth: false
+    initBoundingBox: null
   };
   componentDidMount() {
     this.handleResize();
     window.addEventListener("resize", this.handleResize);
   }
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.rgbImageUrl !== this.props.rgbImageUrl) {
-      let rgbCanvas = this.rgbImageRef.current;
+    let { rgbImageRef, depthImageRef } = this;
+    let { rgbImageUrl, depthImageUrl, prevRgbSize, prevDepthSize, tools, initImage } = this.props;
+    if (prevProps.rgbImageUrl !== rgbImageUrl) {
+      let rgbCanvas = rgbImageRef.current;
       let rgbContext = rgbCanvas.getContext("2d");
-      if (this.props.rgbImageUrl === null) {
-        rgbContext.clearRect(0, 0, this.state.prevRgbSize.width, this.state.prevRgbSize.height);
+      if (rgbImageUrl === null) {
+        rgbContext.clearRect(0, 0, prevRgbSize.width, prevRgbSize.height);
       } else {
         let rgbImage = new Image();
-        objectUrl = getImageUrl(this.props.rgbImageUrl);
+        objectUrl = getImageUrl(rgbImageUrl);
         rgbImage.src = objectUrl;
         rgbImage.onload = () => {
-          drawCanvasImage(rgbImage, rgbCanvas, rgbContext);
-          this.setLoadedRgb(rgbImage);
-          this.setState({ ...this.state, prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height } });
+          let rgbImageDimension = drawCanvasImage(rgbImage, rgbCanvas, rgbContext);
+          initImage({
+            loadedRgbImage: rgbImage,
+            rgbImageDimension: rgbImageDimension,
+            prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height }
+          });
         };
       }
     }
-    if (prevProps.depthImageUrl !== this.props.depthImageUrl) {
-      let depthCanvas = this.depthImageRef.current;
+    if (prevProps.depthImageUrl !== depthImageUrl) {
+      let depthCanvas = depthImageRef.current;
       let depthContext = depthCanvas.getContext("2d");
-      if (this.props.depthImageUrl === null) {
-        depthContext.clearRect(0, 0, this.state.prevDepthSize.width, this.state.prevDepthSize.height);
+      if (depthImageUrl === null) {
+        d3.selectAll(".histogram").remove();
+        d3.selectAll("g.y-axis").remove();
+        depthContext.clearRect(0, 0, prevDepthSize.width, prevDepthSize.height);
       } else {
         let depthImage = new Image();
-        objectUrl = getImageUrl(this.props.depthImageUrl);
+        objectUrl = getImageUrl(depthImageUrl);
         depthImage.src = objectUrl;
         depthImage.onload = () => {
           let depthImageDimension = drawCanvasImage(depthImage, depthCanvas, depthContext);
-          this.setLoadedDepth(depthImage, depthCanvas, depthImageDimension);
-          this.setState({ ...this.state, prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height } });
+          initImage({
+            loadedDepthImage: depthImage,
+            mainDepthCanvas: cloneCanvas(depthCanvas),
+            depthImageDimension: depthImageDimension,
+            prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height }
+          });
         };
-      }
-      if (this.props.depthImageUrl === null) {
-        d3.selectAll(".histogram").remove();
-        d3.selectAll("g.y-axis").remove();
-      } else {
+
         let histImage = new Image();
-        objectUrl = getImageUrl(this.props.depthImageUrl);
+        objectUrl = getImageUrl(depthImageUrl);
         histImage.src = objectUrl;
         histImage.onload = () => {
           if (this.histRef.current) {
@@ -85,9 +84,9 @@ class MainPane extends Component {
         };
       }
     }
-    if (prevState.selectDepth !== this.state.selectDepth) {
-      if (this.state.selectDepth) {
-        let depthCanvas = this.depthImageRef.current;
+    if (prevProps.tools.depth !== tools.depth) {
+      if (tools.depth) {
+        let depthCanvas = depthImageRef.current;
         let depthContext = depthCanvas.getContext("2d");
         depthCanvas.addEventListener("click", event => {
           this.drawBoundingBox(event, depthCanvas, depthContext);
@@ -110,29 +109,13 @@ class MainPane extends Component {
       this.drawBoundingBox(event, depthCanvas, depthContext);
     });
   }
-  setLoadedRgb = rgbImage => {
-    this.setState({ ...this.state, loadedRgbImage: rgbImage });
-  };
-  setLoadedDepth = (depthImage, depthCanvas, depthImageDimension) => {
-    this.setState(
-      {
-        ...this.state,
-        loadedDepthImage: depthImage,
-        mainDepthCanvas: cloneCanvas(depthCanvas),
-        depthImageDimension: depthImageDimension
-      },
-      () => {
-        this.props.setThreeDepthImage(canvasToImage(this.state.mainDepthCanvas));
-      }
-    );
-  };
   onHandleChange = e => {
     this.props.handleChange(e);
     e.target.value = null;
   };
   handleResize = () => {
     this.setState({ ...this.state, windowWidth: window.innerWidth });
-    let { loadedRgbImage, loadedDepthImage } = this.state;
+    let { loadedRgbImage, loadedDepthImage, initImage } = this.props;
     let rgbCanvas = this.rgbImageRef.current;
     let depthCanvas = this.depthImageRef.current;
     if (rgbCanvas && depthCanvas) {
@@ -147,22 +130,28 @@ class MainPane extends Component {
       depthCanvas.width = (window.innerWidth / 1500) * 521;
       depthCanvas.height = (window.innerHeight / 1200) * 352;
 
-      loadedRgbImage && drawCanvasImage(loadedRgbImage, rgbCanvas, rgbContext);
+      if (loadedRgbImage) {
+        let rgbImageDimension = drawCanvasImage(loadedRgbImage, rgbCanvas, rgbContext);
+        initImage({
+          rgbImageDimension: rgbImageDimension,
+          prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height }
+        });
+      }
       if (loadedDepthImage) {
         let depthImageDimension = drawCanvasImage(loadedDepthImage, depthCanvas, depthContext);
-        this.setState(
-          { ...this.state, mainDepthCanvas: cloneCanvas(depthCanvas), depthImageDimension: depthImageDimension },
-          () => {
-            this.props.setThreeDepthImage(canvasToImage(this.state.mainDepthCanvas));
-          }
-        );
+        initImage({
+          mainDepthCanvas: cloneCanvas(depthCanvas),
+          depthImageDimension: depthImageDimension,
+          prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height }
+        });
       }
     } else {
       return;
     }
   };
   drawBoundingBox = (event, depthCanvas, depthContext) => {
-    let { mainDepthCanvas, initBoundingBox, depthImageDimension } = this.state;
+    let { initBoundingBox } = this.state;
+    let { mainDepthCanvas, depthImageDimension, storeParameters } = this.props;
     if (mainDepthCanvas) {
       let x = event.layerX;
       let y = event.layerY;
@@ -176,20 +165,30 @@ class MainPane extends Component {
         let new_w = Math.min(Math.max(initBoundingBox.x, x), image_x2) - new_x;
         let new_h = Math.min(Math.max(initBoundingBox.y, y), image_y2) - new_y;
         depthContext.fillRect(new_x, new_y, new_w, new_h);
-        this.setState({ ...this.state, initBoundingBox: null, croppedeArea: [new_x, new_y, new_w, new_h] });
+        this.setState({ initBoundingBox: null }, () => {
+          storeParameters({ croppedeArea: [new_x, new_y, new_w, new_h] });
+        });
       } else {
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
         depthContext.globalAlpha = 1;
         depthContext.drawImage(mainDepthCanvas, 0, 0);
-        this.setState({ ...this.state, initBoundingBox: { x, y } });
+        this.setState({ initBoundingBox: { x, y } });
       }
     }
   };
   render() {
-    const { mainDepthCanvas, croppedeArea } = this.state;
     const { rgbImageRef, depthImageRef, histRef, onHandleChange } = this;
-    const { toolExtOpen, rgbImageUrl, depthImageUrl, threeDepthImage, setThreeDepthImage, removeItem, removeAllItem } =
-      this.props;
+    const {
+      toolExtOpen,
+      rgbImageUrl,
+      depthImageUrl,
+      mainDepthCanvas,
+      parameters,
+      initImage,
+      selectTool,
+      removeItem,
+      removeAllItem
+    } = this.props;
     return (
       <MainPaneStyle>
         <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
@@ -212,7 +211,7 @@ class MainPane extends Component {
             </div>
             <div className="main-column main-column-3d">
               <div className="box threeD-box">
-                <ThreeDViewer rgbImageUrl={rgbImageUrl} depthImageUrl={threeDepthImage} />
+                <ThreeDViewer rgbImageUrl={rgbImageUrl} depthImageUrl={canvasToImage(mainDepthCanvas)} />
               </div>
               <div className="box histogram-box">
                 <svg id="hist-svg" height="1" width="1" ref={histRef}></svg>
@@ -228,7 +227,7 @@ class MainPane extends Component {
                 <input
                   id="upload-rgb-image"
                   type="file"
-                  name="rgbImage"
+                  name="rgbImageUrl"
                   onChange={onHandleChange}
                   accept="image/png, image/gif, image/jpeg, image/jpg"
                 />
@@ -243,8 +242,7 @@ class MainPane extends Component {
                 <div
                   onClick={e => {
                     e.stopPropagation();
-                    removeItem("rgbImage");
-                    this.setState({ ...this.state, loadedRgbImage: null });
+                    removeItem({ rgbImageUrl: null, loadedRgbImage: null });
                   }}
                   className="remove-img"
                 >
@@ -259,7 +257,7 @@ class MainPane extends Component {
                 <input
                   id="upload-depth-image"
                   type="file"
-                  name="depthImage"
+                  name="depthImageUrl"
                   onChange={onHandleChange}
                   accept="image/png, image/gif, image/jpeg, image/jpg"
                 />
@@ -274,10 +272,7 @@ class MainPane extends Component {
                 <div
                   onClick={e => {
                     e.stopPropagation();
-                    removeItem("depthImage");
-                    this.setState({ ...this.state, loadedDepthImage: null, mainDepthCanvas: null }, () => {
-                      setThreeDepthImage(null);
-                    });
+                    removeItem({ depthImageUrl: null, loadedDepthImage: null, mainDepthCanvas: null });
                   }}
                   className="remove-img"
                 >
@@ -289,7 +284,7 @@ class MainPane extends Component {
           <div className="main-side-bar-footer">
             <Button
               onClick={() => {
-                this.setState({ ...this.state, selectDepth: !this.state.selectDepth });
+                selectTool("depth");
               }}
               size="sm"
               color="default"
@@ -298,9 +293,7 @@ class MainPane extends Component {
             </Button>
             <Button
               onClick={() => {
-                this.setState({ ...this.state, mainDepthCanvas: cloneCanvas(depthImageRef.current) }, () => {
-                  setThreeDepthImage(canvasToImage(mainDepthCanvas));
-                });
+                initImage({ mainDepthCanvas: cloneCanvas(depthImageRef.current) });
               }}
               size="sm"
               color="default"
@@ -311,7 +304,7 @@ class MainPane extends Component {
               onClick={() => {
                 const depthCanvas = depthImageRef.current;
                 const depthContext = depthCanvas.getContext("2d");
-                editBoundingArea(croppedeArea, depthContext);
+                editBoundingArea(parameters.croppedeArea, depthContext);
               }}
               size="sm"
               color="default"
@@ -321,12 +314,6 @@ class MainPane extends Component {
             <Button
               onClick={() => {
                 removeAllItem();
-                this.setState(
-                  { ...this.state, loadedRgbImage: null, loadedDepthImage: null, mainDepthCanvas: null },
-                  () => {
-                    setThreeDepthImage(null);
-                  }
-                );
               }}
               size="sm"
               color="default"
@@ -342,14 +329,24 @@ class MainPane extends Component {
 
 const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
-  rgbImageUrl: imageSelectors.rgbImage(state),
-  depthImageUrl: imageSelectors.depthImage(state),
-  threeDepthImage: imageSelectors.threeDepthImage(state)
+  rgbImageUrl: imageSelectors.rgbImageUrl(state),
+  depthImageUrl: imageSelectors.depthImageUrl(state),
+  loadedRgbImage: imageSelectors.loadedRgbImage(state),
+  loadedDepthImage: imageSelectors.loadedDepthImage(state),
+  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
+  rgbImageDimension: imageSelectors.rgbImageDimension(state),
+  depthImageDimension: imageSelectors.depthImageDimension(state),
+  prevRgbSize: imageSelectors.prevRgbSize(state),
+  prevDepthSize: imageSelectors.prevDepthSize(state),
+  tools: imageSelectors.tools(state),
+  parameters: imageSelectors.parameters(state)
 });
 
 const mapDispatchToProps = {
   handleChange: imageActions.handleChange,
-  setThreeDepthImage: imageActions.setThreeDepthImage,
+  initImage: imageActions.initImage,
+  selectTool: imageActions.selectTool,
+  storeParameters: imageActions.storeParameters,
   removeItem: imageActions.removeItem,
   removeAllItem: imageActions.removeAllItem
 };
