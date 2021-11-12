@@ -19,14 +19,13 @@ export const getImageData = img => {
   return histBrightness;
 };
 
-export const processImage = (histRef, histBrightness) => {
+export const processImage = (q, histBrightness) => {
   let W = 800;
   let H = W / 2;
   const svg = d3.select("#hist-svg");
   const margin = { top: 20, right: 20, bottom: 30, left: 50 };
   const width = W - margin.left - margin.right;
   const height = H - margin.top - margin.bottom;
-  let q = histRef.current;
   q.style.width = W;
   q.style.height = H;
 
