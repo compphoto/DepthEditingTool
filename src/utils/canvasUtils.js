@@ -52,6 +52,8 @@ export const editBoundingArea = (boundingBox, context) => {
 
 export const cropCanvas = (oldCanvas, boundingBox) => {
   var newCanvas = document.createElement("canvas");
+  newCanvas.width = boundingBox[2];
+  newCanvas.height = boundingBox[3];
   var context = newCanvas.getContext("2d");
   context.drawImage(
     oldCanvas,

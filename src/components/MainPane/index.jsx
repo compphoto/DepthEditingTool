@@ -159,7 +159,7 @@ class MainPane extends Component {
   };
   drawBoundingBox = event => {
     let { initBoundingBox } = this.state;
-    let { mainDepthCanvas, depthImageDimension, storeParameters } = this.props;
+    let { mainDepthCanvas, tempDepthCanvas, depthImageDimension, storeParameters } = this.props;
     let depthCanvas = this.depthImageRef.current;
     let depthContext = depthCanvas.getContext("2d");
     if (mainDepthCanvas) {
@@ -177,7 +177,7 @@ class MainPane extends Component {
         depthContext.fillRect(new_x, new_y, new_w, new_h);
         let croppedArea = [new_x, new_y, new_w, new_h];
         this.setState({ initBoundingBox: null }, () => {
-          storeParameters({ croppedCanvasImage: cropCanvas(depthCanvas, croppedArea), croppedeArea: croppedArea });
+          storeParameters({ croppedCanvasImage: cropCanvas(tempDepthCanvas, croppedArea), croppedeArea: croppedArea });
         });
       } else {
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
