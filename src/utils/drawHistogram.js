@@ -19,15 +19,15 @@ export const getImageData = img => {
   return histBrightness;
 };
 
-export const processImage = (q, histBrightness) => {
+export const processImage = (histSVG, histBrightness) => {
   let W = (window.innerWidth / 1700) * 521;
   let H = W / 2;
   const svg = d3.select("#hist-svg");
   const margin = { top: 20, right: 20, bottom: 30, left: 50 };
   const width = W - margin.left - margin.right;
   const height = H - margin.top - margin.bottom;
-  q.style.width = W;
-  q.style.height = H;
+  histSVG.style.width = W;
+  histSVG.style.height = H;
 
   function graphComponent(histData) {
     d3.selectAll(".histogram").remove();
