@@ -20,7 +20,7 @@ export const getImageData = img => {
 };
 
 export const processImage = (q, histBrightness) => {
-  let W = 800;
+  let W = (window.innerWidth / 1700) * 521;
   let H = W / 2;
   const svg = d3.select("#hist-svg");
   const margin = { top: 20, right: 20, bottom: 30, left: 50 };

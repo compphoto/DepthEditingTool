@@ -122,7 +122,7 @@ class MainPane extends Component {
   };
   handleResize = () => {
     this.setState({ ...this.state, windowWidth: window.innerWidth });
-    let { loadedRgbImage, loadedDepthImage, initImage } = this.props;
+    let { loadedRgbImage, loadedDepthImage, initImage, parameters } = this.props;
     let rgbCanvas = this.rgbImageRef.current;
     let depthCanvas = this.depthImageRef.current;
     if (rgbCanvas && depthCanvas) {
@@ -152,6 +152,9 @@ class MainPane extends Component {
           depthImageDimension: depthImageDimension,
           prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height }
         });
+      }
+      if (parameters.croppedCanvasImage) {
+        processImage(this.histRef.current, getImageData(parameters.croppedCanvasImage));
       }
     } else {
       return;
