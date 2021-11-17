@@ -33,58 +33,43 @@ class MainPane extends Component {
   }
   componentDidUpdate(prevProps, prevState) {
     let { rgbImageRef, depthImageRef } = this;
-    let {
-      rgbImageUrl,
-      depthImageUrl,
-      mainDepthCanvas,
-      tempDepthCanvas,
-      prevRgbSize,
-      prevDepthSize,
-      tools,
-      parameters,
-      initImage
-    } = this.props;
+    let { rgbImageUrl, depthImageUrl, mainDepthCanvas, prevRgbSize, prevDepthSize, tools, parameters, initImage } =
+      this.props;
     let rgbCanvas = rgbImageRef.current;
     let rgbContext = rgbCanvas.getContext("2d");
     let depthCanvas = depthImageRef.current;
     let depthContext = depthCanvas.getContext("2d");
     if (prevProps.rgbImageUrl !== rgbImageUrl) {
-      if (rgbImageUrl === null) {
-        rgbContext.clearRect(0, 0, prevRgbSize.width, prevRgbSize.height);
-      } else {
-        let rgbImage = new Image();
-        objectUrl = getImageUrl(rgbImageUrl);
-        rgbImage.src = objectUrl;
-        rgbImage.onload = () => {
-          let rgbImageDimension = drawCanvasImage(rgbImage, rgbCanvas, rgbContext);
-          initImage({
-            loadedRgbImage: rgbImage,
-            rgbImageDimension: rgbImageDimension,
-            prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height }
-          });
-        };
-      }
+      rgbContext.clearRect(0, 0, prevRgbSize.width, prevRgbSize.height);
+      let rgbImage = new Image();
+      objectUrl = getImageUrl(rgbImageUrl);
+      rgbImage.src = objectUrl;
+      rgbImage.onload = () => {
+        let rgbImageDimension = drawCanvasImage(rgbImage, rgbCanvas, rgbContext);
+        initImage({
+          loadedRgbImage: rgbImage,
+          rgbImageDimension: rgbImageDimension,
+          prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height }
+        });
+      };
     }
     if (prevProps.depthImageUrl !== depthImageUrl) {
-      if (depthImageUrl === null) {
-        d3.selectAll(".histogram").remove();
-        d3.selectAll("g.y-axis").remove();
-        depthContext.clearRect(0, 0, prevDepthSize.width, prevDepthSize.height);
-      } else {
-        let depthImage = new Image();
-        objectUrl = getImageUrl(depthImageUrl);
-        depthImage.src = objectUrl;
-        depthImage.onload = () => {
-          let depthImageDimension = drawCanvasImage(depthImage, depthCanvas, depthContext);
-          initImage({
-            loadedDepthImage: depthImage,
-            mainDepthCanvas: cloneCanvas(depthCanvas),
-            tempDepthCanvas: cloneCanvas(depthCanvas),
-            depthImageDimension: depthImageDimension,
-            prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height }
-          });
-        };
-      }
+      d3.selectAll(".histogram").remove();
+      d3.selectAll("g.y-axis").remove();
+      depthContext.clearRect(0, 0, prevDepthSize.width, prevDepthSize.height);
+      let depthImage = new Image();
+      objectUrl = getImageUrl(depthImageUrl);
+      depthImage.src = objectUrl;
+      depthImage.onload = () => {
+        let depthImageDimension = drawCanvasImage(depthImage, depthCanvas, depthContext);
+        initImage({
+          loadedDepthImage: depthImage,
+          mainDepthCanvas: cloneCanvas(depthCanvas),
+          tempDepthCanvas: cloneCanvas(depthCanvas),
+          depthImageDimension: depthImageDimension,
+          prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height }
+        });
+      };
     }
     if (prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage) {
       if (parameters.croppedCanvasImage && this.histRef.current) {
@@ -128,9 +113,6 @@ class MainPane extends Component {
     if (rgbCanvas && depthCanvas) {
       let rgbContext = rgbCanvas.getContext("2d");
       let depthContext = depthCanvas.getContext("2d");
-
-      rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
-      depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
 
       rgbCanvas.width = (window.innerWidth / 1500) * 521;
       rgbCanvas.height = (window.innerHeight / 1200) * 352;
