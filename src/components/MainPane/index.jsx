@@ -56,6 +56,7 @@ class MainPane extends Component {
     if (prevProps.depthImageUrl !== depthImageUrl) {
       d3.selectAll(".histogram").remove();
       d3.selectAll("g.y-axis").remove();
+      d3.selectAll("text").remove();
       depthContext.clearRect(0, 0, prevDepthSize.width, prevDepthSize.height);
       let depthImage = new Image();
       objectUrl = getImageUrl(depthImageUrl);

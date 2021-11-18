@@ -32,6 +32,7 @@ export const processImage = (histSVG, histBrightness) => {
   function graphComponent(histData) {
     d3.selectAll(".histogram").remove();
     d3.selectAll("g.y-axis").remove();
+    d3.selectAll("text").remove();
 
     let data = histData.map((value, key) => {
       return { freq: value, idx: +key };
@@ -76,6 +77,11 @@ export const processImage = (histSVG, histBrightness) => {
       .attr("height", d => {
         return height - y(d.freq);
       });
+    g.append("text")
+      .attr("x", width / 2 + margin.top)
+      .attr("y", 0)
+      .attr("text-anchor", "middle")
+      .text("Depth Histogram");
   }
   graphComponent(histBrightness);
 };
