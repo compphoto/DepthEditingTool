@@ -5,10 +5,7 @@ export const getImageData = img => {
   canvas.height = img.height;
   context.drawImage(img, 0, 0);
   const src = context.getImageData(0, 0, img.width, img.height).data;
-  let histDepth = {};
-  for (let i = 0; i < 256; i++) {
-    histDepth[i] = 0;
-  }
+  let histDepth = new Array(256).fill(0);
   for (let i = 0; i < src.length; i += 4) {
     let r = src[i];
     let g = src[i + 1];
