@@ -10,7 +10,7 @@ import { RiDeleteBin5Fill } from "react-icons/ri";
 import { ThreeDViewer } from "components/ThreeDViewer";
 import MainPaneStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
-import { getImageData, processImage } from "utils/drawHistogram";
+import { drawBar, drawLine, getImageData, processImage } from "utils/drawHistogram";
 import { cloneCanvas, editBoundingArea, drawCanvasImage, canvasToImage, cropCanvas } from "utils/canvasUtils";
 
 let objectUrl = null;
@@ -20,7 +20,7 @@ class MainPane extends Component {
     super();
     this.rgbImageRef = createRef();
     this.depthImageRef = createRef();
-    this.histRef = createRef();
+    this.histImageRef = createRef();
   }
   state = {
     windowWidth: window.innerWidth,
@@ -32,13 +32,15 @@ class MainPane extends Component {
     window.addEventListener("resize", this.handleResize);
   }
   componentDidUpdate(prevProps, prevState) {
-    let { rgbImageRef, depthImageRef } = this;
+    let { rgbImageRef, depthImageRef, histImageRef } = this;
     let { rgbImageUrl, depthImageUrl, mainDepthCanvas, prevRgbSize, prevDepthSize, tools, parameters, initImage } =
       this.props;
     let rgbCanvas = rgbImageRef.current;
     let rgbContext = rgbCanvas.getContext("2d");
     let depthCanvas = depthImageRef.current;
     let depthContext = depthCanvas.getContext("2d");
+    let histCanvas = histImageRef.current;
+    let histContext = histCanvas.getContext("2d");
     if (prevProps.rgbImageUrl !== rgbImageUrl) {
       rgbContext.clearRect(0, 0, prevRgbSize.width, prevRgbSize.height);
       let rgbImage = new Image();
@@ -73,8 +75,25 @@ class MainPane extends Component {
       };
     }
     if (prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage) {
-      if (parameters.croppedCanvasImage && this.histRef.current) {
-        processImage(this.histRef.current, getImageData(parameters.croppedCanvasImage));
+      if (parameters.croppedCanvasImage && histCanvas) {
+        let histDepth = getImageData(parameters.croppedCanvasImage);
+        let padding = 2;
+        let newCanvasWidth = histCanvas.width - padding * 2;
+        let newCanvasHeight = histCanvas.height - padding * 2;
+        let maxDepth = Math.max(...Object.values(histDepth));
+        let binSizeY = newCanvasHeight / maxDepth;
+        let binSizeX = newCanvasWidth / 256;
+        drawLine(histContext, padding, padding, padding, newCanvasHeight, "blue");
+        drawLine(histContext, padding, newCanvasHeight, newCanvasWidth, newCanvasHeight, "blue");
+        let lastPositionX = 0;
+        for (const [key, value] of Object.entries(histDepth)) {
+          let upperLeftCornerX = padding + lastPositionX;
+          let upperLeftCornerY = padding + newCanvasHeight - value * binSizeY;
+          let width = binSizeX;
+          let height = value * binSizeY;
+          lastPositionX += binSizeX;
+          drawBar(histContext, upperLeftCornerX, upperLeftCornerY, width, height);
+        }
       }
     }
     if (prevProps.tools.depth !== tools.depth) {
@@ -136,9 +155,9 @@ class MainPane extends Component {
           prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height }
         });
       }
-      if (parameters.croppedCanvasImage) {
-        processImage(this.histRef.current, getImageData(parameters.croppedCanvasImage));
-      }
+      // if (parameters.croppedCanvasImage) {
+      //   processImage(this.histImageRef.current, getImageData(parameters.croppedCanvasImage));
+      // }
     } else {
       return;
     }
@@ -174,7 +193,7 @@ class MainPane extends Component {
     }
   };
   render() {
-    const { rgbImageRef, depthImageRef, histRef, onHandleChange } = this;
+    const { rgbImageRef, depthImageRef, histImageRef, onHandleChange } = this;
     const {
       toolExtOpen,
       rgbImageUrl,
@@ -212,7 +231,7 @@ class MainPane extends Component {
                 <ThreeDViewer rgbImageUrl={rgbImageUrl} depthImageUrl={canvasToImage(mainDepthCanvas)} />
               </div>
               <div className="box histogram-box">
-                <svg id="hist-svg" height="1" width="1" ref={histRef}></svg>
+                <canvas width="1200" height="400" ref={histImageRef}></canvas>
               </div>
             </div>
           </div>
