@@ -36,3 +36,24 @@ export const drawBar = (ctx, upperLeftCornerX, upperLeftCornerY, width, height, 
   ctx.fillRect(upperLeftCornerX, upperLeftCornerY, width, height);
   ctx.restore();
 };
+
+export const drawHistogramImage = (canvas, ctx, data) => {
+  let padding = 2;
+  let newCanvasWidth = canvas.width - padding * 2;
+  let newCanvasHeight = canvas.height - padding * 2;
+  let maxDepth = Math.max(...Object.values(data));
+  let binSizeY = newCanvasHeight / maxDepth;
+  let binSizeX = newCanvasWidth / 256;
+  drawLine(ctx, padding, padding, padding, newCanvasHeight, "black");
+  drawLine(ctx, padding, newCanvasHeight, newCanvasWidth, newCanvasHeight, "black");
+  let lastPositionX = 0;
+  for (const [key, value] of Object.entries(data)) {
+    let upperLeftCornerX = padding + lastPositionX;
+    let upperLeftCornerY = padding + newCanvasHeight - value * binSizeY;
+    let width = binSizeX;
+    let height = value * binSizeY;
+    let color = key % 2 === 0 ? "#080808" : "#333";
+    lastPositionX += binSizeX;
+    drawBar(ctx, upperLeftCornerX, upperLeftCornerY, width, height, color);
+  }
+};

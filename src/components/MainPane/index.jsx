@@ -158,6 +158,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
+  handleChange: imageActions.handleChange,
   removeItem: imageActions.removeItem,
   removeAllItem: imageActions.removeAllItem
 };

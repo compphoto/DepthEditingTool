@@ -1,11 +1,10 @@
 import React, { Component, createRef } from "react";
 import { connect } from "react-redux";
 import { imageActions } from "store/image";
-import { selectors as toolExtSelectors } from "store/toolext";
 import { selectors as imageSelectors } from "store/image";
 import DepthViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
-import { cloneCanvas, editBoundingArea, drawCanvasImage, canvasToImage, cropCanvas } from "utils/canvasUtils";
+import { cloneCanvas, drawCanvasImage, cropCanvas } from "utils/canvasUtils";
 
 let objectUrl = null;
 
@@ -25,13 +24,10 @@ class DepthViewer extends Component {
   }
   componentDidUpdate(prevProps, prevState) {
     let { depthImageRef } = this;
-    let { depthImageUrl, mainDepthCanvas, prevDepthSize, tools, parameters, initImage } = this.props;
+    let { depthImageUrl, mainDepthCanvas, prevDepthSize, tools, initImage } = this.props;
     let depthCanvas = depthImageRef.current;
     let depthContext = depthCanvas.getContext("2d");
     if (prevProps.depthImageUrl !== depthImageUrl) {
-      // d3.selectAll(".histogram").remove();
-      // d3.selectAll("g.y-axis").remove();
-      // d3.selectAll("text").remove();
       depthContext.clearRect(0, 0, prevDepthSize.width, prevDepthSize.height);
       let depthImage = new Image();
       objectUrl = getImageUrl(depthImageUrl);
@@ -52,10 +48,12 @@ class DepthViewer extends Component {
         depthCanvas.addEventListener("click", this.drawBoundingBox);
       } else {
         depthCanvas.removeEventListener("click", this.drawBoundingBox);
-        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
-        depthContext.globalAlpha = 1;
-        depthContext.drawImage(mainDepthCanvas, 0, 0);
-        initImage({ tempDepthCanvas: cloneCanvas(depthCanvas) });
+        if (mainDepthCanvas) {
+          depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
+          depthContext.globalAlpha = 1;
+          depthContext.drawImage(mainDepthCanvas, 0, 0);
+          initImage({ tempDepthCanvas: cloneCanvas(depthCanvas) });
+        }
       }
     }
     if (prevProps.mainDepthCanvas !== mainDepthCanvas) {
@@ -73,9 +71,10 @@ class DepthViewer extends Component {
     URL.revokeObjectURL(objectUrl);
   }
   handleResize = () => {
+    let { depthImageRef } = this;
     this.setState({ ...this.state, windowWidth: window.innerWidth });
-    let { loadedDepthImage, initImage, parameters } = this.props;
-    let depthCanvas = this.depthImageRef.current;
+    let { loadedDepthImage, initImage } = this.props;
+    let depthCanvas = depthImageRef.current;
     if (depthCanvas) {
       let depthContext = depthCanvas.getContext("2d");
       depthCanvas.width = (window.innerWidth / 1500) * 521;
@@ -138,28 +137,19 @@ class DepthViewer extends Component {
 }
 
 const mapStateToProps = state => ({
-  toolExtOpen: toolExtSelectors.toolExtOpen(state),
-  rgbImageUrl: imageSelectors.rgbImageUrl(state),
   depthImageUrl: imageSelectors.depthImageUrl(state),
-  loadedRgbImage: imageSelectors.loadedRgbImage(state),
   loadedDepthImage: imageSelectors.loadedDepthImage(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  rgbImageDimension: imageSelectors.rgbImageDimension(state),
   depthImageDimension: imageSelectors.depthImageDimension(state),
-  prevRgbSize: imageSelectors.prevRgbSize(state),
   prevDepthSize: imageSelectors.prevDepthSize(state),
   tools: imageSelectors.tools(state),
   parameters: imageSelectors.parameters(state)
 });
 
 const mapDispatchToProps = {
-  handleChange: imageActions.handleChange,
   initImage: imageActions.initImage,
-  selectTool: imageActions.selectTool,
-  storeParameters: imageActions.storeParameters,
-  removeItem: imageActions.removeItem,
-  removeAllItem: imageActions.removeAllItem
+  storeParameters: imageActions.storeParameters
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(DepthViewer);
