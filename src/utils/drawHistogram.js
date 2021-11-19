@@ -44,8 +44,8 @@ export const drawHistogramImage = (canvas, ctx, data) => {
   let maxDepth = Math.max(...Object.values(data));
   let binSizeY = newCanvasHeight / maxDepth;
   let binSizeX = newCanvasWidth / 256;
-  drawLine(ctx, padding, padding, padding, newCanvasHeight, "black");
-  drawLine(ctx, padding, newCanvasHeight, newCanvasWidth, newCanvasHeight, "black");
+  drawLine(ctx, padding - 1, padding - 1, padding - 1, newCanvasHeight + 1, "black");
+  drawLine(ctx, padding - 1, newCanvasHeight + 1, newCanvasWidth + 1, newCanvasHeight + 1, "black");
   let lastPositionX = 0;
   for (const [key, value] of Object.entries(data)) {
     let upperLeftCornerX = padding + lastPositionX;
