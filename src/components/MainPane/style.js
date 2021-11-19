@@ -125,6 +125,8 @@ const MainPaneStyle = styled.div`
           padding: 5px;
           width: 100%;
           margin-bottom: 0.5rem;
+          overflow: hidden;
+          max-height: 200px;
           .side-bar-img {
             width: 100%;
           }
