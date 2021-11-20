@@ -8,7 +8,7 @@ import { DoubleSide } from "three";
 import ThreeDViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
 
-export function ThreeDViewer({ rgbImageUrl, depthImageUrl }) {
+export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   const [imageDimension, setImageDimension] = useState(1.0);
   const [colorMap, setColorMap] = useState(false);
   const [displacementMap, setDisplacementMap] = useState(false);
@@ -28,17 +28,17 @@ export function ThreeDViewer({ rgbImageUrl, depthImageUrl }) {
   // });
 
   useEffect(() => {
-    let colorMap = new TextureLoader().setCrossOrigin("").load(getImageUrl(rgbImageUrl), colorMap => {
+    let colorMap = new TextureLoader().setCrossOrigin("").load(rgbImageCanvas, colorMap => {
       colorMap.needsUpdate = true;
       setImageDimension(colorMap.image.height / colorMap.image.width);
     });
     setColorMap(colorMap);
-  }, [rgbImageUrl]);
+  }, [rgbImageCanvas]);
 
   useEffect(() => {
-    let displacementMap = new TextureLoader().setCrossOrigin("").load(depthImageUrl);
+    let displacementMap = new TextureLoader().setCrossOrigin("").load(depthImageCanvas);
     setDisplacementMap(displacementMap);
-  }, [depthImageUrl]);
+  }, [depthImageCanvas]);
 
   return (
     <ThreeDViewerStyle>

@@ -21,7 +21,8 @@ class MainPane extends Component {
   };
   render() {
     const { onHandleChange } = this;
-    const { toolExtOpen, rgbImageUrl, depthImageUrl, mainDepthCanvas, removeItem, removeAllItem } = this.props;
+    const { toolExtOpen, rgbImageUrl, depthImageUrl, mainRgbCanvas, mainDepthCanvas, removeItem, removeAllItem } =
+      this.props;
     return (
       <MainPaneStyle>
         <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
@@ -36,7 +37,10 @@ class MainPane extends Component {
             </div>
             <div className="main-column main-column-3d">
               <div className="box threeD-box">
-                <ThreeDViewer rgbImageUrl={rgbImageUrl} depthImageUrl={canvasToImage(mainDepthCanvas)} />
+                <ThreeDViewer
+                  rgbImageCanvas={canvasToImage(mainRgbCanvas)}
+                  depthImageCanvas={canvasToImage(mainDepthCanvas)}
+                />
               </div>
               <div className="box histogram-box">
                 <HistViewer />
@@ -67,7 +71,12 @@ class MainPane extends Component {
                 <div
                   onClick={e => {
                     e.stopPropagation();
-                    removeItem({ rgbImageUrl: null, loadedRgbImage: null });
+                    removeItem({
+                      rgbImageUrl: null,
+                      loadedRgbImage: null,
+                      mainRgbCanvas: null,
+                      rgbImageDimension: null
+                    });
                   }}
                   className="remove-img"
                 >
@@ -101,6 +110,8 @@ class MainPane extends Component {
                       depthImageUrl: null,
                       loadedDepthImage: null,
                       mainDepthCanvas: null,
+                      depthImageDimension: null,
+                      depthCanvaUpdate: null,
                       tools: {
                         currentTool: null,
                         depth: false
@@ -154,6 +165,7 @@ const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
   rgbImageUrl: imageSelectors.rgbImageUrl(state),
   depthImageUrl: imageSelectors.depthImageUrl(state),
+  mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state)
 });
 
