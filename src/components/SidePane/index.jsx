@@ -1,19 +1,43 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { toolExtActions } from "store/toolext";
 import { imageActions } from "store/image";
 import { selectors as toolExtSelectors } from "store/toolext";
 import { selectors as imageSelectors } from "store/image";
-import { Button, UncontrolledCollapse, CardBody, Card } from "reactstrap";
+import { Button, UncontrolledCollapse, CardBody, Card, FormGroup, Label, Input } from "reactstrap";
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
 import { MdCrop, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import { editBoundingArea } from "utils/canvasUtils";
 
-export function SidePane({ toolExtOpen, toolExtActions, mainDepthCanvas, tools, selectTool }) {
+export function SidePane({
+  toolExtOpen,
+  toolExtActions,
+  mainDepthCanvas,
+  tempDepthCanvas,
+  tools,
+  parameters,
+  initImage,
+  selectTool
+}) {
   const [activeTool, setActiveTool] = useState(0);
+  const [toolRange, setToolRange] = useState({
+    depthIntensityRange: 0
+  });
   const toggleTool = index => {
     setActiveTool(index);
   };
+  const onHandleChange = e => {
+    let { name, value } = e.target;
+    setToolRange({ ...toolRange, [name]: value });
+  };
+  useEffect(() => {
+    if (tempDepthCanvas) {
+      let tempDepthContext = tempDepthCanvas.getContext("2d");
+      editBoundingArea(parameters.croppedeArea, tempDepthContext, toolRange.depthIntensityRange);
+      initImage({ depthCanvaUpdate: toolRange.depthIntensityRange });
+    }
+  }, [toolRange.depthIntensityRange]);
   const adjust = () => {
     return (
       <>
@@ -25,17 +49,31 @@ export function SidePane({ toolExtOpen, toolExtActions, mainDepthCanvas, tools, 
           <UncontrolledCollapse style={{ width: "100%" }} toggler="#depth-area-toggler">
             <Card className="tool-ext-card">
               <CardBody className="tool-ext-card-body">
-                <div
-                  onClick={() => {
-                    if (mainDepthCanvas) {
-                      selectTool("depth");
-                    }
-                  }}
-                  className={tools.depth && mainDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
-                >
-                  <MdCrop />
-                  Draw
+                <div className="tool-ext-card-body-icons">
+                  <div
+                    onClick={() => {
+                      if (mainDepthCanvas) {
+                        selectTool("depth");
+                      }
+                    }}
+                    className={tools.depth && mainDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
+                  >
+                    <MdCrop />
+                    Draw
+                  </div>
                 </div>
+                <FormGroup className="w-100 my-3">
+                  <Label for="depthIntensityRange">Intensity</Label>
+                  <Input
+                    onMouseUp={onHandleChange}
+                    className="w-100"
+                    id="depthIntensityRange"
+                    name="depthIntensityRange"
+                    min="-100"
+                    max="100"
+                    type="range"
+                  />
+                </FormGroup>
               </CardBody>
             </Card>
           </UncontrolledCollapse>
@@ -226,11 +264,15 @@ export function SidePane({ toolExtOpen, toolExtActions, mainDepthCanvas, tools, 
 const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  tools: imageSelectors.tools(state)
+  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
+  depthCanvaUpdate: imageSelectors.depthCanvaUpdate(state),
+  tools: imageSelectors.tools(state),
+  parameters: imageSelectors.parameters(state)
 });
 
 const mapDispatchToProps = {
   toolExtActions: toolExtActions.toggleToolExt,
+  initImage: imageActions.initImage,
   selectTool: imageActions.selectTool
 };
 

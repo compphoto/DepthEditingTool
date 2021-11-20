@@ -25,6 +25,16 @@ export function ImageEditor({ mainDepthCanvas, tempDepthCanvas, initImage }) {
             <div>
               <Button
                 onClick={() => {
+                  initImage({ tempDepthCanvas: cloneCanvas(mainDepthCanvas) });
+                }}
+                size="sm"
+                color="secondary"
+                className="mr-3"
+              >
+                Reset
+              </Button>
+              <Button
+                onClick={() => {
                   initImage({ mainDepthCanvas: cloneCanvas(tempDepthCanvas) });
                 }}
                 size="sm"

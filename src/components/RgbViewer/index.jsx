@@ -4,7 +4,7 @@ import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import RgbViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
-import { drawCanvasImage } from "utils/canvasUtils";
+import { cloneCanvas, drawCanvasImage } from "utils/canvasUtils";
 
 let objectUrl = null;
 
@@ -23,7 +23,7 @@ class RgbViewer extends Component {
   }
   componentDidUpdate(prevProps, prevState) {
     let { rgbImageRef } = this;
-    let { rgbImageUrl, prevRgbSize, initImage } = this.props;
+    let { rgbImageUrl, mainRgbCanvas, prevRgbSize, initImage } = this.props;
     let rgbCanvas = rgbImageRef.current;
     let rgbContext = rgbCanvas.getContext("2d");
     if (prevProps.rgbImageUrl !== rgbImageUrl) {
@@ -35,6 +35,7 @@ class RgbViewer extends Component {
         let rgbImageDimension = drawCanvasImage(rgbImage, rgbCanvas, rgbContext);
         initImage({
           loadedRgbImage: rgbImage,
+          mainRgbCanvas: cloneCanvas(rgbCanvas),
           rgbImageDimension: rgbImageDimension,
           prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height }
         });
@@ -82,7 +83,7 @@ class RgbViewer extends Component {
 const mapStateToProps = state => ({
   rgbImageUrl: imageSelectors.rgbImageUrl(state),
   loadedRgbImage: imageSelectors.loadedRgbImage(state),
-  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
+  mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
   rgbImageDimension: imageSelectors.rgbImageDimension(state),
   prevRgbSize: imageSelectors.prevRgbSize(state)
 });

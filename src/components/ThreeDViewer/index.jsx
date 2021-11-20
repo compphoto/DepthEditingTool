@@ -8,7 +8,8 @@ import { DoubleSide } from "three";
 import ThreeDViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
 
-export function ThreeDViewer({ rgbImageUrl, depthImageUrl }) {
+export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
+  const [imageDimension, setImageDimension] = useState(1.0);
   const [colorMap, setColorMap] = useState(false);
   const [displacementMap, setDisplacementMap] = useState(false);
   // const { middleGrey, maxLuminance } = useControls({
@@ -27,14 +28,17 @@ export function ThreeDViewer({ rgbImageUrl, depthImageUrl }) {
   // });
 
   useEffect(() => {
-    let colorMap = new TextureLoader().setCrossOrigin("").load(getImageUrl(rgbImageUrl));
+    let colorMap = new TextureLoader().setCrossOrigin("").load(rgbImageCanvas, colorMap => {
+      colorMap.needsUpdate = true;
+      setImageDimension(colorMap.image.height / colorMap.image.width);
+    });
     setColorMap(colorMap);
-  }, [rgbImageUrl]);
+  }, [rgbImageCanvas]);
 
   useEffect(() => {
-    let displacementMap = new TextureLoader().setCrossOrigin("").load(depthImageUrl);
+    let displacementMap = new TextureLoader().setCrossOrigin("").load(depthImageCanvas);
     setDisplacementMap(displacementMap);
-  }, [depthImageUrl]);
+  }, [depthImageCanvas]);
 
   return (
     <ThreeDViewerStyle>
@@ -44,7 +48,7 @@ export function ThreeDViewer({ rgbImageUrl, depthImageUrl }) {
           <pointLight position={[0, 4, 4]} />
           {/* <spotLight color={0xffa95c} intensity={4} position={[-50, 50, 50]} />
           <hemisphereLight color={0xffeeb1} groundColor={0x080820} intensity={4} /> */}
-          <mesh scale={0.9}>
+          <mesh scale={[1.0, imageDimension, 1.0]}>
             <planeBufferGeometry args={[2, 2, 2000, 2000]} />
             <meshStandardMaterial
               side={DoubleSide}
