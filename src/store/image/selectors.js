@@ -5,6 +5,7 @@ export const selectors = {
   loadedDepthImage: state => state.image.loadedDepthImage,
   mainDepthCanvas: state => state.image.mainDepthCanvas,
   tempDepthCanvas: state => state.image.tempDepthCanvas,
+  depthCanvaUpdate: state => state.image.depthCanvaUpdate,
   rgbImageDimension: state => state.image.rgbImageDimension,
   depthImageDimension: state => state.image.depthImageDimension,
   prevRgbSize: state => state.image.prevRgbSize,
