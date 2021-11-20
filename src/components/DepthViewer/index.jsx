@@ -32,7 +32,8 @@ class DepthViewer extends Component {
       prevDepthSize,
       tools,
       parameters,
-      initImage
+      initImage,
+      storeParameters
     } = this.props;
     let depthCanvas = depthImageRef.current;
     let depthContext = depthCanvas.getContext("2d");
@@ -74,6 +75,10 @@ class DepthViewer extends Component {
     }
     if (prevProps.tempDepthCanvas !== tempDepthCanvas) {
       if (tempDepthCanvas) {
+        storeParameters({
+          croppedCanvasImage: null,
+          croppedeArea: null
+        });
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
         depthContext.globalAlpha = 1;
         depthContext.drawImage(tempDepthCanvas, 0, 0);
