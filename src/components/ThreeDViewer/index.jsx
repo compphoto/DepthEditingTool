@@ -49,12 +49,12 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
           {/* <spotLight color={0xffa95c} intensity={4} position={[-50, 50, 50]} />
           <hemisphereLight color={0xffeeb1} groundColor={0x080820} intensity={4} /> */}
           <mesh scale={[1.0, imageDimension, 1.0]}>
-            <planeBufferGeometry args={[2, 2, 2000, 2000]} />
+            <planeBufferGeometry args={[4, 4, 2000, 2000]} />
             <meshStandardMaterial
               side={DoubleSide}
               map={colorMap}
               displacementMap={displacementMap}
-              displacementScale={1}
+              displacementScale={1.0}
             />
           </mesh>
           <OrbitControls
