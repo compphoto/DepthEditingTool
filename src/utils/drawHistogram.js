@@ -8,11 +8,7 @@ export const getImageData = img => {
   let histDepth = new Array(256).fill(0);
   for (let i = 0; i < src.length; i += 4) {
     let r = src[i];
-    let g = src[i + 1];
-    let b = src[i + 2];
     histDepth[r]++;
-    histDepth[g]++;
-    histDepth[b]++;
   }
   return histDepth;
 };
