@@ -30,11 +30,38 @@ class RangeSlider extends React.Component {
             position: "relative",
             width: "100%"
           }}
-          onUpdate={update => this.setState({ update: update, inputValues: update })}
+          onUpdate={update => this.setState({ update, inputValues: update })}
           onChange={values => this.setState({ values })}
           values={values}
         >
-          <Rail> {({ getRailProps }) => <MuiRail getRailProps={getRailProps} />}</Rail>
+          <Rail>{({ getRailProps }) => <MuiRail getRailProps={getRailProps} />}</Rail>
+          <Handles>
+            {({ handles, getHandleProps }) => (
+              <div className="slider-handles">
+                {handles.map(handle => (
+                  <MuiHandle key={handle.id} handle={handle} domain={domain} getHandleProps={getHandleProps} />
+                ))}
+              </div>
+            )}
+          </Handles>
+          <Tracks left={false} right={false}>
+            {({ tracks, getTrackProps }) => (
+              <div className="slider-tracks">
+                {tracks.map(({ id, source, target }) => (
+                  <MuiTrack key={id} source={source} target={target} getTrackProps={getTrackProps} />
+                ))}
+              </div>
+            )}
+          </Tracks>
+          <Ticks count={5}>
+            {({ ticks }) => (
+              <div className="slider-ticks">
+                {ticks.map(tick => (
+                  <MuiTick key={tick.id} tick={tick} count={ticks.length} />
+                ))}
+              </div>
+            )}
+          </Ticks>
         </Slider>
         <Grid container alignItems="center" justify="space-around" style={{ marginTop: "88px" }}>
           <Grid item xs={4} style={{ textAlign: "right" }}>
@@ -51,7 +78,7 @@ class RangeSlider extends React.Component {
                 }
               }}
               InputProps={{
-                startAdornment: <InputAdornment position="start"> $ </InputAdornment>
+                startAdornment: <InputAdornment position="start">$</InputAdornment>
               }}
             />
           </Grid>
@@ -72,7 +99,7 @@ class RangeSlider extends React.Component {
                 }
               }}
               InputProps={{
-                startAdornment: <InputAdornment position="start"> $ </InputAdornment>
+                startAdornment: <InputAdornment position="start">$</InputAdornment>
               }}
             />
           </Grid>
