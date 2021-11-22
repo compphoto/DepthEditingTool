@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { Grid, Button, TextField, InputAdornment } from "@material-ui/core";
 import { Slider, Rail, Handles, Tracks, Ticks } from "react-compound-slider";
 import { MuiRail, MuiHandle, MuiTrack, MuiTick } from "./components";
@@ -8,7 +8,7 @@ class RangeSlider extends React.Component {
   constructor(props) {
     super(props);
     const indexes = props.data.map((val, i) => i);
-    const range = [indexes[0], indexes[indexes.length - 1]];
+    const range = [0, 255];
     this.state = {
       domain: range,
       update: range,
@@ -16,11 +16,10 @@ class RangeSlider extends React.Component {
       inputValues: range
     };
   }
-
   render() {
     const { domain, values, update, inputValues } = this.state;
     return (
-      <div style={{ margin: "10%", height: 120, width: "80%" }}>
+      <Fragment>
         <BarChart data={this.props.data} highlight={update} />
         <Slider
           mode={3}
@@ -67,7 +66,7 @@ class RangeSlider extends React.Component {
           <Grid item xs={4} style={{ textAlign: "right" }}>
             <TextField
               variant="outlined"
-              label="starting price"
+              label="min depth"
               value={inputValues[0]}
               onChange={evt => {
                 const value = evt.target.value;
@@ -88,7 +87,7 @@ class RangeSlider extends React.Component {
           <Grid item xs={4} style={{ textAlign: "left" }}>
             <TextField
               variant="outlined"
-              label="max price"
+              label="max depth"
               value={inputValues[1]}
               onChange={evt => {
                 const value = evt.target.value;
@@ -116,7 +115,7 @@ class RangeSlider extends React.Component {
         >
           Reset
         </Button>
-      </div>
+      </Fragment>
     );
   }
 }
