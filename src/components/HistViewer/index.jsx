@@ -13,22 +13,23 @@ class HistViewer extends Component {
   state = {
     windowWidth: window.innerWidth,
     windowHeight: window.innerHeight,
-    data: []
+    data: [],
+    pixelToIntensityMap: {}
   };
   componentDidUpdate(prevProps, prevState) {
     let { parameters } = this.props;
     if (prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage) {
       if (parameters.croppedCanvasImage) {
-        let histDepthData = getImageData(parameters.croppedCanvasImage);
-        this.setState({ data: histDepthData });
+        let [histDepthData, histDepthMapper] = getImageData(parameters.croppedCanvasImage);
+        this.setState({ data: histDepthData, pixelToIntensityMap: histDepthMapper });
       }
     }
   }
   render() {
-    const { data } = this.state;
+    const { data, pixelToIntensityMap } = this.state;
     return (
       <HistViewerStyle>
-        <RangeSlider data={data} />
+        <RangeSlider data={data} pixelToIntensityMap={pixelToIntensityMap} />
       </HistViewerStyle>
     );
   }

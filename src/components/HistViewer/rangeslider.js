@@ -1,5 +1,7 @@
 import React, { Fragment } from "react";
-import { Grid, Button, TextField, InputAdornment } from "@material-ui/core";
+import { connect } from "react-redux";
+import { imageActions } from "store/image";
+import { Grid, Button, TextField } from "@material-ui/core";
 import { Slider, Rail, Handles, Tracks, Ticks } from "react-compound-slider";
 import { MuiRail, MuiHandle, MuiTrack, MuiTick } from "./components";
 import BarChart from "./barchart";
@@ -7,7 +9,6 @@ import BarChart from "./barchart";
 class RangeSlider extends React.Component {
   constructor(props) {
     super(props);
-    const indexes = props.data.map((val, i) => i);
     const range = [0, 255];
     this.state = {
       domain: range,
@@ -16,6 +17,19 @@ class RangeSlider extends React.Component {
       inputValues: range
     };
   }
+  handleClip = () => {
+    let { inputValues } = this.state;
+    let { pixelToIntensityMap, storeParameters } = this.props;
+    let pixelArray = [];
+    for (let i = inputValues[0]; i <= inputValues[1]; i++) {
+      if (i in pixelToIntensityMap) {
+        pixelArray.push(...pixelToIntensityMap[i]);
+      }
+    }
+    storeParameters({
+      pixelRangeArray: pixelArray
+    });
+  };
   render() {
     const { domain, values, update, inputValues } = this.state;
     return (
@@ -76,9 +90,6 @@ class RangeSlider extends React.Component {
                   this.setState({ values: newState });
                 }
               }}
-              InputProps={{
-                startAdornment: <InputAdornment position="start">$</InputAdornment>
-              }}
             />
           </Grid>
           <Grid item xs={4} style={{ textAlign: "center" }}>
@@ -97,9 +108,6 @@ class RangeSlider extends React.Component {
                   this.setState({ values: newState });
                 }
               }}
-              InputProps={{
-                startAdornment: <InputAdornment position="start">$</InputAdornment>
-              }}
             />
           </Grid>
         </Grid>
@@ -115,9 +123,16 @@ class RangeSlider extends React.Component {
         >
           Reset
         </Button>
+        <Button style={{ marginTop: "3%", marginBottom: "3%" }} onClick={this.handleClip}>
+          CLIP
+        </Button>
       </Fragment>
     );
   }
 }
 
-export default RangeSlider;
+const mapDispatchToProps = {
+  storeParameters: imageActions.storeParameters
+};
+
+export default connect(null, mapDispatchToProps)(RangeSlider);

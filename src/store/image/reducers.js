@@ -19,7 +19,8 @@ const initialState = {
   },
   parameters: {
     croppedCanvasImage: null,
-    croppedeArea: null
+    croppedeArea: null,
+    pixelRangeArray: null
   }
 };
 
@@ -89,7 +90,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         depthImageDimension: null,
         parameters: {
           croppedCanvasImage: null,
-          croppedeArea: null
+          croppedeArea: null,
+          pixelRangeArray: null
         }
       };
       return {
