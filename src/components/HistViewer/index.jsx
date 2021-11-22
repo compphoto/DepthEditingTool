@@ -6,8 +6,6 @@ import RangeSlider from "./rangeslider";
 import HistViewerStyle from "./style";
 import { getImageData } from "utils/drawHistogram";
 
-const prices = [2, 4, 5, 6, 7, 8];
-
 class HistViewer extends Component {
   constructor() {
     super();
@@ -15,7 +13,7 @@ class HistViewer extends Component {
   state = {
     windowWidth: window.innerWidth,
     windowHeight: window.innerHeight,
-    data: null
+    data: []
   };
   componentDidUpdate(prevProps, prevState) {
     let { parameters } = this.props;
@@ -30,7 +28,7 @@ class HistViewer extends Component {
     const { data } = this.state;
     return (
       <HistViewerStyle>
-        <RangeSlider data={data || prices} />
+        <RangeSlider data={data} />
       </HistViewerStyle>
     );
   }
