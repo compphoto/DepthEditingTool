@@ -68,12 +68,7 @@ const muiHandleStyle = theme => ({
   }
 });
 
-function MuiHandleComponent({
-  domain: [min, max],
-  handle: { id, value, percent },
-  classes,
-  getHandleProps
-}) {
+function MuiHandleComponent({ domain: [min, max], handle: { id, value, percent }, classes, getHandleProps }) {
   return (
     <div
       role="slider"
@@ -128,11 +123,7 @@ function MuiTrackComponent({ classes, source, target, getTrackProps }) {
   return (
     <Fragment>
       <div className={classes.track} style={{ left, width }} />
-      <div
-        className={classes.trackHotspot}
-        style={{ left, width }}
-        {...getTrackProps()}
-      />
+      <div className={classes.trackHotspot} style={{ left, width }} {...getTrackProps()} />
     </Fragment>
   );
 }

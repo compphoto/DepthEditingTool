@@ -21,7 +21,7 @@ class RangeSlider extends React.Component {
     const { domain, values, update, inputValues } = this.state;
     return (
       <div style={{ margin: "10%", height: 120, width: "80%" }}>
-        <BarChart data={this.props.data} highlight={update} />{" "}
+        <BarChart data={this.props.data} highlight={update} />
         <Slider
           mode={3}
           step={1}
@@ -34,41 +34,8 @@ class RangeSlider extends React.Component {
           onChange={values => this.setState({ values })}
           values={values}
         >
-          <Rail> {({ getRailProps }) => <MuiRail getRailProps={getRailProps} />}</Rail>{" "}
-          {/* <Handles>
-                                                            {" "}
-                                                            {({ handles, getHandleProps }) => (
-                                                              <div className="slider-handles">
-                                                                {" "}
-                                                                {handles.map(handle => (
-                                                                  <MuiHandle key={handle.id} handle={handle} domain={domain} getHandleProps={getHandleProps} />
-                                                                ))}{" "}
-                                                              </div>
-                                                            )}{" "}
-                                                          </Handles>{" "}
-                                                          <Tracks left={false} right={false}>
-                                                            {" "}
-                                                            {({ tracks, getTrackProps }) => (
-                                                              <div className="slider-tracks">
-                                                                {" "}
-                                                                {tracks.map(({ id, source, target }) => (
-                                                                  <MuiTrack key={id} source={source} target={target} getTrackProps={getTrackProps} />
-                                                                ))}{" "}
-                                                              </div>
-                                                            )}{" "}
-                                                          </Tracks>{" "}
-                                                          <Ticks count={5}>
-                                                            {" "}
-                                                            {({ ticks }) => (
-                                                              <div className="slider-ticks">
-                                                                {" "}
-                                                                {ticks.map(tick => (
-                                                                  <MuiTick key={tick.id} tick={tick} count={ticks.length} />
-                                                                ))}{" "}
-                                                              </div>
-                                                            )}{" "}
-                                                          </Ticks>{" "} */}{" "}
-        </Slider>{" "}
+          <Rail> {({ getRailProps }) => <MuiRail getRailProps={getRailProps} />}</Rail>
+        </Slider>
         <Grid container alignItems="center" justify="space-around" style={{ marginTop: "88px" }}>
           <Grid item xs={4} style={{ textAlign: "right" }}>
             <TextField
@@ -86,12 +53,11 @@ class RangeSlider extends React.Component {
               InputProps={{
                 startAdornment: <InputAdornment position="start"> $ </InputAdornment>
               }}
-            />{" "}
-          </Grid>{" "}
+            />
+          </Grid>
           <Grid item xs={4} style={{ textAlign: "center" }}>
-            {" "}
-            —{" "}
-          </Grid>{" "}
+            —
+          </Grid>
           <Grid item xs={4} style={{ textAlign: "left" }}>
             <TextField
               variant="outlined"
@@ -108,9 +74,9 @@ class RangeSlider extends React.Component {
               InputProps={{
                 startAdornment: <InputAdornment position="start"> $ </InputAdornment>
               }}
-            />{" "}
-          </Grid>{" "}
-        </Grid>{" "}
+            />
+          </Grid>
+        </Grid>
         <Button
           style={{ marginTop: "3%", marginBottom: "3%" }}
           onClick={() => {
@@ -121,8 +87,8 @@ class RangeSlider extends React.Component {
             });
           }}
         >
-          Reset{" "}
-        </Button>{" "}
+          Reset
+        </Button>
       </div>
     );
   }
