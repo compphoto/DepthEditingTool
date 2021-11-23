@@ -80,7 +80,7 @@ class RangeSlider extends React.Component {
           <Grid item xs={4} style={{ textAlign: "right" }}>
             <TextField
               variant="outlined"
-              label="min depth"
+              label="min disparity"
               value={inputValues[0]}
               onChange={evt => {
                 const value = evt.target.value;
@@ -98,7 +98,7 @@ class RangeSlider extends React.Component {
           <Grid item xs={4} style={{ textAlign: "left" }}>
             <TextField
               variant="outlined"
-              label="max depth"
+              label="max disparity"
               value={inputValues[1]}
               onChange={evt => {
                 const value = evt.target.value;
