@@ -102,9 +102,9 @@ class DepthViewer extends Component {
         depthContext.globalAlpha = 1;
         depthContext.drawImage(mainDepthCanvas, 0, 0);
         depthContext.beginPath();
-        depthContext.globalAlpha = 0.2;
-        depthContext.fillStyle = "blue";
-        depthContext.fillRect(croppedeArea[0], croppedeArea[1], croppedeArea[2], croppedeArea[3]);
+        depthContext.strokeStyle = "blue";
+        depthContext.rect(croppedeArea[0], croppedeArea[1], croppedeArea[2], croppedeArea[3]);
+        depthContext.stroke();
         highlightPixelArea(croppedeArea, depthContext, pixelRangeArray);
       }
     }
@@ -147,12 +147,12 @@ class DepthViewer extends Component {
       let y = event.layerY;
       if (initBoundingBox) {
         let [image_x1, image_y1, image_x2, image_y2] = depthImageDimension;
-        depthContext.beginPath();
-        depthContext.strokeStyle = "blue";
         let new_x = Math.max(Math.min(initBoundingBox.x, x), image_x1);
         let new_y = Math.max(Math.min(initBoundingBox.y, y), image_y1);
         let new_w = Math.min(Math.max(initBoundingBox.x, x), image_x2) - new_x;
         let new_h = Math.min(Math.max(initBoundingBox.y, y), image_y2) - new_y;
+        depthContext.beginPath();
+        depthContext.strokeStyle = "blue";
         depthContext.rect(new_x, new_y, new_w, new_h);
         depthContext.stroke();
         let croppedArea = [new_x, new_y, new_w, new_h];
