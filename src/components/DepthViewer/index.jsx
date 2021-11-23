@@ -4,7 +4,7 @@ import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import DepthViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
-import { cloneCanvas, drawCanvasImage, cropCanvas, editBoundingArea } from "utils/canvasUtils";
+import { cloneCanvas, drawCanvasImage, cropCanvas, editBoundingArea, highlightPixelArea } from "utils/canvasUtils";
 
 let objectUrl = null;
 
@@ -87,6 +87,19 @@ class DepthViewer extends Component {
     if (prevProps.depthCanvaUpdate !== depthCanvaUpdate) {
       if (depthCanvaUpdate) {
         editBoundingArea(parameters.croppedeArea, depthContext, depthCanvaUpdate);
+      }
+    }
+    if (prevProps.parameters.pixelRangeArray !== parameters.pixelRangeArray) {
+      if (parameters.pixelRangeArray) {
+        const { croppedeArea } = parameters;
+        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
+        depthContext.globalAlpha = 1;
+        depthContext.drawImage(mainDepthCanvas, 0, 0);
+        depthContext.beginPath();
+        depthContext.globalAlpha = 0.2;
+        depthContext.fillStyle = "blue";
+        depthContext.fillRect(croppedeArea[0], croppedeArea[1], croppedeArea[2], croppedeArea[3]);
+        highlightPixelArea(parameters.croppedeArea, depthContext, parameters.pixelRangeArray);
       }
     }
   }

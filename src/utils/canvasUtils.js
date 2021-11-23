@@ -50,6 +50,21 @@ export const editBoundingArea = (boundingBox, context, depth) => {
   }
 };
 
+export const highlightPixelArea = (boundingBox, context, pixelRangeArray) => {
+  if (boundingBox && context) {
+    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
+    const src = imageData.data;
+    for (let i = 0; i < src.length; i += 4) {
+      if (pixelRangeArray.includes(i)) {
+        src[i] = 255;
+        src[i + 1] = 0;
+        src[i + 2] = 0;
+      }
+    }
+    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
+  }
+};
+
 export const cropCanvas = (oldCanvas, boundingBox) => {
   var newCanvas = document.createElement("canvas");
   newCanvas.width = boundingBox[2];
