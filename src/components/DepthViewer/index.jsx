@@ -37,6 +37,7 @@ class DepthViewer extends Component {
     } = this.props;
     let depthCanvas = depthImageRef.current;
     let depthContext = depthCanvas.getContext("2d");
+    // Load image and initialize all canvas images
     if (prevProps.depthImageUrl !== depthImageUrl) {
       depthContext.clearRect(0, 0, prevDepthSize.width, prevDepthSize.height);
       let depthImage = new Image();
@@ -53,6 +54,33 @@ class DepthViewer extends Component {
         });
       };
     }
+    // On saving the image, this clears all annotations
+    if (prevProps.mainDepthCanvas !== mainDepthCanvas) {
+      if (mainDepthCanvas) {
+        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
+        depthContext.globalAlpha = 1;
+        depthContext.drawImage(mainDepthCanvas, 0, 0);
+      }
+    }
+    // tempDepthCanvas changes on clicking the reset button
+    if (prevProps.tempDepthCanvas !== tempDepthCanvas) {
+      if (tempDepthCanvas) {
+        storeParameters({
+          croppedCanvasImage: null,
+          croppedeArea: null,
+          pixelRangeArray: null
+        });
+        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
+        depthContext.globalAlpha = 1;
+        depthContext.drawImage(tempDepthCanvas, 0, 0);
+      }
+    }
+    if (prevProps.depthCanvaUpdate !== depthCanvaUpdate) {
+      if (depthCanvaUpdate) {
+        editBoundingArea(parameters.croppedeArea, depthContext, depthCanvaUpdate);
+      }
+    }
+    // Listens for mouse movements around the depth canvas and draw bounding box
     if (prevProps.tools.depth !== tools.depth) {
       if (tools.depth) {
         depthCanvas.addEventListener("click", this.drawBoundingBox);
@@ -66,32 +94,10 @@ class DepthViewer extends Component {
         }
       }
     }
-    if (prevProps.mainDepthCanvas !== mainDepthCanvas) {
-      if (mainDepthCanvas) {
-        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
-        depthContext.globalAlpha = 1;
-        depthContext.drawImage(mainDepthCanvas, 0, 0);
-      }
-    }
-    if (prevProps.tempDepthCanvas !== tempDepthCanvas) {
-      if (tempDepthCanvas) {
-        storeParameters({
-          croppedCanvasImage: null,
-          croppedeArea: null
-        });
-        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
-        depthContext.globalAlpha = 1;
-        depthContext.drawImage(tempDepthCanvas, 0, 0);
-      }
-    }
-    if (prevProps.depthCanvaUpdate !== depthCanvaUpdate) {
-      if (depthCanvaUpdate) {
-        editBoundingArea(parameters.croppedeArea, depthContext, depthCanvaUpdate);
-      }
-    }
+    // Highlight pixel range from specified range
     if (prevProps.parameters.pixelRangeArray !== parameters.pixelRangeArray) {
-      if (parameters.pixelRangeArray) {
-        const { croppedeArea } = parameters;
+      if (parameters.pixelRangeArray && parameters.croppedeArea) {
+        const { croppedeArea, pixelRangeArray } = parameters;
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
         depthContext.globalAlpha = 1;
         depthContext.drawImage(mainDepthCanvas, 0, 0);
@@ -99,7 +105,7 @@ class DepthViewer extends Component {
         depthContext.globalAlpha = 0.2;
         depthContext.fillStyle = "blue";
         depthContext.fillRect(croppedeArea[0], croppedeArea[1], croppedeArea[2], croppedeArea[3]);
-        highlightPixelArea(parameters.croppedeArea, depthContext, parameters.pixelRangeArray);
+        highlightPixelArea(croppedeArea, depthContext, pixelRangeArray);
       }
     }
   }
