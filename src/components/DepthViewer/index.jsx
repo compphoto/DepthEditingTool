@@ -106,7 +106,7 @@ class DepthViewer extends Component {
         if (croppedeArea) {
           newArea = croppedeArea;
           depthContext.beginPath();
-          depthContext.strokeStyle = "blue";
+          depthContext.strokeStyle = "red";
           depthContext.rect(newArea[0], newArea[1], newArea[2], newArea[3]);
           depthContext.stroke();
           highlightPixelArea(newArea, depthContext, pixelRange);
@@ -165,7 +165,7 @@ class DepthViewer extends Component {
         let new_w = Math.min(Math.max(initBoundingBox.x, x), image_x2) - new_x;
         let new_h = Math.min(Math.max(initBoundingBox.y, y), image_y2) - new_y;
         depthContext.beginPath();
-        depthContext.strokeStyle = "blue";
+        depthContext.strokeStyle = "red";
         depthContext.rect(new_x, new_y, new_w, new_h);
         depthContext.stroke();
         let croppedArea = [new_x, new_y, new_w, new_h];
