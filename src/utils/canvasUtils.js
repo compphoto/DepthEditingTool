@@ -55,7 +55,7 @@ export const highlightPixelArea = (boundingBox, context, pixelRangeArray) => {
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
-      if (pixelRangeArray.includes(i)) {
+      if (pixelRangeArray.has(i)) {
         src[i] = 0;
         src[i + 1] = 0;
         src[i + 2] = 255;
