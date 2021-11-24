@@ -3,14 +3,37 @@ export const getImageData = img => {
   const context = canvas.getContext("2d");
   canvas.width = img.width;
   canvas.height = img.height;
-  context.drawImage(img, 0, 0);
-  const src = context.getImageData(0, 0, img.width, img.height).data;
-  let histDepth = new Array(256).fill(0);
-  for (let i = 0; i < src.length; i += 4) {
-    let r = src[i];
-    histDepth[r]++;
+  if (canvas.width > 0 && canvas.height > 0) {
+    context.drawImage(img, 0, 0);
+    const src = context.getImageData(0, 0, img.width, img.height).data;
+    let histDepth = new Array(256).fill(0);
+    for (let i = 0; i < src.length; i += 4) {
+      let r = src[i];
+      histDepth[r]++;
+    }
+    return histDepth;
   }
-  return histDepth;
+  return [];
+};
+
+export const getCanvasImageData = (canvasImage, dimension) => {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  canvas.width = canvasImage.width;
+  canvas.height = canvasImage.height;
+  if (canvas.width > 0 && canvas.height > 0) {
+    let width = dimension[2] - dimension[0];
+    let height = dimension[3] - dimension[1];
+    context.drawImage(canvasImage, 0, 0);
+    const src = context.getImageData(dimension[0], dimension[1], width, height).data;
+    let histDepth = new Array(256).fill(0);
+    for (let i = 0; i < src.length; i += 4) {
+      let r = src[i];
+      histDepth[r]++;
+    }
+    return histDepth;
+  }
+  return [];
 };
 
 export const drawLine = (ctx, startX, startY, endX, endY, color) => {
