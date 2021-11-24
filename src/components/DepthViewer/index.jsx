@@ -29,6 +29,7 @@ class DepthViewer extends Component {
       mainDepthCanvas,
       depthCanvaUpdate,
       tempDepthCanvas,
+      depthImageDimension,
       prevDepthSize,
       tools,
       parameters,
@@ -94,18 +95,30 @@ class DepthViewer extends Component {
         }
       }
     }
-    // Highlight pixel range from specified range
+    // Highlight pixel range from specified range for either cropped image or initial full image
     if (prevProps.parameters.pixelRange !== parameters.pixelRange) {
-      if (parameters.pixelRange && parameters.croppedeArea) {
+      if (parameters.pixelRange && (parameters.croppedeArea || depthImageDimension)) {
         const { croppedeArea, pixelRange } = parameters;
+        let newArea = null;
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
         depthContext.globalAlpha = 1;
         depthContext.drawImage(mainDepthCanvas, 0, 0);
-        depthContext.beginPath();
-        depthContext.strokeStyle = "blue";
-        depthContext.rect(croppedeArea[0], croppedeArea[1], croppedeArea[2], croppedeArea[3]);
-        depthContext.stroke();
-        highlightPixelArea(croppedeArea, depthContext, pixelRange);
+        if (croppedeArea) {
+          newArea = croppedeArea;
+          depthContext.beginPath();
+          depthContext.strokeStyle = "blue";
+          depthContext.rect(newArea[0], newArea[1], newArea[2], newArea[3]);
+          depthContext.stroke();
+          highlightPixelArea(newArea, depthContext, pixelRange);
+        } else {
+          newArea = [
+            depthImageDimension[0],
+            depthImageDimension[1],
+            depthImageDimension[2] - depthImageDimension[0],
+            depthImageDimension[3] - depthImageDimension[1]
+          ];
+          highlightPixelArea(newArea, depthContext, pixelRange);
+        }
       }
     }
   }
