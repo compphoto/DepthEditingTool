@@ -20,9 +20,8 @@ class RangeSlider extends React.Component {
   handleClip = () => {
     let { inputValues } = this.state;
     let { storeParameters } = this.props;
-    console.warn(inputValues);
     storeParameters({
-      pixelRange: inputValues
+      pixelRange: [...inputValues]
     });
   };
   render() {
