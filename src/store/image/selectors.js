@@ -6,11 +6,11 @@ export const selectors = {
   mainRgbCanvas: state => state.image.mainRgbCanvas,
   mainDepthCanvas: state => state.image.mainDepthCanvas,
   tempDepthCanvas: state => state.image.tempDepthCanvas,
-  depthCanvaUpdate: state => state.image.depthCanvaUpdate,
   rgbImageDimension: state => state.image.rgbImageDimension,
   depthImageDimension: state => state.image.depthImageDimension,
   prevRgbSize: state => state.image.prevRgbSize,
   prevDepthSize: state => state.image.prevDepthSize,
   tools: state => state.image.tools,
+  toolsParameters: state => state.image.toolsParameters,
   parameters: state => state.image.parameters
 };

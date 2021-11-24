@@ -63,6 +63,21 @@ export const highlightPixelArea = (boundingBox, context, pixelRange) => {
   }
 };
 
+export const editHighlightPixelArea = (boundingBox, context, pixelRange, depth) => {
+  if (boundingBox && context) {
+    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
+    const src = imageData.data;
+    for (let i = 0; i < src.length; i += 4) {
+      if (src[i] >= pixelRange[0] && src[i] <= pixelRange[1]) {
+        src[i] += 255 * (depth / 100);
+        src[i + 1] += 255 * (depth / 100);
+        src[i + 2] += 255 * (depth / 100);
+      }
+    }
+    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
+  }
+};
+
 export const cropCanvas = (oldCanvas, boundingBox) => {
   var newCanvas = document.createElement("canvas");
   newCanvas.width = boundingBox[2];

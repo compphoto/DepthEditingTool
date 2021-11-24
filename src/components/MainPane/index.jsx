@@ -110,15 +110,20 @@ class MainPane extends Component {
                       depthImageUrl: null,
                       loadedDepthImage: null,
                       mainDepthCanvas: null,
+                      tempDepthCanvas: null,
                       depthImageDimension: null,
-                      depthCanvaUpdate: null,
                       tools: {
                         currentTool: null,
                         depth: false
                       },
+                      toolsParameters: {
+                        depthBoxIntensity: 0,
+                        depthRangeIntensity: 0
+                      },
                       parameters: {
                         croppedCanvasImage: null,
-                        croppedeArea: null
+                        croppedeArea: null,
+                        pixelRange: null
                       }
                     });
                   }}

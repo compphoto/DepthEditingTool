@@ -4,7 +4,14 @@ import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import DepthViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
-import { cloneCanvas, drawCanvasImage, cropCanvas, editBoundingArea, highlightPixelArea } from "utils/canvasUtils";
+import {
+  cloneCanvas,
+  drawCanvasImage,
+  cropCanvas,
+  editBoundingArea,
+  highlightPixelArea,
+  editHighlightPixelArea
+} from "utils/canvasUtils";
 
 let objectUrl = null;
 
@@ -27,11 +34,11 @@ class DepthViewer extends Component {
     let {
       depthImageUrl,
       mainDepthCanvas,
-      depthCanvaUpdate,
       tempDepthCanvas,
       depthImageDimension,
       prevDepthSize,
       tools,
+      toolsParameters,
       parameters,
       initImage,
       storeParameters
@@ -76,9 +83,31 @@ class DepthViewer extends Component {
         depthContext.drawImage(tempDepthCanvas, 0, 0);
       }
     }
-    if (prevProps.depthCanvaUpdate !== depthCanvaUpdate) {
-      if (depthCanvaUpdate) {
-        editBoundingArea(parameters.croppedeArea, depthContext, depthCanvaUpdate);
+    if (prevProps.toolsParameters.depthBoxIntensity !== toolsParameters.depthBoxIntensity) {
+      if (toolsParameters.depthBoxIntensity) {
+        editBoundingArea(parameters.croppedeArea, depthContext, toolsParameters.depthBoxIntensity);
+      }
+    }
+    if (prevProps.toolsParameters.depthRangeIntensity !== toolsParameters.depthRangeIntensity) {
+      if (
+        toolsParameters.depthRangeIntensity &&
+        parameters.pixelRange &&
+        (parameters.croppedeArea || depthImageDimension)
+      ) {
+        const { croppedeArea, pixelRange } = parameters;
+        let newArea = null;
+        if (croppedeArea) {
+          newArea = croppedeArea;
+          editHighlightPixelArea(newArea, depthContext, pixelRange, toolsParameters.depthRangeIntensity);
+        } else {
+          newArea = [
+            depthImageDimension[0],
+            depthImageDimension[1],
+            depthImageDimension[2] - depthImageDimension[0],
+            depthImageDimension[3] - depthImageDimension[1]
+          ];
+          editHighlightPixelArea(newArea, depthContext, pixelRange, toolsParameters.depthRangeIntensity);
+        }
       }
     }
     // Listens for mouse movements around the depth canvas and draw bounding box
@@ -199,10 +228,10 @@ const mapStateToProps = state => ({
   loadedDepthImage: imageSelectors.loadedDepthImage(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  depthCanvaUpdate: imageSelectors.depthCanvaUpdate(state),
   depthImageDimension: imageSelectors.depthImageDimension(state),
   prevDepthSize: imageSelectors.prevDepthSize(state),
   tools: imageSelectors.tools(state),
+  toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state)
 });
 
