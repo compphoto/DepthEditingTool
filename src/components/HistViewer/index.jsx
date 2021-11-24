@@ -4,7 +4,7 @@ import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import RangeSlider from "./rangeslider";
 import HistViewerStyle from "./style";
-import { getImageData } from "utils/drawHistogram";
+import { getCanvasImageData, getImageData } from "utils/drawHistogram";
 
 class HistViewer extends Component {
   constructor() {
@@ -16,7 +16,7 @@ class HistViewer extends Component {
     data: []
   };
   componentDidUpdate(prevProps, prevState) {
-    let { mainDepthCanvas, parameters } = this.props;
+    let { mainDepthCanvas, depthImageDimension, parameters } = this.props;
     if (prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage) {
       if (parameters.croppedCanvasImage) {
         let histDepthData = getImageData(parameters.croppedCanvasImage);
@@ -25,7 +25,7 @@ class HistViewer extends Component {
     }
     if (prevProps.mainDepthCanvas !== mainDepthCanvas) {
       if (mainDepthCanvas) {
-        let histDepthData = getImageData(mainDepthCanvas);
+        let histDepthData = getCanvasImageData(mainDepthCanvas, depthImageDimension);
         this.setState({ data: histDepthData });
       }
     }
@@ -42,6 +42,7 @@ class HistViewer extends Component {
 
 const mapStateToProps = state => ({
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
+  depthImageDimension: imageSelectors.depthImageDimension(state),
   parameters: imageSelectors.parameters(state)
 });
 
