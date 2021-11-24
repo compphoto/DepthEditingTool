@@ -19,15 +19,10 @@ class RangeSlider extends React.Component {
   }
   handleClip = () => {
     let { inputValues } = this.state;
-    let { pixelToIntensityMap, storeParameters } = this.props;
-    let pixelArray = new Set();
-    for (let i = inputValues[0]; i <= inputValues[1]; i++) {
-      if (i in pixelToIntensityMap) {
-        pixelToIntensityMap[i].forEach(pixelArray.add, pixelArray);
-      }
-    }
+    let { storeParameters } = this.props;
+    console.warn(inputValues);
     storeParameters({
-      pixelRangeArray: pixelArray
+      pixelRange: inputValues
     });
   };
   render() {

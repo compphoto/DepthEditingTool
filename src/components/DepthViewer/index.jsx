@@ -68,7 +68,7 @@ class DepthViewer extends Component {
         storeParameters({
           croppedCanvasImage: null,
           croppedeArea: null,
-          pixelRangeArray: null
+          pixelRange: null
         });
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
         depthContext.globalAlpha = 1;
@@ -95,9 +95,9 @@ class DepthViewer extends Component {
       }
     }
     // Highlight pixel range from specified range
-    if (prevProps.parameters.pixelRangeArray !== parameters.pixelRangeArray) {
-      if (parameters.pixelRangeArray && parameters.croppedeArea) {
-        const { croppedeArea, pixelRangeArray } = parameters;
+    if (prevProps.parameters.pixelRange !== parameters.pixelRange) {
+      if (parameters.pixelRange && parameters.croppedeArea) {
+        const { croppedeArea, pixelRange } = parameters;
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
         depthContext.globalAlpha = 1;
         depthContext.drawImage(mainDepthCanvas, 0, 0);
@@ -105,7 +105,7 @@ class DepthViewer extends Component {
         depthContext.strokeStyle = "blue";
         depthContext.rect(croppedeArea[0], croppedeArea[1], croppedeArea[2], croppedeArea[3]);
         depthContext.stroke();
-        highlightPixelArea(croppedeArea, depthContext, pixelRangeArray);
+        highlightPixelArea(croppedeArea, depthContext, pixelRange);
       }
     }
   }

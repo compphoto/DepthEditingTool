@@ -50,12 +50,12 @@ export const editBoundingArea = (boundingBox, context, depth) => {
   }
 };
 
-export const highlightPixelArea = (boundingBox, context, pixelRangeArray) => {
+export const highlightPixelArea = (boundingBox, context, pixelRange) => {
   if (boundingBox && context) {
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
-      if (pixelRangeArray.has(i)) {
+      if (src[i] >= pixelRange[0] && src[i] <= pixelRange[1]) {
         src[i] = 0;
         src[i + 1] = 0;
         src[i + 2] = 255;

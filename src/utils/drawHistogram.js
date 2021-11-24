@@ -6,17 +6,11 @@ export const getImageData = img => {
   context.drawImage(img, 0, 0);
   const src = context.getImageData(0, 0, img.width, img.height).data;
   let histDepth = new Array(256).fill(0);
-  let histDepthMapper = {};
   for (let i = 0; i < src.length; i += 4) {
     let r = src[i];
     histDepth[r]++;
-    if (r in histDepthMapper) {
-      histDepthMapper[r].push(i);
-    } else {
-      histDepthMapper[r] = [i];
-    }
   }
-  return [histDepth, histDepthMapper];
+  return histDepth;
 };
 
 export const drawLine = (ctx, startX, startY, endX, endY, color) => {
