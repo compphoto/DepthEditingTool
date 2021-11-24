@@ -17,13 +17,15 @@ class RangeSlider extends React.Component {
       inputValues: range
     };
   }
-  handleClip = () => {
+  componentDidUpdate(prevProps, prevState) {
     let { inputValues } = this.state;
     let { storeParameters } = this.props;
-    storeParameters({
-      pixelRange: [...inputValues]
-    });
-  };
+    if (prevState.inputValues !== inputValues) {
+      storeParameters({
+        pixelRange: [...inputValues]
+      });
+    }
+  }
   render() {
     const { domain, values, update, inputValues } = this.state;
     return (
@@ -116,9 +118,6 @@ class RangeSlider extends React.Component {
           }}
         >
           Reset
-        </Button>
-        <Button style={{ marginTop: "3%", marginBottom: "3%" }} onClick={this.handleClip}>
-          CLIP
         </Button>
       </Fragment>
     );
