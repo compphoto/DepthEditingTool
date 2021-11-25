@@ -7,6 +7,7 @@ const initialState = {
   loadedDepthImage: null,
   mainRgbCanvas: null, // use canvas to image to convert to image
   mainDepthCanvas: null, // use canvas to image to convert to image
+  tempRgbCanvas: null, // global reference to depth canvas
   tempDepthCanvas: null, // global reference to depth canvas
   rgbImageDimension: null,
   depthImageDimension: null,
@@ -104,6 +105,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         loadedDepthImage: null,
         mainRgbCanvas: null,
         mainDepthCanvas: null,
+        tempRgbCanvas: null,
         tempDepthCanvas: null,
         rgbImageDimension: null,
         depthImageDimension: null,

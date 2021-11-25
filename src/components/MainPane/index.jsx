@@ -21,7 +21,7 @@ class MainPane extends Component {
   };
   render() {
     const { onHandleChange } = this;
-    const { toolExtOpen, rgbImageUrl, depthImageUrl, mainRgbCanvas, mainDepthCanvas, removeItem, removeAllItem } =
+    const { toolExtOpen, rgbImageUrl, depthImageUrl, tempRgbCanvas, tempDepthCanvas, removeItem, removeAllItem } =
       this.props;
     return (
       <MainPaneStyle>
@@ -38,8 +38,8 @@ class MainPane extends Component {
             <div className="main-column main-column-3d">
               <div className="box threeD-box">
                 <ThreeDViewer
-                  rgbImageCanvas={canvasToImage(mainRgbCanvas)}
-                  depthImageCanvas={canvasToImage(mainDepthCanvas)}
+                  rgbImageCanvas={canvasToImage(tempRgbCanvas)}
+                  depthImageCanvas={canvasToImage(tempDepthCanvas)}
                 />
               </div>
               <div className="box histogram-box">
@@ -75,6 +75,7 @@ class MainPane extends Component {
                       rgbImageUrl: null,
                       loadedRgbImage: null,
                       mainRgbCanvas: null,
+                      tempRgbCanvas: null,
                       rgbImageDimension: null
                     });
                   }}
@@ -135,21 +136,6 @@ class MainPane extends Component {
             </div>
           </div>
           <div className="main-side-bar-footer">
-            {/* <Button
-              onClick={() => {
-                if (tempDepthCanvas) {
-                  let depthCanvas = depthImageRef.current;
-                  let depthContext = depthCanvas.getContext("2d");
-                  let tempDepthContext = tempDepthCanvas.getContext("2d");
-                  editBoundingArea(parameters.croppedeArea, depthContext);
-                  editBoundingArea(parameters.croppedeArea, tempDepthContext);
-                }
-              }}
-              size="sm"
-              color="default"
-            >
-              Increase
-            </Button> */}
             <Button
               onClick={() => {
                 removeAllItem();
@@ -171,7 +157,9 @@ const mapStateToProps = state => ({
   rgbImageUrl: imageSelectors.rgbImageUrl(state),
   depthImageUrl: imageSelectors.depthImageUrl(state),
   mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
-  mainDepthCanvas: imageSelectors.mainDepthCanvas(state)
+  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
+  tempRgbCanvas: imageSelectors.tempRgbCanvas(state),
+  tempDepthCanvas: imageSelectors.tempDepthCanvas(state)
 });
 
 const mapDispatchToProps = {

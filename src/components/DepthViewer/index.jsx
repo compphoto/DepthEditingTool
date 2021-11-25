@@ -98,7 +98,6 @@ class DepthViewer extends Component {
         let newArea = null;
         if (croppedeArea) {
           newArea = croppedeArea;
-          editHighlightPixelArea(newArea, depthContext, pixelRange, toolsParameters.depthRangeIntensity);
         } else {
           newArea = [
             depthImageDimension[0],
@@ -106,8 +105,8 @@ class DepthViewer extends Component {
             depthImageDimension[2] - depthImageDimension[0],
             depthImageDimension[3] - depthImageDimension[1]
           ];
-          editHighlightPixelArea(newArea, depthContext, pixelRange, toolsParameters.depthRangeIntensity);
         }
+        editHighlightPixelArea(newArea, depthContext, pixelRange, toolsParameters.depthRangeIntensity);
       }
     }
     // Listens for mouse movements around the depth canvas and draw bounding box
@@ -138,7 +137,6 @@ class DepthViewer extends Component {
           depthContext.strokeStyle = "red";
           depthContext.rect(newArea[0], newArea[1], newArea[2], newArea[3]);
           depthContext.stroke();
-          highlightPixelArea(newArea, depthContext, pixelRange);
         } else {
           newArea = [
             depthImageDimension[0],
@@ -146,8 +144,8 @@ class DepthViewer extends Component {
             depthImageDimension[2] - depthImageDimension[0],
             depthImageDimension[3] - depthImageDimension[1]
           ];
-          highlightPixelArea(newArea, depthContext, pixelRange);
         }
+        highlightPixelArea(newArea, depthContext, pixelRange);
       }
     }
   }
