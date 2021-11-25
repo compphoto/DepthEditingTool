@@ -73,7 +73,7 @@ export function SidePane({
                         selectTool("depth");
                       }
                     }}
-                    className={tools.depth && mainDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
+                    className={tools.depth && tempDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
                   >
                     <MdCrop />
                     Draw
@@ -82,6 +82,7 @@ export function SidePane({
                 <FormGroup className="w-100 my-3">
                   <Label for="depthBoxIntensity">Box Intensity</Label>
                   <Input
+                    disabled={!tempDepthCanvas || !parameters.croppedeArea}
                     onMouseUp={onHandleChange}
                     className="w-100"
                     id="depthBoxIntensity"
@@ -94,6 +95,7 @@ export function SidePane({
                 <FormGroup className="w-100 my-3">
                   <Label for="depthRangeIntensity">Depth Intensity</Label>
                   <Input
+                    disabled={!tempDepthCanvas || !parameters.pixelRange}
                     onMouseUp={onHandleChange}
                     className="w-100"
                     id="depthRangeIntensity"
