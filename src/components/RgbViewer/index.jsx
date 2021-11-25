@@ -79,6 +79,9 @@ class RgbViewer extends Component {
     if (prevProps.parameters.croppedeArea !== parameters.croppedeArea) {
       const { croppedeArea } = parameters;
       if (croppedeArea && tempRgbCanvas) {
+        rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
+        rgbContext.globalAlpha = 1;
+        rgbContext.drawImage(mainRgbCanvas, 0, 0);
         rgbContext.beginPath();
         rgbContext.strokeStyle = "red";
         rgbContext.rect(croppedeArea[0], croppedeArea[1], croppedeArea[2], croppedeArea[3]);
