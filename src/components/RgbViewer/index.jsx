@@ -137,6 +137,8 @@ class RgbViewer extends Component {
       if (loadedRgbImage) {
         let rgbImageDimension = drawCanvasImage(loadedRgbImage, rgbCanvas, rgbContext);
         initImage({
+          mainRgbCanvas: cloneCanvas(rgbCanvas),
+          tempRgbCanvas: cloneCanvas(rgbCanvas),
           rgbImageDimension: rgbImageDimension,
           prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height }
         });
