@@ -71,8 +71,8 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
             </mesh>
             <OrbitControls
               // autoRotate
-              enableZoom={false}
-              enablePan={false}
+              // enableZoom={false}
+              // enablePan={false}
               maxAzimuthAngle={Math.PI / 4}
               maxPolarAngle={Math.PI}
               minAzimuthAngle={-Math.PI / 4}
