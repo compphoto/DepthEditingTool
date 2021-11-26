@@ -4,7 +4,7 @@ import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import RgbViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
-import { cloneCanvas, drawCanvasImage, highlightPixelArea } from "utils/canvasUtils";
+import { cloneCanvas, drawCanvasImage, highlightPixelAreaRgb } from "utils/canvasUtils";
 
 let objectUrl = null;
 
@@ -94,6 +94,7 @@ class RgbViewer extends Component {
     // Highlight pixel range from specified range for either cropped image or initial full image
     if (prevProps.parameters.pixelRange !== parameters.pixelRange) {
       if (tempRgbCanvas && parameters.pixelRange && (parameters.croppedeArea || rgbImageDimension)) {
+        let depthContext = tempDepthCanvas.getContext("2d");
         const { croppedeArea, pixelRange } = parameters;
         let newArea = null;
         rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
@@ -113,7 +114,7 @@ class RgbViewer extends Component {
             rgbImageDimension[3] - rgbImageDimension[1]
           ];
         }
-        highlightPixelArea(newArea, rgbContext, pixelRange);
+        highlightPixelAreaRgb(newArea, rgbContext, depthContext, pixelRange);
         initImage({
           tempRgbCanvas: cloneCanvas(rgbCanvas)
         });
