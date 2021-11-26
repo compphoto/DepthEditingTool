@@ -5,6 +5,7 @@ import { ToneMapping, EffectComposer } from "@react-three/postprocessing";
 import { useControls } from "leva";
 import { TextureLoader } from "three/src/loaders/TextureLoader";
 import { DoubleSide } from "three";
+import { Input } from "reactstrap";
 import ThreeDViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
 
@@ -12,6 +13,10 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   const [imageDimension, setImageDimension] = useState(1.0);
   const [colorMap, setColorMap] = useState(false);
   const [displacementMap, setDisplacementMap] = useState(false);
+  const [angle, setAngle] = useState({
+    xAngle: 0,
+    vAngle: 0
+  });
   // const { middleGrey, maxLuminance } = useControls({
   //   middleGrey: {
   //     min: 0,
@@ -26,7 +31,10 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   //     step: 1
   //   }
   // });
-
+  const onHandleChange = e => {
+    let { name, value } = e.target;
+    setAngle({ ...angle, [name]: (value / 180) * Math.PI });
+  };
   useEffect(() => {
     let colorMap = new TextureLoader().setCrossOrigin("").load(rgbImageCanvas, colorMap => {
       colorMap.needsUpdate = true;
@@ -42,33 +50,43 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
 
   return (
     <ThreeDViewerStyle>
-      <Canvas camera={{ fov: 75, near: 0.1, far: 100, position: [0, 0, 2] }}>
-        <Suspense fallback={null}>
-          <ambientLight intensity={-1} />
-          <pointLight position={[0, 4, 4]} />
-          {/* <spotLight color={0xffa95c} intensity={4} position={[-50, 50, 50]} />
+      <div className="v-slider">
+        <Input onChange={onHandleChange} id="vAngle" name="vAngle" orient="vertical" min="-45" max="45" type="range" />
+      </div>
+      <div className="x-div">
+        <Canvas camera={{ fov: 75, near: 0.1, far: 100, position: [0, 0, 2] }}>
+          <Suspense fallback={null}>
+            <ambientLight intensity={-1} />
+            <pointLight position={[0, 4, 4]} />
+            {/* <spotLight color={0xffa95c} intensity={4} position={[-50, 50, 50]} />
           <hemisphereLight color={0xffeeb1} groundColor={0x080820} intensity={4} /> */}
-          <mesh scale={[1.0, imageDimension, 1.0]}>
-            <planeBufferGeometry args={[4, 4, 2000, 2000]} />
-            <meshStandardMaterial
-              side={DoubleSide}
-              map={colorMap}
-              displacementMap={displacementMap}
-              displacementScale={1.0}
+            <mesh scale={[1.0, imageDimension, 1.0]} rotation={[angle.vAngle, angle.xAngle, 0]}>
+              <planeBufferGeometry args={[3, 3, 2000, 2000]} />
+              <meshStandardMaterial
+                side={DoubleSide}
+                map={colorMap}
+                displacementMap={displacementMap}
+                displacementScale={0.7}
+              />
+            </mesh>
+            <OrbitControls
+              // autoRotate
+              enableZoom={false}
+              enablePan={false}
+              maxAzimuthAngle={Math.PI / 4}
+              maxPolarAngle={Math.PI}
+              minAzimuthAngle={-Math.PI / 4}
+              minPolarAngle={0}
             />
-          </mesh>
-          <OrbitControls
-          // autoRotate
-          // enableZoom={false}
-          // enablePan={false}
-          // minPolarAngle={Math.PI / 2.8}
-          // maxPolarAngle={Math.PI / 2.8}
-          />
-          {/* <EffectComposer>
+            {/* <EffectComposer>
             <ToneMapping middleGrey={middleGrey} maxLuminance={maxLuminance} />
           </EffectComposer> */}
-        </Suspense>
-      </Canvas>
+          </Suspense>
+        </Canvas>
+        <div className="x-slider">
+          <Input onChange={onHandleChange} id="xAngle" name="xAngle" min="-45" max="45" type="range" />
+        </div>
+      </div>
     </ThreeDViewerStyle>
   );
 }
