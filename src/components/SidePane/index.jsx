@@ -8,36 +8,53 @@ import { Button, UncontrolledCollapse, CardBody, Card, FormGroup, Label, Input }
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
 import { MdCrop, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
-import { editBoundingArea } from "utils/canvasUtils";
+import { editBoundingArea, editHighlightPixelArea } from "utils/canvasUtils";
 
 export function SidePane({
   toolExtOpen,
   toolExtActions,
   mainDepthCanvas,
   tempDepthCanvas,
+  depthImageDimension,
   tools,
+  toolsParameters,
   parameters,
-  initImage,
-  selectTool
+  selectTool,
+  storeToolParameters
 }) {
   const [activeTool, setActiveTool] = useState(0);
-  const [toolRange, setToolRange] = useState({
-    depthIntensityRange: 0
-  });
   const toggleTool = index => {
     setActiveTool(index);
   };
   const onHandleChange = e => {
     let { name, value } = e.target;
-    setToolRange({ ...toolRange, [name]: value });
+    storeToolParameters({ [name]: value });
   };
   useEffect(() => {
     if (tempDepthCanvas) {
       let tempDepthContext = tempDepthCanvas.getContext("2d");
-      editBoundingArea(parameters.croppedeArea, tempDepthContext, toolRange.depthIntensityRange);
-      initImage({ depthCanvaUpdate: toolRange.depthIntensityRange });
+      editBoundingArea(parameters.croppedeArea, tempDepthContext, toolsParameters.depthBoxIntensity);
     }
-  }, [toolRange.depthIntensityRange]);
+  }, [toolsParameters.depthBoxIntensity]);
+  useEffect(() => {
+    if (tempDepthCanvas && parameters.pixelRange && (parameters.croppedeArea || depthImageDimension)) {
+      let tempDepthContext = tempDepthCanvas.getContext("2d");
+      const { croppedeArea, pixelRange } = parameters;
+      let newArea = null;
+      if (croppedeArea) {
+        newArea = croppedeArea;
+        editHighlightPixelArea(newArea, tempDepthContext, pixelRange, toolsParameters.depthRangeIntensity);
+      } else {
+        newArea = [
+          depthImageDimension[0],
+          depthImageDimension[1],
+          depthImageDimension[2] - depthImageDimension[0],
+          depthImageDimension[3] - depthImageDimension[1]
+        ];
+        editHighlightPixelArea(newArea, tempDepthContext, pixelRange, toolsParameters.depthRangeIntensity);
+      }
+    }
+  }, [toolsParameters.depthRangeIntensity]);
   const adjust = () => {
     return (
       <>
@@ -56,19 +73,33 @@ export function SidePane({
                         selectTool("depth");
                       }
                     }}
-                    className={tools.depth && mainDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
+                    className={tools.depth && tempDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
                   >
                     <MdCrop />
                     Draw
                   </div>
                 </div>
                 <FormGroup className="w-100 my-3">
-                  <Label for="depthIntensityRange">Intensity</Label>
+                  <Label for="depthBoxIntensity">Box Intensity</Label>
                   <Input
+                    disabled={!tempDepthCanvas || !parameters.croppedeArea}
                     onMouseUp={onHandleChange}
                     className="w-100"
-                    id="depthIntensityRange"
-                    name="depthIntensityRange"
+                    id="depthBoxIntensity"
+                    name="depthBoxIntensity"
+                    min="-100"
+                    max="100"
+                    type="range"
+                  />
+                </FormGroup>
+                <FormGroup className="w-100 my-3">
+                  <Label for="depthRangeIntensity">Depth Intensity</Label>
+                  <Input
+                    disabled={!tempDepthCanvas || !parameters.pixelRange}
+                    onMouseUp={onHandleChange}
+                    className="w-100"
+                    id="depthRangeIntensity"
+                    name="depthRangeIntensity"
                     min="-100"
                     max="100"
                     type="range"
@@ -265,15 +296,16 @@ const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  depthCanvaUpdate: imageSelectors.depthCanvaUpdate(state),
+  depthImageDimension: imageSelectors.depthImageDimension(state),
   tools: imageSelectors.tools(state),
+  toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state)
 });
 
 const mapDispatchToProps = {
   toolExtActions: toolExtActions.toggleToolExt,
-  initImage: imageActions.initImage,
-  selectTool: imageActions.selectTool
+  selectTool: imageActions.selectTool,
+  storeToolParameters: imageActions.storeToolParameters
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SidePane);

@@ -4,7 +4,14 @@ import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import DepthViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
-import { cloneCanvas, drawCanvasImage, cropCanvas, editBoundingArea } from "utils/canvasUtils";
+import {
+  cloneCanvas,
+  drawCanvasImage,
+  cropCanvas,
+  editBoundingArea,
+  highlightPixelArea,
+  editHighlightPixelArea
+} from "utils/canvasUtils";
 
 let objectUrl = null;
 
@@ -27,16 +34,18 @@ class DepthViewer extends Component {
     let {
       depthImageUrl,
       mainDepthCanvas,
-      depthCanvaUpdate,
       tempDepthCanvas,
+      depthImageDimension,
       prevDepthSize,
       tools,
+      toolsParameters,
       parameters,
       initImage,
       storeParameters
     } = this.props;
     let depthCanvas = depthImageRef.current;
     let depthContext = depthCanvas.getContext("2d");
+    // Load image and initialize all canvas images
     if (prevProps.depthImageUrl !== depthImageUrl) {
       depthContext.clearRect(0, 0, prevDepthSize.width, prevDepthSize.height);
       let depthImage = new Image();
@@ -53,6 +62,54 @@ class DepthViewer extends Component {
         });
       };
     }
+    // On saving the image, this clears all annotations
+    if (prevProps.mainDepthCanvas !== mainDepthCanvas) {
+      if (mainDepthCanvas) {
+        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
+        depthContext.globalAlpha = 1;
+        depthContext.drawImage(mainDepthCanvas, 0, 0);
+      }
+    }
+    // tempDepthCanvas changes on clicking the reset button
+    if (prevProps.tempDepthCanvas !== tempDepthCanvas) {
+      if (tempDepthCanvas) {
+        storeParameters({
+          croppedCanvasImage: null,
+          croppedeArea: null,
+          pixelRange: null
+        });
+        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
+        depthContext.globalAlpha = 1;
+        depthContext.drawImage(tempDepthCanvas, 0, 0);
+      }
+    }
+    if (prevProps.toolsParameters.depthBoxIntensity !== toolsParameters.depthBoxIntensity) {
+      if (toolsParameters.depthBoxIntensity) {
+        editBoundingArea(parameters.croppedeArea, depthContext, toolsParameters.depthBoxIntensity);
+      }
+    }
+    if (prevProps.toolsParameters.depthRangeIntensity !== toolsParameters.depthRangeIntensity) {
+      if (
+        toolsParameters.depthRangeIntensity &&
+        parameters.pixelRange &&
+        (parameters.croppedeArea || depthImageDimension)
+      ) {
+        const { croppedeArea, pixelRange } = parameters;
+        let newArea = null;
+        if (croppedeArea) {
+          newArea = croppedeArea;
+        } else {
+          newArea = [
+            depthImageDimension[0],
+            depthImageDimension[1],
+            depthImageDimension[2] - depthImageDimension[0],
+            depthImageDimension[3] - depthImageDimension[1]
+          ];
+        }
+        editHighlightPixelArea(newArea, depthContext, pixelRange, toolsParameters.depthRangeIntensity);
+      }
+    }
+    // Listens for mouse movements around the depth canvas and draw bounding box
     if (prevProps.tools.depth !== tools.depth) {
       if (tools.depth) {
         depthCanvas.addEventListener("click", this.drawBoundingBox);
@@ -66,27 +123,29 @@ class DepthViewer extends Component {
         }
       }
     }
-    if (prevProps.mainDepthCanvas !== mainDepthCanvas) {
-      if (mainDepthCanvas) {
+    // Highlight pixel range from specified range for either cropped image or initial full image
+    if (prevProps.parameters.pixelRange !== parameters.pixelRange) {
+      if (parameters.pixelRange && (parameters.croppedeArea || depthImageDimension)) {
+        const { croppedeArea, pixelRange } = parameters;
+        let newArea = null;
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
         depthContext.globalAlpha = 1;
         depthContext.drawImage(mainDepthCanvas, 0, 0);
-      }
-    }
-    if (prevProps.tempDepthCanvas !== tempDepthCanvas) {
-      if (tempDepthCanvas) {
-        storeParameters({
-          croppedCanvasImage: null,
-          croppedeArea: null
-        });
-        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
-        depthContext.globalAlpha = 1;
-        depthContext.drawImage(tempDepthCanvas, 0, 0);
-      }
-    }
-    if (prevProps.depthCanvaUpdate !== depthCanvaUpdate) {
-      if (depthCanvaUpdate) {
-        editBoundingArea(parameters.croppedeArea, depthContext, depthCanvaUpdate);
+        if (croppedeArea) {
+          newArea = croppedeArea;
+          depthContext.beginPath();
+          depthContext.strokeStyle = "red";
+          depthContext.rect(newArea[0], newArea[1], newArea[2], newArea[3]);
+          depthContext.stroke();
+        } else {
+          newArea = [
+            depthImageDimension[0],
+            depthImageDimension[1],
+            depthImageDimension[2] - depthImageDimension[0],
+            depthImageDimension[3] - depthImageDimension[1]
+          ];
+        }
+        highlightPixelArea(newArea, depthContext, pixelRange);
       }
     }
   }
@@ -128,14 +187,14 @@ class DepthViewer extends Component {
       let y = event.layerY;
       if (initBoundingBox) {
         let [image_x1, image_y1, image_x2, image_y2] = depthImageDimension;
-        depthContext.beginPath();
-        depthContext.globalAlpha = 0.2;
-        depthContext.fillStyle = "blue";
         let new_x = Math.max(Math.min(initBoundingBox.x, x), image_x1);
         let new_y = Math.max(Math.min(initBoundingBox.y, y), image_y1);
         let new_w = Math.min(Math.max(initBoundingBox.x, x), image_x2) - new_x;
         let new_h = Math.min(Math.max(initBoundingBox.y, y), image_y2) - new_y;
-        depthContext.fillRect(new_x, new_y, new_w, new_h);
+        depthContext.beginPath();
+        depthContext.strokeStyle = "red";
+        depthContext.rect(new_x, new_y, new_w, new_h);
+        depthContext.stroke();
         let croppedArea = [new_x, new_y, new_w, new_h];
         this.setState({ initBoundingBox: null }, () => {
           storeParameters({ croppedCanvasImage: cropCanvas(tempDepthCanvas, croppedArea), croppedeArea: croppedArea });
@@ -167,10 +226,10 @@ const mapStateToProps = state => ({
   loadedDepthImage: imageSelectors.loadedDepthImage(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  depthCanvaUpdate: imageSelectors.depthCanvaUpdate(state),
   depthImageDimension: imageSelectors.depthImageDimension(state),
   prevDepthSize: imageSelectors.prevDepthSize(state),
   tools: imageSelectors.tools(state),
+  toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state)
 });
 

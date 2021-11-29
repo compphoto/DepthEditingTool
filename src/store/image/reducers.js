@@ -7,8 +7,8 @@ const initialState = {
   loadedDepthImage: null,
   mainRgbCanvas: null, // use canvas to image to convert to image
   mainDepthCanvas: null, // use canvas to image to convert to image
+  tempRgbCanvas: null, // global reference to depth canvas
   tempDepthCanvas: null, // global reference to depth canvas
-  depthCanvaUpdate: null,
   rgbImageDimension: null,
   depthImageDimension: null,
   prevRgbSize: { width: null, height: null },
@@ -17,9 +17,14 @@ const initialState = {
     currentTool: null,
     depth: false
   },
+  toolsParameters: {
+    depthBoxIntensity: 0,
+    depthRangeIntensity: 0
+  },
   parameters: {
     croppedCanvasImage: null,
-    croppedeArea: null
+    croppedeArea: null,
+    pixelRange: null
   }
 };
 
@@ -44,6 +49,10 @@ export const imageReducer = (state = initialState, { type, payload }) => {
             ...state.tools,
             currentTool: null,
             [payload]: false
+          },
+          toolsParameters: {
+            depthBoxIntensity: 0,
+            depthRangeIntensity: 0
           }
         };
       }
@@ -61,7 +70,19 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           };
       return {
         ...state,
-        tools: newTools
+        tools: newTools,
+        toolsParameters: {
+          depthBoxIntensity: 0,
+          depthRangeIntensity: 0
+        }
+      };
+    case types.STORE_TOOL_PARAMETERS:
+      return {
+        ...state,
+        toolsParameters: {
+          ...state.toolsParameters,
+          ...payload
+        }
       };
     case types.STORE_PARAMETERS:
       return {
@@ -82,14 +103,24 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         depthImageUrl: null,
         loadedRgbImage: null,
         loadedDepthImage: null,
-        mainRgbCanvas: null, // use canvas to image to convert to image
-        mainDepthCanvas: null, // use canvas to image to convert to image
-        depthCanvaUpdate: null,
+        mainRgbCanvas: null,
+        mainDepthCanvas: null,
+        tempRgbCanvas: null,
+        tempDepthCanvas: null,
         rgbImageDimension: null,
         depthImageDimension: null,
+        tools: {
+          currentTool: null,
+          depth: false
+        },
+        toolsParameters: {
+          depthBoxIntensity: 0,
+          depthRangeIntensity: 0
+        },
         parameters: {
           croppedCanvasImage: null,
-          croppedeArea: null
+          croppedeArea: null,
+          pixelRange: null
         }
       };
       return {

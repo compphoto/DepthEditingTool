@@ -4,7 +4,7 @@ import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import RgbViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
-import { cloneCanvas, drawCanvasImage } from "utils/canvasUtils";
+import { cloneCanvas, drawCanvasImage, highlightPixelAreaRgb } from "utils/canvasUtils";
 
 let objectUrl = null;
 
@@ -23,7 +23,19 @@ class RgbViewer extends Component {
   }
   componentDidUpdate(prevProps, prevState) {
     let { rgbImageRef } = this;
-    let { rgbImageUrl, mainRgbCanvas, prevRgbSize, initImage } = this.props;
+    let {
+      rgbImageUrl,
+      mainRgbCanvas,
+      mainDepthCanvas,
+      tempRgbCanvas,
+      tempDepthCanvas,
+      rgbImageDimension,
+      prevRgbSize,
+      tools,
+      toolsParameters,
+      parameters,
+      initImage
+    } = this.props;
     let rgbCanvas = rgbImageRef.current;
     let rgbContext = rgbCanvas.getContext("2d");
     if (prevProps.rgbImageUrl !== rgbImageUrl) {
@@ -36,10 +48,77 @@ class RgbViewer extends Component {
         initImage({
           loadedRgbImage: rgbImage,
           mainRgbCanvas: cloneCanvas(rgbCanvas),
+          tempRgbCanvas: cloneCanvas(rgbCanvas),
           rgbImageDimension: rgbImageDimension,
           prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height }
         });
       };
+    }
+    // On saving the image, this clears all annotations
+    if (prevProps.mainDepthCanvas !== mainDepthCanvas) {
+      if (tempRgbCanvas && mainDepthCanvas) {
+        rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
+        rgbContext.globalAlpha = 1;
+        rgbContext.drawImage(mainRgbCanvas, 0, 0);
+        initImage({
+          tempRgbCanvas: cloneCanvas(rgbCanvas)
+        });
+      }
+    }
+    // tempRgbCanvas changes on clicking the reset button
+    if (prevProps.tempDepthCanvas !== tempDepthCanvas) {
+      if (tempRgbCanvas) {
+        rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
+        rgbContext.globalAlpha = 1;
+        rgbContext.drawImage(mainRgbCanvas, 0, 0);
+        initImage({
+          tempRgbCanvas: cloneCanvas(rgbCanvas)
+        });
+      }
+    }
+    if (prevProps.parameters.croppedeArea !== parameters.croppedeArea) {
+      const { croppedeArea } = parameters;
+      if (croppedeArea && tempRgbCanvas) {
+        rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
+        rgbContext.globalAlpha = 1;
+        rgbContext.drawImage(mainRgbCanvas, 0, 0);
+        rgbContext.beginPath();
+        rgbContext.strokeStyle = "red";
+        rgbContext.rect(croppedeArea[0], croppedeArea[1], croppedeArea[2], croppedeArea[3]);
+        rgbContext.stroke();
+        initImage({
+          tempRgbCanvas: cloneCanvas(rgbCanvas)
+        });
+      }
+    }
+    // Highlight pixel range from specified range for either cropped image or initial full image
+    if (prevProps.parameters.pixelRange !== parameters.pixelRange) {
+      if (tempRgbCanvas && parameters.pixelRange && (parameters.croppedeArea || rgbImageDimension)) {
+        let depthContext = tempDepthCanvas.getContext("2d");
+        const { croppedeArea, pixelRange } = parameters;
+        let newArea = null;
+        rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
+        rgbContext.globalAlpha = 1;
+        rgbContext.drawImage(mainRgbCanvas, 0, 0);
+        if (croppedeArea) {
+          newArea = croppedeArea;
+          rgbContext.beginPath();
+          rgbContext.strokeStyle = "red";
+          rgbContext.rect(newArea[0], newArea[1], newArea[2], newArea[3]);
+          rgbContext.stroke();
+        } else {
+          newArea = [
+            rgbImageDimension[0],
+            rgbImageDimension[1],
+            rgbImageDimension[2] - rgbImageDimension[0],
+            rgbImageDimension[3] - rgbImageDimension[1]
+          ];
+        }
+        highlightPixelAreaRgb(newArea, rgbContext, depthContext, pixelRange);
+        initImage({
+          tempRgbCanvas: cloneCanvas(rgbCanvas)
+        });
+      }
     }
   }
   componentWillUnmount() {
@@ -58,6 +137,8 @@ class RgbViewer extends Component {
       if (loadedRgbImage) {
         let rgbImageDimension = drawCanvasImage(loadedRgbImage, rgbCanvas, rgbContext);
         initImage({
+          mainRgbCanvas: cloneCanvas(rgbCanvas),
+          tempRgbCanvas: cloneCanvas(rgbCanvas),
           rgbImageDimension: rgbImageDimension,
           prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height }
         });
@@ -84,8 +165,14 @@ const mapStateToProps = state => ({
   rgbImageUrl: imageSelectors.rgbImageUrl(state),
   loadedRgbImage: imageSelectors.loadedRgbImage(state),
   mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
+  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
+  tempRgbCanvas: imageSelectors.tempRgbCanvas(state),
+  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
   rgbImageDimension: imageSelectors.rgbImageDimension(state),
-  prevRgbSize: imageSelectors.prevRgbSize(state)
+  prevRgbSize: imageSelectors.prevRgbSize(state),
+  tools: imageSelectors.tools(state),
+  toolsParameters: imageSelectors.toolsParameters(state),
+  parameters: imageSelectors.parameters(state)
 });
 
 const mapDispatchToProps = {
