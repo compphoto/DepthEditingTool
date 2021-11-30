@@ -11,7 +11,9 @@ export const selectors = {
   depthImageDimension: state => state.image.depthImageDimension,
   prevRgbSize: state => state.image.prevRgbSize,
   prevDepthSize: state => state.image.prevDepthSize,
+  scaleParams: state => state.image.scaleParams,
   tools: state => state.image.tools,
   toolsParameters: state => state.image.toolsParameters,
-  parameters: state => state.image.parameters
+  parameters: state => state.image.parameters,
+  operationStack: state => state.image.operationStack
 };

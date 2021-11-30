@@ -1,3 +1,18 @@
+import { imageActions } from "store/image";
+import store from "store/store";
+
+// const store = require("store/store");
+//   store.default.dispatch(
+//     imageActions.initImage({
+//       [type === "depth" ? depthImageDimension : rgbImageDimension]: [x1, y1, x2, y2],
+//       scaleParams: {
+//         ratio: ratio,
+//         shiftX: centerShift_x,
+//         shiftY: centerShift_y
+//       }
+//     })
+//   );
+
 export const canvasToImage = canvas => {
   if (canvas) return canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
   return null;
@@ -12,29 +27,37 @@ export const cloneCanvas = oldCanvas => {
   return newCanvas;
 };
 
-export const drawCanvasImage = (image, canvas, context) => {
+export const getRatio = (image, canvas) => {
   let hRatio = canvas.width / image.naturalWidth;
   let vRatio = canvas.height / image.naturalHeight;
   let ratio = Math.min(hRatio, vRatio);
   let centerShift_x = (canvas.width - image.naturalWidth * ratio) / 2;
   let centerShift_y = (canvas.height - image.naturalHeight * ratio) / 2;
-  context.globalAlpha = 1;
+  return {
+    ratio: ratio,
+    shiftX: centerShift_x,
+    shiftY: centerShift_y
+  };
+};
+
+export const drawCanvasImage = (image, context, params) => {
+  console.warn(params);
+  const [ratio, shiftX, shiftY] = params;
   context.drawImage(
     image,
     0,
     0,
     image.naturalWidth,
     image.naturalHeight,
-    centerShift_x,
-    centerShift_y,
+    shiftX,
+    shiftY,
     image.naturalWidth * ratio,
     image.naturalHeight * ratio
   );
-  let x1 = centerShift_x;
-  let y1 = centerShift_y;
-  let x2 = centerShift_x + image.naturalWidth * ratio;
-  let y2 = centerShift_y + image.naturalHeight * ratio;
-  return [x1, y1, x2, y2];
+  // let x1 = centerShift_x;
+  // let y1 = centerShift_y;
+  // let x2 = centerShift_x + image.naturalWidth * ratio;
+  // let y2 = centerShift_y + image.naturalHeight * ratio;
 };
 
 export const editBoundingArea = (boundingBox, context, depth) => {

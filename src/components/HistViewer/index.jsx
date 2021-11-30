@@ -25,7 +25,7 @@ class HistViewer extends Component {
     }
     if (prevProps.mainDepthCanvas !== mainDepthCanvas) {
       if (mainDepthCanvas) {
-        let histDepthData = getCanvasImageData(mainDepthCanvas, depthImageDimension);
+        let histDepthData = getImageData(mainDepthCanvas);
         this.setState({ data: histDepthData });
       }
     }

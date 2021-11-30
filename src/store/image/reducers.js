@@ -13,6 +13,11 @@ const initialState = {
   depthImageDimension: null,
   prevRgbSize: { width: null, height: null },
   prevDepthSize: { width: null, height: null },
+  scaleParams: {
+    ratio: null,
+    shiftX: null,
+    shiftY: null
+  },
   tools: {
     currentTool: null,
     depth: false
@@ -25,6 +30,12 @@ const initialState = {
     croppedCanvasImage: null,
     croppedeArea: null,
     pixelRange: null
+  },
+  operationStack: {
+    rgbCanvasStack: [],
+    depthCanvasStack: [],
+    mainRgbStack: [],
+    mainDepthStack: []
   }
 };
 
@@ -92,6 +103,14 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           ...payload
         }
       };
+    case types.ADD_OPERATION:
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          [payload.name]: [...state.operationStack, payload.value]
+        }
+      };
     case types.REMOVE_ITEM:
       return {
         ...state,
@@ -109,6 +128,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         tempDepthCanvas: null,
         rgbImageDimension: null,
         depthImageDimension: null,
+        scaleParams: {
+          ratio: null,
+          shiftX: null,
+          shiftY: null
+        },
         tools: {
           currentTool: null,
           depth: false
@@ -121,6 +145,12 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           croppedCanvasImage: null,
           croppedeArea: null,
           pixelRange: null
+        },
+        operationStack: {
+          rgbCanvasStack: [],
+          depthCanvasStack: [],
+          mainRgbStack: [],
+          mainDepthCanvasStack: []
         }
       };
       return {

@@ -28,19 +28,17 @@ class MainPane extends Component {
         <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
           <div className="main-row">
             <div className="main-column main-column-2d">
-              <div className="box rgb-box">
-                <RgbViewer />
-              </div>
+              <div className="box rgb-box">{/* <RgbViewer /> */}</div>
               <div className="box depth-box">
                 <DepthViewer />
               </div>
             </div>
             <div className="main-column main-column-3d">
               <div className="box threeD-box">
-                <ThreeDViewer
+                {/* <ThreeDViewer
                   rgbImageCanvas={canvasToImage(tempRgbCanvas)}
                   depthImageCanvas={canvasToImage(tempDepthCanvas)}
-                />
+                /> */}
               </div>
               <div className="box histogram-box">
                 <HistViewer />
