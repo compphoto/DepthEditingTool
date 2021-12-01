@@ -9,11 +9,8 @@ const initialState = {
   tempDepthCanvas: null, // global reference to depth canvas
   prevRgbSize: { width: null, height: null },
   prevDepthSize: { width: null, height: null },
-  scaleParams: {
-    ratio: null,
-    shiftX: null,
-    shiftY: null
-  },
+  rgbCanvasDimension: null,
+  depthCanvasDimension: null,
   tools: {
     currentTool: null,
     depth: false
@@ -129,11 +126,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         tempDepthCanvas: null, // global reference to depth canvas
         prevRgbSize: { width: null, height: null },
         prevDepthSize: { width: null, height: null },
-        scaleParams: {
-          ratio: null,
-          shiftX: null,
-          shiftY: null
-        },
+        rgbCanvasDimension: null,
+        depthCanvasDimension: null,
         tools: {
           currentTool: null,
           depth: false

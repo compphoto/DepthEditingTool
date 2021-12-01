@@ -12,7 +12,7 @@ import HistViewer from "components/HistViewer";
 import ThreeDViewer from "components/ThreeDViewer";
 import MainPaneStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
-import { canvasToImage } from "utils/canvasUtils";
+import { canvasToImage, cropCanvas } from "utils/canvasUtils";
 
 class MainPane extends Component {
   onHandleChange = e => {
@@ -21,24 +21,47 @@ class MainPane extends Component {
   };
   render() {
     const { onHandleChange } = this;
-    const { toolExtOpen, rgbImageUrl, depthImageUrl, tempRgbCanvas, tempDepthCanvas, removeItem, removeAllItem } =
-      this.props;
+    const {
+      toolExtOpen,
+      rgbImageUrl,
+      depthImageUrl,
+      tempRgbCanvas,
+      tempDepthCanvas,
+      rgbCanvasDimension,
+      depthCanvasDimension,
+      removeItem,
+      removeAllItem
+    } = this.props;
+    const rgbBoundingBox = rgbCanvasDimension && [
+      rgbCanvasDimension[0],
+      rgbCanvasDimension[1],
+      rgbCanvasDimension[2] - rgbCanvasDimension[0],
+      rgbCanvasDimension[3] - rgbCanvasDimension[1]
+    ];
+    const depthBoundingBox = depthCanvasDimension && [
+      depthCanvasDimension[0],
+      depthCanvasDimension[1],
+      depthCanvasDimension[2] - depthCanvasDimension[0],
+      depthCanvasDimension[3] - depthCanvasDimension[1]
+    ];
     return (
       <MainPaneStyle>
         <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
           <div className="main-row">
             <div className="main-column main-column-2d">
-              <div className="box rgb-box">{/* <RgbViewer /> */}</div>
+              <div className="box rgb-box">
+                <RgbViewer />
+              </div>
               <div className="box depth-box">
                 <DepthViewer />
               </div>
             </div>
             <div className="main-column main-column-3d">
               <div className="box threeD-box">
-                {/* <ThreeDViewer
-                  rgbImageCanvas={canvasToImage(tempRgbCanvas)}
-                  depthImageCanvas={canvasToImage(tempDepthCanvas)}
-                /> */}
+                <ThreeDViewer
+                  rgbImageCanvas={canvasToImage(cropCanvas(tempRgbCanvas, rgbBoundingBox))}
+                  depthImageCanvas={canvasToImage(cropCanvas(tempDepthCanvas, depthBoundingBox))}
+                />
               </div>
               <div className="box histogram-box">
                 <HistViewer />
@@ -154,10 +177,10 @@ const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
   rgbImageUrl: imageSelectors.rgbImageUrl(state),
   depthImageUrl: imageSelectors.depthImageUrl(state),
-  mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
-  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   tempRgbCanvas: imageSelectors.tempRgbCanvas(state),
-  tempDepthCanvas: imageSelectors.tempDepthCanvas(state)
+  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
+  rgbCanvasDimension: imageSelectors.rgbCanvasDimension(state),
+  depthCanvasDimension: imageSelectors.depthCanvasDimension(state)
 });
 
 const mapDispatchToProps = {

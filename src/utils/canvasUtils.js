@@ -19,8 +19,8 @@ export const canvasToImage = canvas => {
 };
 
 export const cloneCanvas = oldCanvas => {
-  var newCanvas = document.createElement("canvas");
-  var context = newCanvas.getContext("2d");
+  const newCanvas = document.createElement("canvas");
+  const context = newCanvas.getContext("2d");
   newCanvas.width = oldCanvas.width;
   newCanvas.height = oldCanvas.height;
   context.drawImage(oldCanvas, 0, 0);
@@ -90,11 +90,12 @@ export const highlightPixelArea = (image, context, boundingBox, pixelRange) => {
   }
 };
 
-export const highlightPixelAreaRgb = (boundingBox, rgbContext, depthContext, pixelRange) => {
-  if (boundingBox && rgbContext && depthContext) {
+export const highlightPixelAreaRgb = (image, rgbContext, depthContext, boundingBox, pixelRange) => {
+  if (rgbContext && depthContext && boundingBox) {
     const imageData = rgbContext.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const rgbSrc = imageData.data;
     const depthSrc = depthContext.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]).data;
+    console.warn(rgbSrc.length, depthSrc.length);
     for (let i = 0; i < rgbSrc.length; i += 4) {
       if (depthSrc[i] < pixelRange[0] || depthSrc[i] > pixelRange[1]) {
         rgbSrc[i] -= 150;
@@ -122,20 +123,23 @@ export const editHighlightPixelArea = (boundingBox, context, pixelRange, depth) 
 };
 
 export const cropCanvas = (oldCanvas, boundingBox) => {
-  var newCanvas = document.createElement("canvas");
-  newCanvas.width = boundingBox[2];
-  newCanvas.height = boundingBox[3];
-  var context = newCanvas.getContext("2d");
-  context.drawImage(
-    oldCanvas,
-    boundingBox[0],
-    boundingBox[1],
-    boundingBox[2],
-    boundingBox[3],
-    0,
-    0,
-    boundingBox[2],
-    boundingBox[3]
-  );
-  return newCanvas;
+  if (oldCanvas && boundingBox) {
+    const newCanvas = document.createElement("canvas");
+    newCanvas.width = boundingBox[2];
+    newCanvas.height = boundingBox[3];
+    const context = newCanvas.getContext("2d");
+    context.drawImage(
+      oldCanvas,
+      boundingBox[0],
+      boundingBox[1],
+      boundingBox[2],
+      boundingBox[3],
+      0,
+      0,
+      boundingBox[2],
+      boundingBox[3]
+    );
+    return newCanvas;
+  }
+  return null;
 };

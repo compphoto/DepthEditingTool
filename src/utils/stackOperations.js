@@ -2,22 +2,26 @@ import store from "store/store";
 import { imageActions } from "store/image";
 import { canvasToImage, cloneCanvas } from "./canvasUtils";
 
-export const runDepthCanvasOperations = (image, context) => {
-  let depthCanvasStack = store.getState().image.operationStack.depthCanvasStack;
-  depthCanvasStack.forEach(element => {
+export const runCanvasOperations = (name, image, context) => {
+  let canvasStack = store.getState().image.operationStack[name];
+  canvasStack.forEach(element => {
     element.params ? element.func(image, context, ...element.params) : element.func(image, context);
   });
 };
 
-export const runTempDepthOperations = image => {
+export const runTempOperations = (name, image, width, height) => {
   const canvas = document.createElement("canvas");
-  canvas.width = image.width;
-  canvas.height = image.height;
+  canvas.width = width;
+  canvas.height = height;
   const context = canvas.getContext("2d");
-  let tempDepthStack = store.getState().image.operationStack.tempDepthStack;
-  tempDepthStack.forEach(element => {
+  let tempStack = store.getState().image.operationStack[name];
+  tempStack.forEach(element => {
     element.params ? element.func(image, context, ...element.params) : element.func(image, context);
   });
   const storeAction = require("store/store");
-  storeAction.default.dispatch(imageActions.initImage({ tempDepthCanvas: cloneCanvas(canvas) }));
+  if (name === "tempRgbStack") {
+    storeAction.default.dispatch(imageActions.initImage({ tempRgbCanvas: cloneCanvas(canvas) }));
+  } else {
+    storeAction.default.dispatch(imageActions.initImage({ tempDepthCanvas: cloneCanvas(canvas) }));
+  }
 };
