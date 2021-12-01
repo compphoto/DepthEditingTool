@@ -58,7 +58,7 @@ export function ImageEditor({ mainDepthCanvas, tempDepthCanvas, initImage }) {
         </Container>
       </header>
       <section>
-        <SidePane />
+        {/* <SidePane /> */}
         <MainPane />
       </section>
       <footer>Computational Photography Labs SFU</footer>

@@ -7,8 +7,8 @@ import store from "store/store";
 //       [type === "depth" ? depthImageDimension : rgbImageDimension]: [x1, y1, x2, y2],
 //       scaleParams: {
 //         ratio: ratio,
-//         shiftX: centerShift_x,
-//         shiftY: centerShift_y
+//         centerShift_x: centerShift_x,
+//         centerShift_y: centerShift_y
 //       }
 //     })
 //   );
@@ -28,36 +28,38 @@ export const cloneCanvas = oldCanvas => {
 };
 
 export const getRatio = (image, canvas) => {
-  let hRatio = canvas.width / image.naturalWidth;
-  let vRatio = canvas.height / image.naturalHeight;
+  let hRatio = canvas.width / image.width;
+  let vRatio = canvas.height / image.height;
   let ratio = Math.min(hRatio, vRatio);
-  let centerShift_x = (canvas.width - image.naturalWidth * ratio) / 2;
-  let centerShift_y = (canvas.height - image.naturalHeight * ratio) / 2;
+  let centerShift_x = (canvas.width - image.width * ratio) / 2;
+  let centerShift_y = (canvas.height - image.height * ratio) / 2;
   return {
     ratio: ratio,
-    shiftX: centerShift_x,
-    shiftY: centerShift_y
+    centerShift_x: centerShift_x,
+    centerShift_y: centerShift_y
   };
 };
 
-export const drawCanvasImage = (image, context, params) => {
-  console.warn(params);
-  const [ratio, shiftX, shiftY] = params;
+export const getDimension = (image, ratio, centerShift_x, centerShift_y) => {
+  let x1 = centerShift_x;
+  let y1 = centerShift_y;
+  let x2 = centerShift_x + image.width * ratio;
+  let y2 = centerShift_y + image.height * ratio;
+  return [x1, y1, x2, y2];
+};
+
+export const drawCanvasImage = (image, context, ratio, centerShift_x, centerShift_y) => {
   context.drawImage(
     image,
     0,
     0,
-    image.naturalWidth,
-    image.naturalHeight,
-    shiftX,
-    shiftY,
-    image.naturalWidth * ratio,
-    image.naturalHeight * ratio
+    image.width,
+    image.height,
+    centerShift_x,
+    centerShift_y,
+    image.width * ratio,
+    image.height * ratio
   );
-  // let x1 = centerShift_x;
-  // let y1 = centerShift_y;
-  // let x2 = centerShift_x + image.naturalWidth * ratio;
-  // let y2 = centerShift_y + image.naturalHeight * ratio;
 };
 
 export const editBoundingArea = (boundingBox, context, depth) => {
@@ -73,7 +75,7 @@ export const editBoundingArea = (boundingBox, context, depth) => {
   }
 };
 
-export const highlightPixelArea = (boundingBox, context, pixelRange) => {
+export const highlightPixelArea = (image, context, boundingBox, pixelRange) => {
   if (boundingBox && context) {
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const src = imageData.data;

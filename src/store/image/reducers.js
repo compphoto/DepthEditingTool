@@ -3,14 +3,10 @@ import { types } from "./constants";
 const initialState = {
   rgbImageUrl: null,
   depthImageUrl: null,
-  loadedRgbImage: null,
-  loadedDepthImage: null,
   mainRgbCanvas: null, // use canvas to image to convert to image
   mainDepthCanvas: null, // use canvas to image to convert to image
   tempRgbCanvas: null, // global reference to depth canvas
   tempDepthCanvas: null, // global reference to depth canvas
-  rgbImageDimension: null,
-  depthImageDimension: null,
   prevRgbSize: { width: null, height: null },
   prevDepthSize: { width: null, height: null },
   scaleParams: {
@@ -34,8 +30,8 @@ const initialState = {
   operationStack: {
     rgbCanvasStack: [],
     depthCanvasStack: [],
-    mainRgbStack: [],
-    mainDepthStack: []
+    tempRgbStack: [],
+    tempDepthStack: []
   }
 };
 
@@ -104,11 +100,18 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         }
       };
     case types.ADD_OPERATION:
+      const { name, value } = payload;
+      if (
+        state.operationStack[name].length !== 0 &&
+        state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString()
+      ) {
+        state.operationStack[name].pop();
+      }
       return {
         ...state,
         operationStack: {
           ...state.operationStack,
-          [payload.name]: [...state.operationStack, payload.value]
+          [name]: [...state.operationStack[name], value]
         }
       };
     case types.REMOVE_ITEM:
@@ -120,14 +123,12 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       let newState = {
         rgbImageUrl: null,
         depthImageUrl: null,
-        loadedRgbImage: null,
-        loadedDepthImage: null,
-        mainRgbCanvas: null,
-        mainDepthCanvas: null,
-        tempRgbCanvas: null,
-        tempDepthCanvas: null,
-        rgbImageDimension: null,
-        depthImageDimension: null,
+        mainRgbCanvas: null, // use canvas to image to convert to image
+        mainDepthCanvas: null, // use canvas to image to convert to image
+        tempRgbCanvas: null, // global reference to depth canvas
+        tempDepthCanvas: null, // global reference to depth canvas
+        prevRgbSize: { width: null, height: null },
+        prevDepthSize: { width: null, height: null },
         scaleParams: {
           ratio: null,
           shiftX: null,
@@ -149,8 +150,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         operationStack: {
           rgbCanvasStack: [],
           depthCanvasStack: [],
-          mainRgbStack: [],
-          mainDepthCanvasStack: []
+          tempRgbStack: [],
+          tempDepthStack: []
         }
       };
       return {
