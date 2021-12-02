@@ -7,6 +7,7 @@ export const imageActions = {
   storeToolParameters: payload => ({ type: types.STORE_TOOL_PARAMETERS, payload: payload }),
   storeParameters: payload => ({ type: types.STORE_PARAMETERS, payload: payload }),
   addOperation: payload => ({ type: types.ADD_OPERATION, payload: payload }),
+  removeOperation: payload => ({ type: types.REMOVE_OPERATION, payload: payload }),
   removeItem: name => ({ type: types.REMOVE_ITEM, payload: name }),
   removeAllItem: () => ({ type: types.REMOVE_ALL_ITEM })
 };

@@ -4,7 +4,14 @@ import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import RgbViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
-import { cloneCanvas, drawCanvasImage, getDimension, getRatio, highlightPixelAreaRgb } from "utils/canvasUtils";
+import {
+  cloneCanvas,
+  drawBox,
+  drawCanvasImage,
+  getDimension,
+  getRatio,
+  highlightPixelAreaRgb
+} from "utils/canvasUtils";
 import { runCanvasOperations, runTempOperations } from "utils/stackOperations";
 
 let objectUrl = null;
@@ -37,7 +44,8 @@ class RgbViewer extends Component {
       parameters,
       operationStack,
       initImage,
-      addOperation
+      addOperation,
+      removeOperation
     } = this.props;
     let rgbCanvas = rgbImageRef.current;
     let rgbContext = rgbCanvas.getContext("2d");
@@ -85,13 +93,13 @@ class RgbViewer extends Component {
     }
     // Highlight pixel range from specified range for either cropped image or initial full image
     if (prevProps.parameters.pixelRange !== parameters.pixelRange) {
-      if (parameters.pixelRange || parameters.croppedeArea) {
-        const { croppedeArea, pixelRange } = parameters;
+      if (parameters.pixelRange || parameters.croppedArea) {
+        const { croppedArea, pixelRange } = parameters;
         const depthContext = tempDepthCanvas.getContext("2d");
         rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
         let newArea = null;
-        if (croppedeArea) {
-          newArea = croppedeArea;
+        if (croppedArea) {
+          newArea = croppedArea;
           rgbContext.beginPath();
           rgbContext.strokeStyle = "red";
           rgbContext.rect(newArea[0], newArea[1], newArea[2], newArea[3]);
@@ -136,46 +144,61 @@ class RgbViewer extends Component {
     //     });
     //   }
     // }
-    // if (prevProps.parameters.croppedeArea !== parameters.croppedeArea) {
-    //   const { croppedeArea } = parameters;
-    //   if (croppedeArea && tempRgbCanvas) {
-    //     rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
-    //     rgbContext.globalAlpha = 1;
-    //     rgbContext.drawImage(mainRgbCanvas, 0, 0);
-    //     rgbContext.beginPath();
-    //     rgbContext.strokeStyle = "red";
-    //     rgbContext.rect(croppedeArea[0], croppedeArea[1], croppedeArea[2], croppedeArea[3]);
-    //     rgbContext.stroke();
-    //     initImage({
-    //       tempRgbCanvas: cloneCanvas(rgbCanvas)
-    //     });
-    //   }
-    // }
+    if (prevProps.parameters.croppedArea !== parameters.croppedArea) {
+      const { croppedArea } = parameters;
+      if (croppedArea && tempRgbCanvas) {
+        addOperation({
+          name: "rgbCanvasStack",
+          value: { func: drawBox, params: croppedArea }
+        });
+        addOperation({
+          name: "tempRgbStack",
+          value: { func: drawBox, params: croppedArea }
+        });
+      }
+    }
+    if (prevProps.tools.depth !== tools.depth) {
+      if (!tools.depth) {
+        removeOperation({
+          name: "rgbCanvasStack",
+          value: drawBox
+        });
+        removeOperation({
+          name: "tempRgbStack",
+          value: drawBox
+        });
+      }
+    }
   }
   componentWillUnmount() {
     window.removeEventListener("resize", this.handleResize);
     URL.revokeObjectURL(objectUrl);
   }
   handleResize = () => {
-    let { rgbImageRef } = this;
     this.setState({ ...this.state, windowWidth: window.innerWidth });
-    let { loadedRgbImage, initImage } = this.props;
-    let rgbCanvas = rgbImageRef.current;
-    if (rgbCanvas) {
-      let rgbContext = rgbCanvas.getContext("2d");
+    const { rgbImageRef } = this;
+    const { mainRgbCanvas, operationStack, initImage, addOperation } = this.props;
+    const rgbCanvas = rgbImageRef.current;
+    if (rgbCanvas && mainRgbCanvas) {
       rgbCanvas.width = (window.innerWidth / 1500) * 521;
       rgbCanvas.height = (window.innerHeight / 1200) * 352;
-      if (loadedRgbImage) {
-        let rgbCanvasDimension = drawCanvasImage(loadedRgbImage, rgbCanvas, rgbContext);
-        initImage({
-          mainRgbCanvas: cloneCanvas(rgbCanvas),
-          tempRgbCanvas: cloneCanvas(rgbCanvas),
-          rgbCanvasDimension: rgbCanvasDimension,
-          prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height }
-        });
-      }
-    } else {
-      return;
+      const { ratio, centerShift_x, centerShift_y } = getRatio(mainRgbCanvas, rgbCanvas);
+      initImage({
+        operationStack: {
+          ...operationStack,
+          rgbCanvasStack: []
+        },
+        prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height },
+        rgbCanvasDimension: getDimension(mainRgbCanvas, ratio, centerShift_x, centerShift_y)
+      });
+      addOperation({
+        name: "rgbCanvasStack",
+        value: { func: drawCanvasImage, params: [ratio, centerShift_x, centerShift_y] }
+      });
+      addOperation({
+        name: "tempRgbStack",
+        value: { func: drawCanvasImage, params: [ratio, centerShift_x, centerShift_y] }
+      });
     }
   };
   render() {
@@ -208,7 +231,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   initImage: imageActions.initImage,
-  addOperation: imageActions.addOperation
+  addOperation: imageActions.addOperation,
+  removeOperation: imageActions.removeOperation
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RgbViewer);

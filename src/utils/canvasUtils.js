@@ -62,6 +62,13 @@ export const drawCanvasImage = (image, context, ratio, centerShift_x, centerShif
   );
 };
 
+export const drawBox = (image, context, new_x, new_y, new_w, new_h) => {
+  context.beginPath();
+  context.strokeStyle = "red";
+  context.rect(new_x, new_y, new_w, new_h);
+  context.stroke();
+};
+
 export const editBoundingArea = (boundingBox, context, depth) => {
   if (boundingBox && context) {
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
@@ -95,7 +102,6 @@ export const highlightPixelAreaRgb = (image, rgbContext, depthContext, boundingB
     const imageData = rgbContext.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const rgbSrc = imageData.data;
     const depthSrc = depthContext.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]).data;
-    console.warn(rgbSrc.length, depthSrc.length);
     for (let i = 0; i < rgbSrc.length; i += 4) {
       if (depthSrc[i] < pixelRange[0] || depthSrc[i] > pixelRange[1]) {
         rgbSrc[i] -= 150;

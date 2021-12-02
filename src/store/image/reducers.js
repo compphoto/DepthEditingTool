@@ -21,7 +21,7 @@ const initialState = {
   },
   parameters: {
     croppedCanvasImage: null,
-    croppedeArea: null,
+    croppedArea: null,
     pixelRange: null
   },
   operationStack: {
@@ -45,7 +45,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         ...payload
       };
     case types.SELECT_TOOL:
-      let prevTool = state.tools.currentTool;
+      var prevTool = state.tools.currentTool;
       if (prevTool === payload) {
         return {
           ...state,
@@ -60,7 +60,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           }
         };
       }
-      let newTools = prevTool
+      var newTools = prevTool
         ? {
             ...state.tools,
             currentTool: payload,
@@ -97,7 +97,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         }
       };
     case types.ADD_OPERATION:
-      const { name, value } = payload;
+      var { name, value } = payload;
       if (
         state.operationStack[name].length !== 0 &&
         state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString()
@@ -111,13 +111,28 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           [name]: [...state.operationStack[name], value]
         }
       };
+    case types.REMOVE_OPERATION:
+      var { name, value } = payload;
+      if (
+        state.operationStack[name].length !== 0 &&
+        state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.toString()
+      ) {
+        state.operationStack[name].pop();
+      }
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          [name]: [...state.operationStack[name]]
+        }
+      };
     case types.REMOVE_ITEM:
       return {
         ...state,
         ...payload
       };
     case types.REMOVE_ALL_ITEM:
-      let newState = {
+      var newState = {
         rgbImageUrl: null,
         depthImageUrl: null,
         mainRgbCanvas: null, // use canvas to image to convert to image
@@ -138,7 +153,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         },
         parameters: {
           croppedCanvasImage: null,
-          croppedeArea: null,
+          croppedArea: null,
           pixelRange: null
         },
         operationStack: {

@@ -144,7 +144,7 @@ class MainPane extends Component {
                       },
                       parameters: {
                         croppedCanvasImage: null,
-                        croppedeArea: null,
+                        croppedArea: null,
                         pixelRange: null
                       }
                     });
