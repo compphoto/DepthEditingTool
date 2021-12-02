@@ -186,7 +186,8 @@ class RgbViewer extends Component {
       initImage({
         operationStack: {
           ...operationStack,
-          rgbCanvasStack: []
+          rgbCanvasStack: [],
+          tempRgbStack: []
         },
         prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height },
         rgbCanvasDimension: getDimension(mainRgbCanvas, ratio, centerShift_x, centerShift_y)

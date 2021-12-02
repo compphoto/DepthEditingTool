@@ -113,17 +113,17 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       };
     case types.REMOVE_OPERATION:
       var { name, value } = payload;
-      if (
-        state.operationStack[name].length !== 0 &&
-        state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.toString()
-      ) {
-        state.operationStack[name].pop();
-      }
+      var array = state.operationStack[name];
+      var newArray = array.filter(x => {
+        if (x.func.toString() !== value.toString()) {
+          return x;
+        }
+      });
       return {
         ...state,
         operationStack: {
           ...state.operationStack,
-          [name]: [...state.operationStack[name]]
+          [name]: [...newArray]
         }
       };
     case types.REMOVE_ITEM:

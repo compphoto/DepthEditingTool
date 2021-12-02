@@ -166,6 +166,11 @@ class DepthViewer extends Component {
           name: "depthCanvasStack",
           value: drawBox
         });
+        storeParameters({
+          croppedCanvasImage: null,
+          croppedArea: null,
+          pixelRange: null
+        });
       }
     }
   }
@@ -187,7 +192,8 @@ class DepthViewer extends Component {
       initImage({
         operationStack: {
           ...operationStack,
-          depthCanvasStack: []
+          depthCanvasStack: [],
+          tempDepthStack: []
         },
         prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height },
         depthCanvasDimension: getDimension(mainDepthCanvas, ratio, centerShift_x, centerShift_y)
