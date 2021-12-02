@@ -22,7 +22,7 @@ const initialState = {
   parameters: {
     croppedCanvasImage: null,
     croppedArea: null,
-    pixelRange: null
+    pixelRange: [0, 255]
   },
   operationStack: {
     rgbCanvasStack: [],
@@ -98,17 +98,17 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       };
     case types.ADD_OPERATION:
       var { name, value } = payload;
-      if (
-        state.operationStack[name].length !== 0 &&
-        state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString()
-      ) {
-        state.operationStack[name].pop();
-      }
+      var array = state.operationStack[name];
+      var newArray = array.filter(x => {
+        if (x.func.toString() !== value.func.toString()) {
+          return x;
+        }
+      });
       return {
         ...state,
         operationStack: {
           ...state.operationStack,
-          [name]: [...state.operationStack[name], value]
+          [name]: [...newArray, value]
         }
       };
     case types.REMOVE_OPERATION:
@@ -154,7 +154,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         parameters: {
           croppedCanvasImage: null,
           croppedArea: null,
-          pixelRange: null
+          pixelRange: [0, 255]
         },
         operationStack: {
           rgbCanvasStack: [],
@@ -172,3 +172,19 @@ export const imageReducer = (state = initialState, { type, payload }) => {
     }
   }
 };
+
+// case types.ADD_OPERATION:
+//       var { name, value } = payload;
+//       if (
+//         state.operationStack[name].length !== 0 &&
+//         state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString()
+//       ) {
+//         state.operationStack[name].pop();
+//       }
+//       return {
+//         ...state,
+//         operationStack: {
+//           ...state.operationStack,
+//           [name]: [...state.operationStack[name], value]
+//         }
+//       };

@@ -17,23 +17,25 @@ class HistViewer extends Component {
     data: []
   };
   componentDidUpdate(prevProps, prevState) {
-    let { mainDepthCanvas, tempDepthCanvas, depthCanvasDimension, parameters } = this.props;
-    if (prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage) {
+    let { tempDepthCanvas, depthCanvasDimension, parameters } = this.props;
+    if (
+      prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage ||
+      prevProps.tempDepthCanvas !== tempDepthCanvas
+    ) {
       if (parameters.croppedCanvasImage) {
         let histDepthData = getImageData(parameters.croppedCanvasImage);
         this.setState({ data: histDepthData });
-      }
-    }
-    if (prevProps.tempDepthCanvas !== tempDepthCanvas) {
-      if (tempDepthCanvas) {
-        const boundingBox = [
-          depthCanvasDimension[0],
-          depthCanvasDimension[1],
-          depthCanvasDimension[2] - depthCanvasDimension[0],
-          depthCanvasDimension[3] - depthCanvasDimension[1]
-        ];
-        let histDepthData = getImageData(cropCanvas(tempDepthCanvas, boundingBox));
-        this.setState({ data: histDepthData });
+      } else {
+        if (tempDepthCanvas) {
+          const boundingBox = [
+            depthCanvasDimension[0],
+            depthCanvasDimension[1],
+            depthCanvasDimension[2] - depthCanvasDimension[0],
+            depthCanvasDimension[3] - depthCanvasDimension[1]
+          ];
+          let histDepthData = getImageData(cropCanvas(tempDepthCanvas, boundingBox));
+          this.setState({ data: histDepthData });
+        }
       }
     }
   }

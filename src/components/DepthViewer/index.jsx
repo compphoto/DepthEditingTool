@@ -103,10 +103,6 @@ class DepthViewer extends Component {
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
         if (croppedArea) {
           newArea = croppedArea;
-          depthContext.beginPath();
-          depthContext.strokeStyle = "red";
-          depthContext.rect(newArea[0], newArea[1], newArea[2], newArea[3]);
-          depthContext.stroke();
         } else {
           newArea = [
             depthCanvasDimension[0],
@@ -169,7 +165,7 @@ class DepthViewer extends Component {
         storeParameters({
           croppedCanvasImage: null,
           croppedArea: null,
-          pixelRange: null
+          pixelRange: [0, 255]
         });
       }
     }
@@ -230,6 +226,9 @@ class DepthViewer extends Component {
         });
       } else {
         this.setState({ initBoundingBox: { x, y } }, () => {
+          storeParameters({
+            pixelRange: [0, 255]
+          });
           removeOperation({
             name: "depthCanvasStack",
             value: drawBox

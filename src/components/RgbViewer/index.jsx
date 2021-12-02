@@ -100,10 +100,6 @@ class RgbViewer extends Component {
         let newArea = null;
         if (croppedArea) {
           newArea = croppedArea;
-          rgbContext.beginPath();
-          rgbContext.strokeStyle = "red";
-          rgbContext.rect(newArea[0], newArea[1], newArea[2], newArea[3]);
-          rgbContext.stroke();
         } else {
           newArea = [
             rgbCanvasDimension[0],
