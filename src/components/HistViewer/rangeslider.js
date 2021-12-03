@@ -17,6 +17,18 @@ class RangeSlider extends React.Component {
       values: range
     };
   }
+  componentDidUpdate(prevProps, prevState) {
+    const { domain } = this.state;
+    const { tools } = this.props;
+    if (prevProps.tools.depth !== tools.depth) {
+      if (!tools.depth) {
+        this.setState({
+          values: domain,
+          update: domain
+        });
+      }
+    }
+  }
   render() {
     const { domain, values, update } = this.state;
     const { parameters, storeParameters } = this.props;
@@ -38,8 +50,8 @@ class RangeSlider extends React.Component {
               });
             })
           }
-          onChange={values => this.setState({ values: parameters.pixelRange })}
-          values={parameters.pixelRange}
+          onChange={values => this.setState({ values })}
+          values={values}
         >
           <Rail>{({ getRailProps }) => <MuiRail getRailProps={getRailProps} />}</Rail>
           <Handles>
@@ -129,6 +141,7 @@ class RangeSlider extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  tools: imageSelectors.tools(state),
   parameters: imageSelectors.parameters(state)
 });
 
