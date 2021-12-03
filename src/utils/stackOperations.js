@@ -9,19 +9,30 @@ export const runCanvasOperations = (name, image, context) => {
   });
 };
 
-export const runTempOperations = (name, image, width, height) => {
+export const runTempRgbOperations = (name, image, width, height) => {
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
   const context = canvas.getContext("2d");
-  let tempStack = store.getState().image.operationStack[name];
-  tempStack.forEach(element => {
+  let stack = store.getState().image.operationStack[name];
+  stack.forEach(element => {
     element.params ? element.func(image, context, ...element.params) : element.func(image, context);
   });
   const storeAction = require("store/store");
-  if (name === "tempRgbStack") {
-    storeAction.default.dispatch(imageActions.initImage({ tempRgbCanvas: cloneCanvas(canvas) }));
-  } else {
-    storeAction.default.dispatch(imageActions.initImage({ tempDepthCanvas: cloneCanvas(canvas) }));
-  }
+  storeAction.default.dispatch(imageActions.initImage({ tempRgbCanvas: cloneCanvas(canvas) }));
+};
+
+export const runTempDepthOperations = (name, image, width, height) => {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+  let stack = store.getState().image.operationStack[name];
+  stack.forEach(element => {
+    if (element.type === "effect") {
+      element.params ? element.func(image, context, ...element.params) : element.func(image, context);
+    }
+  });
+  const storeAction = require("store/store");
+  storeAction.default.dispatch(imageActions.initImage({ tempDepthCanvas: cloneCanvas(canvas) }));
 };

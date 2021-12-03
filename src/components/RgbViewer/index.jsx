@@ -12,7 +12,7 @@ import {
   getRatio,
   highlightPixelAreaRgb
 } from "utils/canvasUtils";
-import { runCanvasOperations, runTempOperations } from "utils/stackOperations";
+import { runCanvasOperations, runTempRgbOperations } from "utils/stackOperations";
 
 let objectUrl = null;
 
@@ -45,7 +45,8 @@ class RgbViewer extends Component {
       operationStack,
       initImage,
       addOperation,
-      removeOperation
+      removeOperation,
+      addEffect
     } = this.props;
     let rgbCanvas = rgbImageRef.current;
     let rgbContext = rgbCanvas.getContext("2d");
@@ -62,8 +63,7 @@ class RgbViewer extends Component {
           rgbCanvasDimension: null,
           operationStack: {
             ...operationStack,
-            rgbCanvasStack: [],
-            tempRgbStack: []
+            rgbStack: []
           }
         });
       };
@@ -71,12 +71,8 @@ class RgbViewer extends Component {
     // If main image changes, add draw/redraw canvas to operation
     if (prevProps.mainRgbCanvas !== mainRgbCanvas) {
       const { ratio, centerShift_x, centerShift_y } = getRatio(mainRgbCanvas, rgbCanvas);
-      addOperation({
-        name: "rgbCanvasStack",
-        value: { func: drawCanvasImage, params: [ratio, centerShift_x, centerShift_y] }
-      });
-      addOperation({
-        name: "tempRgbStack",
+      addEffect({
+        name: "rgbStack",
         value: { func: drawCanvasImage, params: [ratio, centerShift_x, centerShift_y] }
       });
       initImage({
@@ -85,11 +81,9 @@ class RgbViewer extends Component {
       });
     }
     // If operation is added to the stack, rerun all operations in operation stack
-    if (prevProps.operationStack.rgbCanvasStack !== operationStack.rgbCanvasStack) {
-      runCanvasOperations("rgbCanvasStack", mainRgbCanvas, rgbContext);
-    }
-    if (prevProps.operationStack.tempRgbStack !== operationStack.tempRgbStack) {
-      runTempOperations("tempRgbStack", mainRgbCanvas, rgbCanvas.width, rgbCanvas.height);
+    if (prevProps.operationStack.rgbStack !== operationStack.rgbStack) {
+      runCanvasOperations("rgbStack", mainRgbCanvas, rgbContext);
+      runTempRgbOperations("rgbStack", mainRgbCanvas, rgbCanvas.width, rgbCanvas.height);
     }
     // Highlight pixel range from specified range for either cropped image or initial full image
     if (prevProps.parameters.pixelRange !== parameters.pixelRange) {
@@ -109,11 +103,7 @@ class RgbViewer extends Component {
           ];
         }
         addOperation({
-          name: "rgbCanvasStack",
-          value: { func: highlightPixelAreaRgb, params: [depthContext, newArea, pixelRange] }
-        });
-        addOperation({
-          name: "tempRgbStack",
+          name: "rgbStack",
           value: { func: highlightPixelAreaRgb, params: [depthContext, newArea, pixelRange] }
         });
       }
@@ -122,11 +112,7 @@ class RgbViewer extends Component {
       const { croppedArea } = parameters;
       if (croppedArea && tempRgbCanvas) {
         addOperation({
-          name: "rgbCanvasStack",
-          value: { func: drawBox, params: croppedArea }
-        });
-        addOperation({
-          name: "tempRgbStack",
+          name: "rgbStack",
           value: { func: drawBox, params: croppedArea }
         });
       }
@@ -134,11 +120,7 @@ class RgbViewer extends Component {
     if (prevProps.tools.depth !== tools.depth) {
       if (!tools.depth) {
         removeOperation({
-          name: "rgbCanvasStack",
-          value: drawBox
-        });
-        removeOperation({
-          name: "tempRgbStack",
+          name: "rgbStack",
           value: drawBox
         });
       }
@@ -151,7 +133,7 @@ class RgbViewer extends Component {
   handleResize = () => {
     this.setState({ ...this.state, windowWidth: window.innerWidth });
     const { rgbImageRef } = this;
-    const { mainRgbCanvas, operationStack, initImage, addOperation } = this.props;
+    const { mainRgbCanvas, operationStack, initImage, addEffect } = this.props;
     const rgbCanvas = rgbImageRef.current;
     if (rgbCanvas && mainRgbCanvas) {
       rgbCanvas.width = (window.innerWidth / 1500) * 521;
@@ -160,18 +142,13 @@ class RgbViewer extends Component {
       initImage({
         operationStack: {
           ...operationStack,
-          rgbCanvasStack: [],
-          tempRgbStack: []
+          rgbStack: []
         },
         prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height },
         rgbCanvasDimension: getDimension(mainRgbCanvas, ratio, centerShift_x, centerShift_y)
       });
-      addOperation({
-        name: "rgbCanvasStack",
-        value: { func: drawCanvasImage, params: [ratio, centerShift_x, centerShift_y] }
-      });
-      addOperation({
-        name: "tempRgbStack",
+      addEffect({
+        name: "rgbStack",
         value: { func: drawCanvasImage, params: [ratio, centerShift_x, centerShift_y] }
       });
     }
@@ -207,7 +184,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   initImage: imageActions.initImage,
   addOperation: imageActions.addOperation,
-  removeOperation: imageActions.removeOperation
+  removeOperation: imageActions.removeOperation,
+  addEffect: imageActions.addEffect
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RgbViewer);

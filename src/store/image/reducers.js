@@ -25,10 +25,8 @@ const initialState = {
     pixelRange: [0, 255]
   },
   operationStack: {
-    rgbCanvasStack: [],
-    depthCanvasStack: [],
-    tempRgbStack: [],
-    tempDepthStack: []
+    rgbStack: [],
+    depthStack: []
   }
 };
 
@@ -53,10 +51,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
             ...state.tools,
             currentTool: null,
             [payload]: false
-          },
-          toolsParameters: {
-            depthBoxIntensity: 0,
-            depthRangeIntensity: 0
           }
         };
       }
@@ -74,11 +68,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           };
       return {
         ...state,
-        tools: newTools,
-        toolsParameters: {
-          depthBoxIntensity: 0,
-          depthRangeIntensity: 0
-        }
+        tools: newTools
       };
     case types.STORE_TOOL_PARAMETERS:
       return {
@@ -108,7 +98,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         ...state,
         operationStack: {
           ...state.operationStack,
-          [name]: [...newArray, value]
+          [name]: [...newArray, { ...value, type: "operation" }]
         }
       };
     case types.REMOVE_OPERATION:
@@ -124,6 +114,31 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         operationStack: {
           ...state.operationStack,
           [name]: [...newArray]
+        }
+      };
+    case types.ADD_EFFECT:
+      var { name, value } = payload;
+      if (
+        state.operationStack[name].length !== 0 &&
+        state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString()
+      ) {
+        state.operationStack[name].pop();
+      }
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          [name]: [...state.operationStack[name], { ...value, type: "effect" }]
+        }
+      };
+    case types.REMOVE_EFFECT:
+      if (state.operationStack[name].length > 1) {
+        state.operationStack[name].pop();
+      }
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack
         }
       };
     case types.REMOVE_ITEM:
@@ -157,10 +172,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           pixelRange: [0, 255]
         },
         operationStack: {
-          rgbCanvasStack: [],
-          depthCanvasStack: [],
-          tempRgbStack: [],
-          tempDepthStack: []
+          rgbStack: [],
+          depthStack: []
         }
       };
       return {
@@ -172,19 +185,3 @@ export const imageReducer = (state = initialState, { type, payload }) => {
     }
   }
 };
-
-// case types.ADD_OPERATION:
-//       var { name, value } = payload;
-//       if (
-//         state.operationStack[name].length !== 0 &&
-//         state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString()
-//       ) {
-//         state.operationStack[name].pop();
-//       }
-//       return {
-//         ...state,
-//         operationStack: {
-//           ...state.operationStack,
-//           [name]: [...state.operationStack[name], value]
-//         }
-//       };

@@ -16,7 +16,8 @@ import {
   getDimension,
   drawBox
 } from "utils/canvasUtils";
-import { runCanvasOperations, runTempOperations } from "utils/stackOperations";
+import { runCanvasOperations, runTempDepthOperations } from "utils/stackOperations";
+import { addEffect } from "@react-three/fiber";
 
 let objectUrl = null;
 
@@ -49,7 +50,8 @@ class DepthViewer extends Component {
       initImage,
       storeParameters,
       addOperation,
-      removeOperation
+      removeOperation,
+      addEffect
     } = this.props;
     let depthCanvas = depthImageRef.current;
     let depthContext = depthCanvas.getContext("2d");
@@ -66,8 +68,7 @@ class DepthViewer extends Component {
           depthCanvasDimension: null,
           operationStack: {
             ...operationStack,
-            depthCanvasStack: [],
-            tempDepthStack: []
+            depthStack: []
           }
         });
       };
@@ -75,12 +76,8 @@ class DepthViewer extends Component {
     // If main image changes, add draw/redraw canvas to operation
     if (prevProps.mainDepthCanvas !== mainDepthCanvas) {
       const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, depthCanvas);
-      addOperation({
-        name: "depthCanvasStack",
-        value: { func: drawCanvasImage, params: [ratio, centerShift_x, centerShift_y] }
-      });
-      addOperation({
-        name: "tempDepthStack",
+      addEffect({
+        name: "depthStack",
         value: { func: drawCanvasImage, params: [ratio, centerShift_x, centerShift_y] }
       });
       initImage({
@@ -89,11 +86,9 @@ class DepthViewer extends Component {
       });
     }
     // If operation is added to the stack, rerun all operations in operation stack
-    if (prevProps.operationStack.depthCanvasStack !== operationStack.depthCanvasStack) {
-      runCanvasOperations("depthCanvasStack", mainDepthCanvas, depthContext);
-    }
-    if (prevProps.operationStack.tempDepthStack !== operationStack.tempDepthStack) {
-      runTempOperations("tempDepthStack", mainDepthCanvas, depthCanvas.width, depthCanvas.height);
+    if (prevProps.operationStack.depthStack !== operationStack.depthStack) {
+      runCanvasOperations("depthStack", mainDepthCanvas, depthContext);
+      runTempDepthOperations("depthStack", mainDepthCanvas, depthCanvas.width, depthCanvas.height);
     }
     // Highlight pixel range from specified range for either cropped image or initial full image
     if (prevProps.parameters.pixelRange !== parameters.pixelRange) {
@@ -112,25 +107,11 @@ class DepthViewer extends Component {
           ];
         }
         addOperation({
-          name: "depthCanvasStack",
+          name: "depthStack",
           value: { func: highlightPixelArea, params: [newArea, pixelRange] }
         });
       }
     }
-    // On saving the image, this clears all annotations
-    // if (prevProps.mainDepthCanvas !== mainDepthCanvas) {
-    //   if (mainDepthCanvas) {
-    //     depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
-    //     depthContext.globalAlpha = 1;
-    //     depthContext.drawImage(mainDepthCanvas, 0, 0);
-    //   }
-    // }
-    // tempDepthCanvas changes on clicking the reset button
-    // if (prevProps.toolsParameters.depthBoxIntensity !== toolsParameters.depthBoxIntensity) {
-    //   if (toolsParameters.depthBoxIntensity) {
-    //     editBoundingArea(parameters.croppedArea, depthContext, toolsParameters.depthBoxIntensity);
-    //   }
-    // }
     // if (prevProps.toolsParameters.depthRangeIntensity !== toolsParameters.depthRangeIntensity) {
     //   if (
     //     toolsParameters.depthRangeIntensity &&
@@ -159,7 +140,7 @@ class DepthViewer extends Component {
       } else {
         depthCanvas.removeEventListener("click", this.drawBoundingBox);
         removeOperation({
-          name: "depthCanvasStack",
+          name: "depthStack",
           value: drawBox
         });
         storeParameters({
@@ -179,7 +160,7 @@ class DepthViewer extends Component {
   handleResize = () => {
     this.setState({ ...this.state, windowWidth: window.innerWidth });
     const { depthImageRef } = this;
-    const { mainDepthCanvas, operationStack, initImage, addOperation } = this.props;
+    const { mainDepthCanvas, operationStack, initImage, addEffect } = this.props;
     const depthCanvas = depthImageRef.current;
     if (depthCanvas && mainDepthCanvas) {
       depthCanvas.width = (window.innerWidth / 1500) * 521;
@@ -188,18 +169,13 @@ class DepthViewer extends Component {
       initImage({
         operationStack: {
           ...operationStack,
-          depthCanvasStack: [],
-          tempDepthStack: []
+          depthStack: []
         },
         prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height },
         depthCanvasDimension: getDimension(mainDepthCanvas, ratio, centerShift_x, centerShift_y)
       });
-      addOperation({
-        name: "depthCanvasStack",
-        value: { func: drawCanvasImage, params: [ratio, centerShift_x, centerShift_y] }
-      });
-      addOperation({
-        name: "tempDepthStack",
+      addEffect({
+        name: "depthStack",
         value: { func: drawCanvasImage, params: [ratio, centerShift_x, centerShift_y] }
       });
     }
@@ -220,7 +196,7 @@ class DepthViewer extends Component {
         this.setState({ initBoundingBox: null }, () => {
           storeParameters({ croppedCanvasImage: cropCanvas(tempDepthCanvas, croppedArea), croppedArea: croppedArea });
           addOperation({
-            name: "depthCanvasStack",
+            name: "depthStack",
             value: { func: drawBox, params: croppedArea }
           });
         });
@@ -230,7 +206,7 @@ class DepthViewer extends Component {
             pixelRange: [0, 255]
           });
           removeOperation({
-            name: "depthCanvasStack",
+            name: "depthStack",
             value: drawBox
           });
         });
@@ -267,7 +243,8 @@ const mapDispatchToProps = {
   initImage: imageActions.initImage,
   storeParameters: imageActions.storeParameters,
   addOperation: imageActions.addOperation,
-  removeOperation: imageActions.removeOperation
+  removeOperation: imageActions.removeOperation,
+  addEffect: imageActions.addEffect
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(DepthViewer);

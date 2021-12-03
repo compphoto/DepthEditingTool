@@ -8,6 +8,8 @@ export const imageActions = {
   storeParameters: payload => ({ type: types.STORE_PARAMETERS, payload: payload }),
   addOperation: payload => ({ type: types.ADD_OPERATION, payload: payload }),
   removeOperation: payload => ({ type: types.REMOVE_OPERATION, payload: payload }),
+  addEffect: payload => ({ type: types.ADD_EFFECT, payload: payload }),
+  removeEffect: () => ({ type: types.REMOVE_EFFECT }),
   removeItem: name => ({ type: types.REMOVE_ITEM, payload: name }),
   removeAllItem: () => ({ type: types.REMOVE_ALL_ITEM })
 };

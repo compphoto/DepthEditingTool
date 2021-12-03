@@ -20,7 +20,8 @@ export function SidePane({
   toolsParameters,
   parameters,
   selectTool,
-  storeToolParameters
+  storeToolParameters,
+  addEffect
 }) {
   const [activeTool, setActiveTool] = useState(0);
   const toggleTool = index => {
@@ -30,12 +31,14 @@ export function SidePane({
     let { name, value } = e.target;
     storeToolParameters({ [name]: value });
   };
-  // useEffect(() => {
-  //   if (tempDepthCanvas) {
-  //     let tempDepthContext = tempDepthCanvas.getContext("2d");
-  //     editBoundingArea(parameters.croppedArea, tempDepthContext, toolsParameters.depthBoxIntensity);
-  //   }
-  // }, [toolsParameters.depthBoxIntensity]);
+  useEffect(() => {
+    if (parameters.croppedArea) {
+      addEffect({
+        name: "depthStack",
+        value: { func: editBoundingArea, params: [parameters.croppedArea, toolsParameters.depthBoxIntensity] }
+      });
+    }
+  }, [toolsParameters.depthBoxIntensity]);
   // useEffect(() => {
   //   if (tempDepthCanvas && parameters.pixelRange && (parameters.croppedArea || depthImageDimension)) {
   //     let tempDepthContext = tempDepthCanvas.getContext("2d");
@@ -305,6 +308,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   toolExtActions: toolExtActions.toggleToolExt,
   selectTool: imageActions.selectTool,
+  addEffect: imageActions.addEffect,
   storeToolParameters: imageActions.storeToolParameters
 };
 
