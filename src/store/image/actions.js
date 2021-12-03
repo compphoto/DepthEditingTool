@@ -9,7 +9,9 @@ export const imageActions = {
   addOperation: payload => ({ type: types.ADD_OPERATION, payload: payload }),
   removeOperation: payload => ({ type: types.REMOVE_OPERATION, payload: payload }),
   addEffect: payload => ({ type: types.ADD_EFFECT, payload: payload }),
-  removeEffect: () => ({ type: types.REMOVE_EFFECT }),
+  undo: () => ({ type: types.UNDO }),
+  clear: () => ({ type: types.CLEAR }),
+  reset: () => ({ type: types.RESET }),
   removeItem: name => ({ type: types.REMOVE_ITEM, payload: name }),
   removeAllItem: () => ({ type: types.REMOVE_ALL_ITEM })
 };

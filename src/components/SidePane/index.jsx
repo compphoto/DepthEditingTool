@@ -39,25 +39,26 @@ export function SidePane({
       });
     }
   }, [toolsParameters.depthBoxIntensity]);
-  // useEffect(() => {
-  //   if (tempDepthCanvas && parameters.pixelRange && (parameters.croppedArea || depthImageDimension)) {
-  //     let tempDepthContext = tempDepthCanvas.getContext("2d");
-  //     const { croppedArea, pixelRange } = parameters;
-  //     let newArea = null;
-  //     if (croppedArea) {
-  //       newArea = croppedArea;
-  //       editHighlightPixelArea(newArea, tempDepthContext, pixelRange, toolsParameters.depthRangeIntensity);
-  //     } else {
-  //       newArea = [
-  //         depthImageDimension[0],
-  //         depthImageDimension[1],
-  //         depthImageDimension[2] - depthImageDimension[0],
-  //         depthImageDimension[3] - depthImageDimension[1]
-  //       ];
-  //       editHighlightPixelArea(newArea, tempDepthContext, pixelRange, toolsParameters.depthRangeIntensity);
-  //     }
-  //   }
-  // }, [toolsParameters.depthRangeIntensity]);
+  useEffect(() => {
+    if (parameters.pixelRange && (parameters.croppedArea || depthCanvasDimension)) {
+      const { croppedArea, pixelRange } = parameters;
+      let newArea = null;
+      if (croppedArea) {
+        newArea = croppedArea;
+      } else {
+        newArea = [
+          depthCanvasDimension[0],
+          depthCanvasDimension[1],
+          depthCanvasDimension[2] - depthCanvasDimension[0],
+          depthCanvasDimension[3] - depthCanvasDimension[1]
+        ];
+      }
+      addEffect({
+        name: "depthStack",
+        value: { func: editHighlightPixelArea, params: [newArea, pixelRange, toolsParameters.depthRangeIntensity] }
+      });
+    }
+  }, [toolsParameters.depthRangeIntensity]);
   const adjust = () => {
     return (
       <>

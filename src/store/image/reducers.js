@@ -131,14 +131,50 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           [name]: [...state.operationStack[name], { ...value, type: "effect" }]
         }
       };
-    case types.REMOVE_EFFECT:
-      if (state.operationStack[name].length > 1) {
-        state.operationStack[name].pop();
-      }
+    case types.UNDO:
+      var depthStack = state.operationStack.depthStack;
+      var lastEffect = -1;
+      depthStack.forEach((element, index) => {
+        if (element.type === "effect" && index !== 0) {
+          lastEffect = index;
+        }
+      });
+      var newDepthStack = depthStack.filter((x, index) => {
+        if (index !== lastEffect) {
+          return x;
+        }
+      });
       return {
         ...state,
         operationStack: {
-          ...state.operationStack
+          ...state.operationStack,
+          depthStack: [...newDepthStack]
+        }
+      };
+    case types.CLEAR:
+      var rgbStack = [state.operationStack.rgbStack[0]];
+      var depthStack = state.operationStack.depthStack.filter(x => {
+        if (x.type === "effect") {
+          return x;
+        }
+      });
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          rgbStack: [...rgbStack],
+          depthStack: [...depthStack]
+        }
+      };
+    case types.RESET:
+      var rgbStack = [state.operationStack.rgbStack[0]];
+      var depthStack = [state.operationStack.depthStack[0]];
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          rgbStack: [...rgbStack],
+          depthStack: [...depthStack]
         }
       };
     case types.REMOVE_ITEM:

@@ -69,19 +69,6 @@ export const drawBox = (image, context, new_x, new_y, new_w, new_h) => {
   context.stroke();
 };
 
-export const editBoundingArea = (image, context, boundingBox, depth) => {
-  if (context && boundingBox && depth) {
-    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
-    const src = imageData.data;
-    for (let i = 0; i < src.length; i += 4) {
-      src[i] += 255 * (depth / 100);
-      src[i + 1] += 255 * (depth / 100);
-      src[i + 2] += 255 * (depth / 100);
-    }
-    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
-  }
-};
-
 export const highlightPixelArea = (image, context, boundingBox, pixelRange) => {
   if (context && boundingBox && pixelRange) {
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
@@ -113,7 +100,20 @@ export const highlightPixelAreaRgb = (image, rgbContext, depthContext, boundingB
   }
 };
 
-export const editHighlightPixelArea = (boundingBox, context, pixelRange, depth) => {
+export const editBoundingArea = (image, context, boundingBox, depth) => {
+  if (context && boundingBox && depth) {
+    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
+    const src = imageData.data;
+    for (let i = 0; i < src.length; i += 4) {
+      src[i] += 255 * (depth / 100);
+      src[i + 1] += 255 * (depth / 100);
+      src[i + 2] += 255 * (depth / 100);
+    }
+    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
+  }
+};
+
+export const editHighlightPixelArea = (image, context, boundingBox, pixelRange, depth) => {
   if (boundingBox && context) {
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const src = imageData.data;
