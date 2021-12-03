@@ -23,6 +23,14 @@ const ImageEditorStyle = styled.div`
           margin: 0;
         }
       }
+      .nav-button {
+        svg {
+          color: #7e838e;
+          &:hover {
+            color: #fff;
+          }
+        }
+      }
     }
   }
   section {

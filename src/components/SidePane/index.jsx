@@ -15,12 +15,13 @@ export function SidePane({
   toolExtActions,
   mainDepthCanvas,
   tempDepthCanvas,
-  depthImageDimension,
+  depthCanvasDimension,
   tools,
   toolsParameters,
   parameters,
   selectTool,
-  storeToolParameters
+  storeToolParameters,
+  addEffect
 }) {
   const [activeTool, setActiveTool] = useState(0);
   const toggleTool = index => {
@@ -31,28 +32,31 @@ export function SidePane({
     storeToolParameters({ [name]: value });
   };
   useEffect(() => {
-    if (tempDepthCanvas) {
-      let tempDepthContext = tempDepthCanvas.getContext("2d");
-      editBoundingArea(parameters.croppedeArea, tempDepthContext, toolsParameters.depthBoxIntensity);
+    if (parameters.croppedArea) {
+      addEffect({
+        name: "depthStack",
+        value: { func: editBoundingArea, params: [parameters.croppedArea, toolsParameters.depthBoxIntensity] }
+      });
     }
   }, [toolsParameters.depthBoxIntensity]);
   useEffect(() => {
-    if (tempDepthCanvas && parameters.pixelRange && (parameters.croppedeArea || depthImageDimension)) {
-      let tempDepthContext = tempDepthCanvas.getContext("2d");
-      const { croppedeArea, pixelRange } = parameters;
+    if (parameters.pixelRange && (parameters.croppedArea || depthCanvasDimension)) {
+      const { croppedArea, pixelRange } = parameters;
       let newArea = null;
-      if (croppedeArea) {
-        newArea = croppedeArea;
-        editHighlightPixelArea(newArea, tempDepthContext, pixelRange, toolsParameters.depthRangeIntensity);
+      if (croppedArea) {
+        newArea = croppedArea;
       } else {
         newArea = [
-          depthImageDimension[0],
-          depthImageDimension[1],
-          depthImageDimension[2] - depthImageDimension[0],
-          depthImageDimension[3] - depthImageDimension[1]
+          depthCanvasDimension[0],
+          depthCanvasDimension[1],
+          depthCanvasDimension[2] - depthCanvasDimension[0],
+          depthCanvasDimension[3] - depthCanvasDimension[1]
         ];
-        editHighlightPixelArea(newArea, tempDepthContext, pixelRange, toolsParameters.depthRangeIntensity);
       }
+      addEffect({
+        name: "depthStack",
+        value: { func: editHighlightPixelArea, params: [newArea, pixelRange, toolsParameters.depthRangeIntensity] }
+      });
     }
   }, [toolsParameters.depthRangeIntensity]);
   const adjust = () => {
@@ -69,7 +73,7 @@ export function SidePane({
                 <div className="tool-ext-card-body-icons">
                   <div
                     onClick={() => {
-                      if (mainDepthCanvas) {
+                      if (tempDepthCanvas) {
                         selectTool("depth");
                       }
                     }}
@@ -82,7 +86,7 @@ export function SidePane({
                 <FormGroup className="w-100 my-3">
                   <Label for="depthBoxIntensity">Box Intensity</Label>
                   <Input
-                    disabled={!tempDepthCanvas || !parameters.croppedeArea}
+                    disabled={!tempDepthCanvas || !parameters.croppedArea}
                     onMouseUp={onHandleChange}
                     className="w-100"
                     id="depthBoxIntensity"
@@ -296,7 +300,7 @@ const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  depthImageDimension: imageSelectors.depthImageDimension(state),
+  depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
   tools: imageSelectors.tools(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state)
@@ -305,6 +309,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   toolExtActions: toolExtActions.toggleToolExt,
   selectTool: imageActions.selectTool,
+  addEffect: imageActions.addEffect,
   storeToolParameters: imageActions.storeToolParameters
 };
 

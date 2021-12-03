@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import { connect } from "react-redux";
 import { imageActions } from "store/image";
+import { selectors as imageSelectors } from "store/image";
 import { Grid, Button, TextField } from "@material-ui/core";
 import { Slider, Rail, Handles, Tracks, Ticks } from "react-compound-slider";
 import { MuiRail, MuiHandle, MuiTrack, MuiTick } from "./components";
@@ -13,21 +14,24 @@ class RangeSlider extends React.Component {
     this.state = {
       domain: range,
       update: range,
-      values: range,
-      inputValues: range
+      values: range
     };
   }
   componentDidUpdate(prevProps, prevState) {
-    let { inputValues } = this.state;
-    let { storeParameters } = this.props;
-    if (prevState.inputValues !== inputValues) {
-      storeParameters({
-        pixelRange: [...inputValues]
-      });
+    const { domain } = this.state;
+    const { tools } = this.props;
+    if (prevProps.tools.depth !== tools.depth) {
+      if (!tools.depth) {
+        this.setState({
+          values: domain,
+          update: domain
+        });
+      }
     }
   }
   render() {
-    const { domain, values, update, inputValues } = this.state;
+    const { domain, values, update } = this.state;
+    const { parameters, storeParameters } = this.props;
     return (
       <Fragment>
         <BarChart data={this.props.data} highlight={update} />
@@ -39,7 +43,13 @@ class RangeSlider extends React.Component {
             position: "relative",
             width: "100%"
           }}
-          onUpdate={update => this.setState({ update, inputValues: update })}
+          onUpdate={update =>
+            this.setState({ update }, () => {
+              storeParameters({
+                pixelRange: [...update]
+              });
+            })
+          }
           onChange={values => this.setState({ values })}
           values={values}
         >
@@ -77,11 +87,13 @@ class RangeSlider extends React.Component {
             <TextField
               variant="outlined"
               label="min disparity"
-              value={inputValues[0]}
+              value={parameters.pixelRange[0]}
               onChange={evt => {
                 const value = evt.target.value;
-                const newState = [value, inputValues[1]];
-                this.setState({ inputValues: newState });
+                const newState = [value, parameters.pixelRange[1]];
+                storeParameters({
+                  pixelRange: [...newState]
+                });
                 if (value && value >= domain[0]) {
                   this.setState({ values: newState });
                 }
@@ -95,11 +107,13 @@ class RangeSlider extends React.Component {
             <TextField
               variant="outlined"
               label="max disparity"
-              value={inputValues[1]}
+              value={parameters.pixelRange[1]}
               onChange={evt => {
                 const value = evt.target.value;
-                const newState = [inputValues[0], value];
-                this.setState({ inputValues: newState });
+                const newState = [parameters.pixelRange[0], value];
+                storeParameters({
+                  pixelRange: [...newState]
+                });
                 if (value && value <= domain[1] && value >= values[0]) {
                   this.setState({ values: newState });
                 }
@@ -112,8 +126,10 @@ class RangeSlider extends React.Component {
           onClick={() => {
             this.setState({
               values: domain,
-              update: domain,
-              inputValues: domain
+              update: domain
+            });
+            storeParameters({
+              pixelRange: [...domain]
             });
           }}
         >
@@ -124,8 +140,13 @@ class RangeSlider extends React.Component {
   }
 }
 
+const mapStateToProps = state => ({
+  tools: imageSelectors.tools(state),
+  parameters: imageSelectors.parameters(state)
+});
+
 const mapDispatchToProps = {
   storeParameters: imageActions.storeParameters
 };
 
-export default connect(null, mapDispatchToProps)(RangeSlider);
+export default connect(mapStateToProps, mapDispatchToProps)(RangeSlider);

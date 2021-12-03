@@ -5,12 +5,13 @@ import { selectors as imageSelectors } from "store/image";
 import { Helmet } from "react-helmet";
 import { Container, Button } from "reactstrap";
 import { RiDownloadLine } from "react-icons/ri";
+import { ImUndo2 } from "react-icons/im";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
 import { cloneCanvas, canvasToImage } from "utils/canvasUtils";
 
-export function ImageEditor({ mainDepthCanvas, tempDepthCanvas, initImage }) {
+export function ImageEditor({ mainDepthCanvas, tempDepthCanvas, initImage, undo, clear, reset }) {
   return (
     <ImageEditorStyle>
       <Helmet>
@@ -22,14 +23,32 @@ export function ImageEditor({ mainDepthCanvas, tempDepthCanvas, initImage }) {
             <div className="nav-intro">
               <h4>Image Editor</h4>
             </div>
-            <div>
+            <div className="nav-button">
               <Button
                 onClick={() => {
-                  initImage({ tempDepthCanvas: cloneCanvas(mainDepthCanvas) });
+                  undo();
+                }}
+                size="sm"
+                color="outline"
+              >
+                <ImUndo2 />
+              </Button>
+              <Button
+                onClick={() => {
+                  clear();
                 }}
                 size="sm"
                 color="secondary"
-                className="mr-3"
+                className="mx-3"
+              >
+                Clear
+              </Button>
+              <Button
+                onClick={() => {
+                  reset();
+                }}
+                size="sm"
+                color="secondary"
               >
                 Reset
               </Button>
@@ -72,7 +91,10 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  initImage: imageActions.initImage
+  initImage: imageActions.initImage,
+  undo: imageActions.undo,
+  clear: imageActions.clear,
+  reset: imageActions.reset
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ImageEditor);

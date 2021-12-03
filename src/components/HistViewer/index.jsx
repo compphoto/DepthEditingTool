@@ -5,6 +5,7 @@ import { selectors as imageSelectors } from "store/image";
 import RangeSlider from "./rangeslider";
 import HistViewerStyle from "./style";
 import { getCanvasImageData, getImageData } from "utils/drawHistogram";
+import { cropCanvas, getDimension, getRatio } from "utils/canvasUtils";
 
 class HistViewer extends Component {
   constructor() {
@@ -16,17 +17,25 @@ class HistViewer extends Component {
     data: []
   };
   componentDidUpdate(prevProps, prevState) {
-    let { mainDepthCanvas, depthImageDimension, parameters } = this.props;
-    if (prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage) {
+    let { tempDepthCanvas, depthCanvasDimension, parameters } = this.props;
+    if (
+      prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage ||
+      prevProps.tempDepthCanvas !== tempDepthCanvas
+    ) {
       if (parameters.croppedCanvasImage) {
         let histDepthData = getImageData(parameters.croppedCanvasImage);
         this.setState({ data: histDepthData });
-      }
-    }
-    if (prevProps.mainDepthCanvas !== mainDepthCanvas) {
-      if (mainDepthCanvas) {
-        let histDepthData = getCanvasImageData(mainDepthCanvas, depthImageDimension);
-        this.setState({ data: histDepthData });
+      } else {
+        if (tempDepthCanvas) {
+          const boundingBox = [
+            depthCanvasDimension[0],
+            depthCanvasDimension[1],
+            depthCanvasDimension[2] - depthCanvasDimension[0],
+            depthCanvasDimension[3] - depthCanvasDimension[1]
+          ];
+          let histDepthData = getImageData(cropCanvas(tempDepthCanvas, boundingBox));
+          this.setState({ data: histDepthData });
+        }
       }
     }
   }
@@ -42,7 +51,8 @@ class HistViewer extends Component {
 
 const mapStateToProps = state => ({
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  depthImageDimension: imageSelectors.depthImageDimension(state),
+  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
+  depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
   parameters: imageSelectors.parameters(state)
 });
 
