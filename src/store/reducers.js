@@ -1,12 +1,12 @@
 import { combineReducers } from "redux";
 import { testReducer } from "./test";
 import { toolExtReducer } from "./toolext";
-import { uploadImageReducer } from "./uploadimage";
+import { imageReducer } from "./image";
 
 const appReducer = combineReducers({
   test: testReducer,
   toolExt: toolExtReducer,
-  uploadImage: uploadImageReducer
+  image: imageReducer
 });
 
 const rootReducer = (state, action) => {

@@ -1,105 +1,192 @@
-import React, { useState, useEffect } from "react";
+import React, { Component, createRef } from "react";
+import { connect } from "react-redux";
+import { imageActions } from "store/image";
+import { selectors as toolExtSelectors } from "store/toolext";
+import { selectors as imageSelectors } from "store/image";
 import { Button } from "reactstrap";
 import { AiOutlinePlus } from "react-icons/ai";
 import { RiDeleteBin5Fill } from "react-icons/ri";
-import { connect } from "react-redux";
-import { uploadImageActions } from "store/uploadimage";
-import { selectors as toolExtSelectors } from "store/toolext";
-import { selectors as uploadImageSelectors } from "store/uploadimage";
+import DepthViewer from "components/DepthViewer";
+import RgbViewer from "components/RgbViewer";
+import HistViewer from "components/HistViewer";
+import ThreeDViewer from "components/ThreeDViewer";
 import MainPaneStyle from "./style";
+import { getImageUrl } from "utils/getImageFromFile";
+import { canvasToImage, cropCanvas } from "utils/canvasUtils";
 
-export function MainPane({
-  toolExtOpen,
-  handleChange,
-  files,
-  selectActiveImage,
-  activeImage,
-  removeItem,
-  removeAllItem
-}) {
-  const [displayImage, setDisplayImage] = useState();
-  const getImageUrl = file => {
-    return URL.createObjectURL(file);
-  };
-  useEffect(() => {
-    if (!files[activeImage]) {
-      setDisplayImage(undefined);
-      return;
-    }
-    const objectUrl = URL.createObjectURL(files[activeImage]);
-    setDisplayImage(objectUrl);
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [activeImage, files]);
-
-  const onHandleChange = e => {
-    handleChange(e);
+class MainPane extends Component {
+  onHandleChange = e => {
+    this.props.handleChange(e);
     e.target.value = null;
   };
-
-  return (
-    <MainPaneStyle>
-      <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
-        <img src={displayImage} />
-      </div>
-      <div className="main-side-bar">
-        <div className="main-side-bar-header">
-          <input
-            id="upload-image"
-            type="file"
-            onChange={onHandleChange}
-            accept="image/png, image/gif, image/jpeg, image/jpg"
-            multiple
-          />
-          <label htmlFor="upload-image">
-            <div className="btn btn-default">
-              <AiOutlinePlus className="mb-1" /> Import
-            </div>
-          </label>
-        </div>
-        <div className="main-side-bar-content">
-          {files.map((file, key) => (
-            <div
-              key={key}
-              onClick={() => {
-                selectActiveImage(key);
-              }}
-              className={activeImage === key ? "main-side-bar-img main-side-bar-img-active" : "main-side-bar-img"}
-            >
-              <img className="side-bar-img" src={getImageUrl(file)} />
-              <div
-                onClick={e => {
-                  e.stopPropagation();
-                  removeItem(key);
-                }}
-                className="remove-img"
-              >
-                <RiDeleteBin5Fill />
+  render() {
+    const { onHandleChange } = this;
+    const {
+      toolExtOpen,
+      rgbImageUrl,
+      depthImageUrl,
+      tempRgbCanvas,
+      tempDepthCanvas,
+      rgbCanvasDimension,
+      depthCanvasDimension,
+      removeItem,
+      removeAllItem
+    } = this.props;
+    const rgbBoundingBox = rgbCanvasDimension && [
+      rgbCanvasDimension[0],
+      rgbCanvasDimension[1],
+      rgbCanvasDimension[2] - rgbCanvasDimension[0],
+      rgbCanvasDimension[3] - rgbCanvasDimension[1]
+    ];
+    const depthBoundingBox = depthCanvasDimension && [
+      depthCanvasDimension[0],
+      depthCanvasDimension[1],
+      depthCanvasDimension[2] - depthCanvasDimension[0],
+      depthCanvasDimension[3] - depthCanvasDimension[1]
+    ];
+    return (
+      <MainPaneStyle>
+        <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
+          <div className="main-row">
+            <div className="main-column main-column-2d">
+              <div className="box rgb-box">
+                <RgbViewer />
+              </div>
+              <div className="box depth-box">
+                <DepthViewer />
               </div>
             </div>
-          ))}
+            <div className="main-column main-column-3d">
+              <div className="box threeD-box">
+                <ThreeDViewer
+                  rgbImageCanvas={canvasToImage(cropCanvas(tempRgbCanvas, rgbBoundingBox))}
+                  depthImageCanvas={canvasToImage(cropCanvas(tempDepthCanvas, depthBoundingBox))}
+                />
+              </div>
+              <div className="box histogram-box">
+                <HistViewer />
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="main-side-bar-footer">
-          <p>{`${activeImage !== null ? activeImage + 1 : 0}/${files.length}`}</p>
-          <Button onClick={removeAllItem} size="sm" color="default">
-            <RiDeleteBin5Fill className="mb-1" /> Clear All
-          </Button>
+        <div className="main-side-bar">
+          <div className="main-side-bar-body">
+            <div className="main-side-bar-container">
+              <p className="main-side-bar-container-text">RGB Image</p>
+              <div className="main-side-bar-header">
+                <input
+                  id="upload-rgb-image"
+                  type="file"
+                  name="rgbImageUrl"
+                  onChange={onHandleChange}
+                  accept="image/png, image/gif, image/jpeg, image/jpg"
+                />
+                <label htmlFor="upload-rgb-image">
+                  <div className="btn btn-default">
+                    <AiOutlinePlus className="mb-1" /> Import
+                  </div>
+                </label>
+              </div>
+              <div style={rgbImageUrl ? { display: "block" } : { display: "none" }} className="main-side-bar-img">
+                <img className="side-bar-img" src={getImageUrl(rgbImageUrl)} />
+                <div
+                  onClick={e => {
+                    e.stopPropagation();
+                    removeItem({
+                      rgbImageUrl: null,
+                      loadedRgbImage: null,
+                      mainRgbCanvas: null,
+                      tempRgbCanvas: null,
+                      rgbImageDimension: null
+                    });
+                  }}
+                  className="remove-img"
+                >
+                  <RiDeleteBin5Fill />
+                </div>
+              </div>
+            </div>
+            <div className="main-side-bar-divider" tabIndex="-1"></div>
+            <div className="main-side-bar-container">
+              <p className="main-side-bar-container-text">Depth Image</p>
+              <div className="main-side-bar-header">
+                <input
+                  id="upload-depth-image"
+                  type="file"
+                  name="depthImageUrl"
+                  onChange={onHandleChange}
+                  accept="image/png, image/gif, image/jpeg, image/jpg"
+                />
+                <label htmlFor="upload-depth-image">
+                  <div className="btn btn-default">
+                    <AiOutlinePlus className="mb-1" /> Import
+                  </div>
+                </label>
+              </div>
+              <div style={depthImageUrl ? { display: "block" } : { display: "none" }} className="main-side-bar-img">
+                <img className="side-bar-img" src={getImageUrl(depthImageUrl)} />
+                <div
+                  onClick={e => {
+                    e.stopPropagation();
+                    removeItem({
+                      depthImageUrl: null,
+                      loadedDepthImage: null,
+                      mainDepthCanvas: null,
+                      tempDepthCanvas: null,
+                      depthImageDimension: null,
+                      tools: {
+                        currentTool: null,
+                        depth: false
+                      },
+                      toolsParameters: {
+                        depthBoxIntensity: 0,
+                        depthRangeIntensity: 0
+                      },
+                      parameters: {
+                        croppedCanvasImage: null,
+                        croppedArea: null,
+                        pixelRange: null
+                      }
+                    });
+                  }}
+                  className="remove-img"
+                >
+                  <RiDeleteBin5Fill />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="main-side-bar-footer">
+            <Button
+              onClick={() => {
+                removeAllItem();
+              }}
+              size="sm"
+              color="default"
+            >
+              <RiDeleteBin5Fill className="mb-1" /> Clear All
+            </Button>
+          </div>
         </div>
-      </div>
-    </MainPaneStyle>
-  );
+      </MainPaneStyle>
+    );
+  }
 }
 
 const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
-  files: uploadImageSelectors.files(state),
-  activeImage: uploadImageSelectors.activeImage(state)
+  rgbImageUrl: imageSelectors.rgbImageUrl(state),
+  depthImageUrl: imageSelectors.depthImageUrl(state),
+  tempRgbCanvas: imageSelectors.tempRgbCanvas(state),
+  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
+  rgbCanvasDimension: imageSelectors.rgbCanvasDimension(state),
+  depthCanvasDimension: imageSelectors.depthCanvasDimension(state)
 });
 
 const mapDispatchToProps = {
-  handleChange: uploadImageActions.handleChange,
-  selectActiveImage: uploadImageActions.selectActiveImage,
-  removeItem: uploadImageActions.removeItem,
-  removeAllItem: uploadImageActions.removeAllItem
+  handleChange: imageActions.handleChange,
+  removeItem: imageActions.removeItem,
+  removeAllItem: imageActions.removeAllItem
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainPane);

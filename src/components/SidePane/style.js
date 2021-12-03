@@ -41,7 +41,7 @@ const SidePaneStyle = styled.div`
   .tools-ext {
     position: absolute;
     height: 100%;
-    width: 360px;
+    width: 300px;
     background: #2b2c2f;
     color: #7e838e;
     .tools-ext-elements {
@@ -56,8 +56,49 @@ const SidePaneStyle = styled.div`
         .dropdown-button {
           width: 100%;
         }
+        .tool-ext-card {
+          background: transparent;
+          .tool-ext-card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            .tool-ext-card-body-icons {
+              width: 100%;
+              display: flex;
+              flex-wrap: wrap;
+              .card-tool {
+                flex-shrink: 0;
+                width: 72px;
+                height: 72px;
+                color: #7e838e;
+                font-size: 12px;
+                line-height: 1rem;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                padding: 2px;
+                svg {
+                  margin-bottom: 0.25rem;
+                  width: 1.5rem;
+                  height: 1.5rem;
+                }
+                &:hover {
+                  color: #fff;
+                }
+              }
+              .card-tool-active {
+                background: #2b2c2f;
+                color: #fff;
+              }
+            }
+          }
+        }
       }
       .toggle-button {
+        z-index: 1000;
         width: 14px;
         height: 80px;
         cursor: pointer;
@@ -87,7 +128,7 @@ const SidePaneStyle = styled.div`
     -webkit-transition: all 0.5s;
   }
   .tool-ext-inactive {
-    left: -398%;
+    left: -320%;
     transition: all 0.5s;
     -webkit-transition: all 0.5s;
   }
