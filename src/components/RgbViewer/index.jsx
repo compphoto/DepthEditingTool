@@ -118,28 +118,6 @@ class RgbViewer extends Component {
         });
       }
     }
-    // // On saving the image, this clears all annotations
-    // if (prevProps.mainDepthCanvas !== mainDepthCanvas) {
-    //   if (tempRgbCanvas && mainDepthCanvas) {
-    //     rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
-    //     rgbContext.globalAlpha = 1;
-    //     rgbContext.drawImage(mainRgbCanvas, 0, 0);
-    //     initImage({
-    //       tempRgbCanvas: cloneCanvas(rgbCanvas)
-    //     });
-    //   }
-    // }
-    // // tempRgbCanvas changes on clicking the reset button
-    // if (prevProps.tempDepthCanvas !== tempDepthCanvas) {
-    //   if (tempRgbCanvas) {
-    //     rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
-    //     rgbContext.globalAlpha = 1;
-    //     rgbContext.drawImage(mainRgbCanvas, 0, 0);
-    //     initImage({
-    //       tempRgbCanvas: cloneCanvas(rgbCanvas)
-    //     });
-    //   }
-    // }
     if (prevProps.parameters.croppedArea !== parameters.croppedArea) {
       const { croppedArea } = parameters;
       if (croppedArea && tempRgbCanvas) {
