@@ -91,9 +91,9 @@ class DepthViewer extends Component {
       runTempDepthOperations("depthStack", mainDepthCanvas, depthCanvas.width, depthCanvas.height);
     }
     // Highlight pixel range from specified range for either cropped image or initial full image
-    if (prevProps.parameters.pixelRange !== parameters.pixelRange) {
-      if (parameters.pixelRange || parameters.croppedArea) {
-        const { croppedArea, pixelRange } = parameters;
+    if (prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange) {
+      if (parameters.histogramParams.pixelRange || parameters.croppedArea) {
+        const { croppedArea, histogramParams } = parameters;
         let newArea = null;
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
         if (croppedArea) {
@@ -108,17 +108,17 @@ class DepthViewer extends Component {
         }
         addOperation({
           name: "depthStack",
-          value: { func: highlightPixelArea, params: [newArea, pixelRange] }
+          value: { func: highlightPixelArea, params: [newArea, histogramParams.pixelRange] }
         });
       }
     }
     // if (prevProps.toolsParameters.depthRangeIntensity !== toolsParameters.depthRangeIntensity) {
     //   if (
     //     toolsParameters.depthRangeIntensity &&
-    //     parameters.pixelRange &&
+    //     parameters.histogramParams.pixelRange &&
     //     (parameters.croppedArea || depthCanvasDimension)
     //   ) {
-    //     const { croppedArea, pixelRange } = parameters;
+    //     const { croppedArea, histogramParams.pixelRange } = parameters;
     //     let newArea = null;
     //     if (croppedArea) {
     //       newArea = croppedArea;
@@ -130,7 +130,7 @@ class DepthViewer extends Component {
     //         depthCanvasDimension[3] - depthCanvasDimension[1]
     //       ];
     //     }
-    //     editHighlightPixelArea(newArea, depthContext, pixelRange, toolsParameters.depthRangeIntensity);
+    //     editHighlightPixelArea(newArea, depthContext, histogramParams.pixelRange, toolsParameters.depthRangeIntensity);
     //   }
     // }
     // Listens for mouse movements around the depth canvas and draw bounding box
@@ -146,7 +146,12 @@ class DepthViewer extends Component {
         storeParameters({
           croppedCanvasImage: null,
           croppedArea: null,
-          pixelRange: [0, 255]
+          histogramParams: {
+            pixelRange: [0, 255],
+            domain: [0, 255],
+            values: [0, 255],
+            update: [0, 255]
+          }
         });
       }
     }
@@ -203,7 +208,12 @@ class DepthViewer extends Component {
       } else {
         this.setState({ initBoundingBox: { x, y } }, () => {
           storeParameters({
-            pixelRange: [0, 255]
+            histogramParams: {
+              pixelRange: [0, 255],
+              domain: [0, 255],
+              values: [0, 255],
+              update: [0, 255]
+            }
           });
           removeOperation({
             name: "depthStack",

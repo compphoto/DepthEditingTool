@@ -10,28 +10,10 @@ import BarChart from "./barchart";
 class RangeSlider extends React.Component {
   constructor(props) {
     super(props);
-    const range = [0, 255];
-    this.state = {
-      domain: range,
-      update: range,
-      values: range
-    };
-  }
-  componentDidUpdate(prevProps, prevState) {
-    const { domain } = this.state;
-    const { tools } = this.props;
-    if (prevProps.tools.depth !== tools.depth) {
-      if (!tools.depth) {
-        this.setState({
-          values: domain,
-          update: domain
-        });
-      }
-    }
   }
   render() {
-    const { domain, values, update } = this.state;
     const { parameters, storeParameters } = this.props;
+    const { pixelRange, domain, values, update } = parameters.histogramParams;
     return (
       <Fragment>
         <BarChart data={this.props.data} highlight={update} />
@@ -44,13 +26,22 @@ class RangeSlider extends React.Component {
             width: "100%"
           }}
           onUpdate={update =>
-            this.setState({ update }, () => {
-              storeParameters({
-                pixelRange: [...update]
-              });
+            storeParameters({
+              histogramParams: {
+                ...parameters.histogramParams,
+                pixelRange: update,
+                update
+              }
             })
           }
-          onChange={values => this.setState({ values })}
+          onChange={values =>
+            storeParameters({
+              histogramParams: {
+                ...parameters.histogramParams,
+                values
+              }
+            })
+          }
           values={values}
         >
           <Rail>{({ getRailProps }) => <MuiRail getRailProps={getRailProps} />}</Rail>
@@ -87,15 +78,23 @@ class RangeSlider extends React.Component {
             <TextField
               variant="outlined"
               label="min disparity"
-              value={parameters.pixelRange[0]}
+              value={pixelRange[0]}
               onChange={evt => {
                 const value = evt.target.value;
-                const newState = [value, parameters.pixelRange[1]];
+                const newState = [value, pixelRange[1]];
                 storeParameters({
-                  pixelRange: [...newState]
+                  histogramParams: {
+                    ...parameters.histogramParams,
+                    pixelRange: newState
+                  }
                 });
                 if (value && value >= domain[0]) {
-                  this.setState({ values: newState });
+                  storeParameters({
+                    histogramParams: {
+                      ...parameters.histogramParams,
+                      values: newState
+                    }
+                  });
                 }
               }}
             />
@@ -107,15 +106,23 @@ class RangeSlider extends React.Component {
             <TextField
               variant="outlined"
               label="max disparity"
-              value={parameters.pixelRange[1]}
+              value={pixelRange[1]}
               onChange={evt => {
                 const value = evt.target.value;
-                const newState = [parameters.pixelRange[0], value];
+                const newState = [pixelRange[0], value];
                 storeParameters({
-                  pixelRange: [...newState]
+                  histogramParams: {
+                    ...parameters.histogramParams,
+                    pixelRange: newState
+                  }
                 });
                 if (value && value <= domain[1] && value >= values[0]) {
-                  this.setState({ values: newState });
+                  storeParameters({
+                    histogramParams: {
+                      ...parameters.histogramParams,
+                      values: newState
+                    }
+                  });
                 }
               }}
             />
@@ -124,12 +131,13 @@ class RangeSlider extends React.Component {
         <Button
           style={{ marginTop: "3%", marginBottom: "3%" }}
           onClick={() => {
-            this.setState({
-              values: domain,
-              update: domain
-            });
             storeParameters({
-              pixelRange: [...domain]
+              histogramParams: {
+                ...parameters.histogramParams,
+                pixelRange: domain,
+                values: domain,
+                update: domain
+              }
             });
           }}
         >

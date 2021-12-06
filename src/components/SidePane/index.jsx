@@ -40,8 +40,8 @@ export function SidePane({
     }
   }, [toolsParameters.depthBoxIntensity]);
   useEffect(() => {
-    if (parameters.pixelRange && (parameters.croppedArea || depthCanvasDimension)) {
-      const { croppedArea, pixelRange } = parameters;
+    if (parameters.histogramParams.pixelRange && (parameters.croppedArea || depthCanvasDimension)) {
+      const { croppedArea, histogramParams } = parameters;
       let newArea = null;
       if (croppedArea) {
         newArea = croppedArea;
@@ -55,7 +55,10 @@ export function SidePane({
       }
       addEffect({
         name: "depthStack",
-        value: { func: editHighlightPixelArea, params: [newArea, pixelRange, toolsParameters.depthRangeIntensity] }
+        value: {
+          func: editHighlightPixelArea,
+          params: [newArea, histogramParams.pixelRange, toolsParameters.depthRangeIntensity]
+        }
       });
     }
   }, [toolsParameters.depthRangeIntensity]);
@@ -99,7 +102,7 @@ export function SidePane({
                 <FormGroup className="w-100 my-3">
                   <Label for="depthRangeIntensity">Depth Intensity</Label>
                   <Input
-                    disabled={!tempDepthCanvas || !parameters.pixelRange}
+                    disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
                     onMouseUp={onHandleChange}
                     className="w-100"
                     id="depthRangeIntensity"

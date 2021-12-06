@@ -22,7 +22,12 @@ const initialState = {
   parameters: {
     croppedCanvasImage: null,
     croppedArea: null,
-    pixelRange: [0, 255]
+    histogramParams: {
+      pixelRange: [0, 255],
+      domain: [0, 255],
+      values: [0, 255],
+      update: [0, 255]
+    }
   },
   operationStack: {
     rgbStack: [],
@@ -160,6 +165,16 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       });
       return {
         ...state,
+        parameters: {
+          croppedCanvasImage: null,
+          croppedArea: null,
+          histogramParams: {
+            pixelRange: [0, 255],
+            domain: [0, 255],
+            values: [0, 255],
+            update: [0, 255]
+          }
+        },
         operationStack: {
           ...state.operationStack,
           rgbStack: [...rgbStack],
@@ -171,6 +186,16 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       var depthStack = [state.operationStack.depthStack[0]];
       return {
         ...state,
+        parameters: {
+          croppedCanvasImage: null,
+          croppedArea: null,
+          histogramParams: {
+            pixelRange: [0, 255],
+            domain: [0, 255],
+            values: [0, 255],
+            update: [0, 255]
+          }
+        },
         operationStack: {
           ...state.operationStack,
           rgbStack: [...rgbStack],
@@ -205,7 +230,12 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         parameters: {
           croppedCanvasImage: null,
           croppedArea: null,
-          pixelRange: [0, 255]
+          histogramParams: {
+            pixelRange: [0, 255],
+            domain: [0, 255],
+            values: [0, 255],
+            update: [0, 255]
+          }
         },
         operationStack: {
           rgbStack: [],

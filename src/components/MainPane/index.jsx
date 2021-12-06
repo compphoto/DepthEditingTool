@@ -145,7 +145,12 @@ class MainPane extends Component {
                       parameters: {
                         croppedCanvasImage: null,
                         croppedArea: null,
-                        pixelRange: null
+                        histogramParams: {
+                          pixelRange: [0, 255],
+                          domain: [0, 255],
+                          values: [0, 255],
+                          update: [0, 255]
+                        }
                       }
                     });
                   }}

@@ -86,9 +86,9 @@ class RgbViewer extends Component {
       runTempRgbOperations("rgbStack", mainRgbCanvas, rgbCanvas.width, rgbCanvas.height);
     }
     // Highlight pixel range from specified range for either cropped image or initial full image
-    if (prevProps.parameters.pixelRange !== parameters.pixelRange) {
-      if (parameters.pixelRange || parameters.croppedArea) {
-        const { croppedArea, pixelRange } = parameters;
+    if (prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange) {
+      if (parameters.histogramParams.pixelRange || parameters.croppedArea) {
+        const { croppedArea, histogramParams } = parameters;
         const depthContext = tempDepthCanvas.getContext("2d");
         rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
         let newArea = null;
@@ -104,7 +104,7 @@ class RgbViewer extends Component {
         }
         addOperation({
           name: "rgbStack",
-          value: { func: highlightPixelAreaRgb, params: [depthContext, newArea, pixelRange] }
+          value: { func: highlightPixelAreaRgb, params: [depthContext, newArea, histogramParams.pixelRange] }
         });
       }
     }
