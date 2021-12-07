@@ -62,6 +62,34 @@ export const drawCanvasImage = (image, context, ratio, centerShift_x, centerShif
   );
 };
 
+export const drawScaledCanvasImage = (
+  image,
+  context,
+  canvas,
+  ratio,
+  centerShift_x,
+  centerShift_y,
+  scale,
+  translatePos
+) => {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.save();
+  context.translate(translatePos.x, translatePos.y);
+  context.scale(scale, scale);
+  context.drawImage(
+    image,
+    0,
+    0,
+    image.width,
+    image.height,
+    centerShift_x,
+    centerShift_y,
+    image.width * ratio,
+    image.height * ratio
+  );
+  context.restore();
+};
+
 export const drawBox = (image, context, new_x, new_y, new_w, new_h) => {
   context.beginPath();
   context.strokeStyle = "red";

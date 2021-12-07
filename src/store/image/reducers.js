@@ -27,6 +27,13 @@ const initialState = {
       domain: [0, 255],
       values: [0, 255],
       update: [0, 255]
+    },
+    canvasParams: {
+      translatePos: {},
+      scale: 1.0,
+      scaleMultiplier: 0.8,
+      startDragOffset: {},
+      mouseDown: false
     }
   },
   operationStack: {
@@ -96,6 +103,9 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       var array = state.operationStack[name];
       var newArray = array.filter(x => {
         if (x.func.toString() !== value.func.toString()) {
+          if (x.func.toString().includes("scale, translatePos")) {
+            return;
+          }
           return x;
         }
       });
@@ -125,7 +135,10 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       var { name, value } = payload;
       if (
         state.operationStack[name].length !== 0 &&
-        state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString()
+        (state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString() ||
+          state.operationStack[name][state.operationStack[name].length - 1].func
+            .toString()
+            .includes("scale, translatePos"))
       ) {
         state.operationStack[name].pop();
       }
@@ -173,6 +186,13 @@ export const imageReducer = (state = initialState, { type, payload }) => {
             domain: [0, 255],
             values: [0, 255],
             update: [0, 255]
+          },
+          canvasParams: {
+            translatePos: {},
+            scale: 1.0,
+            scaleMultiplier: 0.8,
+            startDragOffset: {},
+            mouseDown: false
           }
         },
         operationStack: {
@@ -194,6 +214,13 @@ export const imageReducer = (state = initialState, { type, payload }) => {
             domain: [0, 255],
             values: [0, 255],
             update: [0, 255]
+          },
+          canvasParams: {
+            translatePos: {},
+            scale: 1.0,
+            scaleMultiplier: 0.8,
+            startDragOffset: {},
+            mouseDown: false
           }
         },
         operationStack: {
@@ -235,6 +262,13 @@ export const imageReducer = (state = initialState, { type, payload }) => {
             domain: [0, 255],
             values: [0, 255],
             update: [0, 255]
+          },
+          canvasParams: {
+            translatePos: {},
+            scale: 1.0,
+            scaleMultiplier: 0.8,
+            startDragOffset: {},
+            mouseDown: false
           }
         },
         operationStack: {

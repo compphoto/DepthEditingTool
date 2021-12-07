@@ -9,9 +9,20 @@ import { ImUndo2 } from "react-icons/im";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
-import { cloneCanvas, canvasToImage } from "utils/canvasUtils";
+import { cloneCanvas, canvasToImage, getRatio, drawScaledCanvasImage } from "utils/canvasUtils";
 
-export function ImageEditor({ mainDepthCanvas, tempDepthCanvas, initImage, undo, clear, reset }) {
+export function ImageEditor({
+  mainDepthCanvas,
+  tempDepthCanvas,
+  parameters,
+  initImage,
+  storeParameters,
+  addOperation,
+  undo,
+  clear,
+  reset
+}) {
+  const { scale, scaleMultiplier, translatePos } = parameters.canvasParams;
   return (
     <ImageEditorStyle>
       <Helmet>
@@ -24,6 +35,51 @@ export function ImageEditor({ mainDepthCanvas, tempDepthCanvas, initImage, undo,
               <h4>Image Editor</h4>
             </div>
             <div className="nav-button">
+              <Button
+                onClick={() => {
+                  let { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
+                  storeParameters({
+                    canvasParams: {
+                      ...parameters.canvasParams,
+                      scale: scale / scaleMultiplier
+                    }
+                  });
+                  addOperation({
+                    name: "depthStack",
+                    value: {
+                      func: drawScaledCanvasImage,
+                      params: [tempDepthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos]
+                    }
+                  });
+                }}
+                size="sm"
+                color="secondary"
+              >
+                Plus
+              </Button>
+              <Button
+                onClick={() => {
+                  let { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
+                  storeParameters({
+                    canvasParams: {
+                      ...parameters.canvasParams,
+                      scale: scale * scaleMultiplier
+                    }
+                  });
+                  addOperation({
+                    name: "depthStack",
+                    value: {
+                      func: drawScaledCanvasImage,
+                      params: [tempDepthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos]
+                    }
+                  });
+                }}
+                size="sm"
+                color="secondary"
+                className="mx-3"
+              >
+                Minus
+              </Button>
               <Button
                 onClick={() => {
                   undo();
@@ -87,11 +143,14 @@ export function ImageEditor({ mainDepthCanvas, tempDepthCanvas, initImage, undo,
 
 const mapStateToProps = state => ({
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  tempDepthCanvas: imageSelectors.tempDepthCanvas(state)
+  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
+  parameters: imageSelectors.parameters(state)
 });
 
 const mapDispatchToProps = {
   initImage: imageActions.initImage,
+  storeParameters: imageActions.storeParameters,
+  addOperation: imageActions.addOperation,
   undo: imageActions.undo,
   clear: imageActions.clear,
   reset: imageActions.reset

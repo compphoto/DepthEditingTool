@@ -14,7 +14,8 @@ import {
   editHighlightPixelArea,
   getRatio,
   getDimension,
-  drawBox
+  drawBox,
+  drawScaledCanvasImage
 } from "utils/canvasUtils";
 import { runCanvasOperations, runTempDepthOperations } from "utils/stackOperations";
 import { addEffect } from "@react-three/fiber";
@@ -82,7 +83,20 @@ class DepthViewer extends Component {
       });
       initImage({
         prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height },
-        depthCanvasDimension: getDimension(mainDepthCanvas, ratio, centerShift_x, centerShift_y)
+        depthCanvasDimension: getDimension(mainDepthCanvas, ratio, centerShift_x, centerShift_y),
+        parameters: {
+          ...parameters,
+          canvasParams: {
+            translatePos: {
+              x: centerShift_x,
+              y: centerShift_y
+            },
+            scale: 1.0,
+            scaleMultiplier: 0.8,
+            startDragOffset: {},
+            mouseDown: false
+          }
+        }
       });
     }
     // If operation is added to the stack, rerun all operations in operation stack
@@ -165,13 +179,26 @@ class DepthViewer extends Component {
   handleResize = () => {
     this.setState({ ...this.state, windowWidth: window.innerWidth });
     const { depthImageRef } = this;
-    const { mainDepthCanvas, operationStack, initImage, addEffect } = this.props;
+    const { mainDepthCanvas, parameters, operationStack, initImage, addEffect } = this.props;
     const depthCanvas = depthImageRef.current;
     if (depthCanvas && mainDepthCanvas) {
       depthCanvas.width = (window.innerWidth / 1500) * 521;
       depthCanvas.height = (window.innerHeight / 1200) * 352;
       const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, depthCanvas);
       initImage({
+        parameters: {
+          ...parameters,
+          canvasParams: {
+            translatePos: {
+              x: centerShift_x,
+              y: centerShift_y
+            },
+            scale: 1.0,
+            scaleMultiplier: 0.8,
+            startDragOffset: {},
+            mouseDown: false
+          }
+        },
         operationStack: {
           ...operationStack,
           depthStack: []
@@ -225,12 +252,72 @@ class DepthViewer extends Component {
   };
   render() {
     const { depthImageRef } = this;
+    const depthCanvas = depthImageRef.current;
+    const { mainDepthCanvas, parameters, tools, storeParameters, addOperation } = this.props;
+    const { scale, translatePos, startDragOffset, mouseDown } = parameters.canvasParams;
     return (
       <DepthViewerStyle>
         <canvas
           width={(window.innerWidth / 1500) * 521}
           height={(window.innerHeight / 1200) * 352}
           ref={depthImageRef}
+          onMouseDown={e =>
+            storeParameters({
+              canvasParams: {
+                ...parameters.canvasParams,
+                startDragOffset: {
+                  x: e.clientX - translatePos.x,
+                  y: e.clientY - translatePos.y
+                },
+                mouseDown: true
+              }
+            })
+          }
+          onMouseUp={e =>
+            storeParameters({
+              canvasParams: {
+                ...parameters.canvasParams,
+                mouseDown: false
+              }
+            })
+          }
+          onMouseOver={e =>
+            storeParameters({
+              canvasParams: {
+                ...parameters.canvasParams,
+                mouseDown: false
+              }
+            })
+          }
+          onMouseOut={e =>
+            storeParameters({
+              canvasParams: {
+                ...parameters.canvasParams,
+                mouseDown: false
+              }
+            })
+          }
+          onMouseMove={e => {
+            if (mouseDown && !tools.depth) {
+              const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, depthCanvas);
+              storeParameters({
+                canvasParams: {
+                  ...parameters.canvasParams,
+                  translatePos: {
+                    x: e.clientX - startDragOffset.x,
+                    y: e.clientY - startDragOffset.y
+                  }
+                }
+              });
+              addOperation({
+                name: "depthStack",
+                value: {
+                  func: drawScaledCanvasImage,
+                  params: [depthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos]
+                }
+              });
+            }
+          }}
         ></canvas>
       </DepthViewerStyle>
     );
