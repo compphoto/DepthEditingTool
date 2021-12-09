@@ -45,7 +45,7 @@ export function ImageEditor({
                     }
                   });
                   addOperation({
-                    name: "depthStack",
+                    name: "moveStack",
                     value: {
                       func: drawScaledCanvasImage,
                       params: [tempDepthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos]
@@ -67,7 +67,7 @@ export function ImageEditor({
                     }
                   });
                   addOperation({
-                    name: "depthStack",
+                    name: "moveStack",
                     value: {
                       func: drawScaledCanvasImage,
                       params: [tempDepthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos]

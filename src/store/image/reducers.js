@@ -38,7 +38,8 @@ const initialState = {
   },
   operationStack: {
     rgbStack: [],
-    depthStack: []
+    depthStack: [],
+    moveStack: []
   }
 };
 
@@ -273,7 +274,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         },
         operationStack: {
           rgbStack: [],
-          depthStack: []
+          depthStack: [],
+          moveStack: []
         }
       };
       return {

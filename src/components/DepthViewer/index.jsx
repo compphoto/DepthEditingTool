@@ -104,6 +104,10 @@ class DepthViewer extends Component {
       runCanvasOperations("depthStack", mainDepthCanvas, depthContext);
       runTempDepthOperations("depthStack", mainDepthCanvas, depthCanvas.width, depthCanvas.height);
     }
+    // If operation is added to the move stack, rerun all operations in operation stack
+    if (prevProps.operationStack.moveStack !== operationStack.moveStack) {
+      runCanvasOperations("moveStack", mainDepthCanvas, depthContext);
+    }
     // Highlight pixel range from specified range for either cropped image or initial full image
     if (prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange) {
       if (parameters.histogramParams.pixelRange || parameters.croppedArea) {
@@ -201,7 +205,8 @@ class DepthViewer extends Component {
         },
         operationStack: {
           ...operationStack,
-          depthStack: []
+          depthStack: [],
+          moveStack: []
         },
         prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height },
         depthCanvasDimension: getDimension(mainDepthCanvas, ratio, centerShift_x, centerShift_y)
@@ -274,6 +279,7 @@ class DepthViewer extends Component {
             })
           }
           onMouseUp={e =>
+            mouseDown &&
             storeParameters({
               canvasParams: {
                 ...parameters.canvasParams,
@@ -282,6 +288,7 @@ class DepthViewer extends Component {
             })
           }
           onMouseOver={e =>
+            mouseDown &&
             storeParameters({
               canvasParams: {
                 ...parameters.canvasParams,
@@ -290,6 +297,7 @@ class DepthViewer extends Component {
             })
           }
           onMouseOut={e =>
+            mouseDown &&
             storeParameters({
               canvasParams: {
                 ...parameters.canvasParams,
@@ -310,7 +318,7 @@ class DepthViewer extends Component {
                 }
               });
               addOperation({
-                name: "depthStack",
+                name: "moveStack",
                 value: {
                   func: drawScaledCanvasImage,
                   params: [depthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos]
