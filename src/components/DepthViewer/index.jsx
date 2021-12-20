@@ -152,8 +152,8 @@ class DepthViewer extends Component {
     //   }
     // }
     // Listens for mouse movements around the depth canvas and draw bounding box
-    if (prevProps.tools.depth !== tools.depth) {
-      if (tools.depth) {
+    if (prevProps.tools.currentTool !== tools.currentTool) {
+      if (tools.currentTool) {
         depthCanvas.addEventListener("click", this.drawBoundingBox);
       } else {
         depthCanvas.removeEventListener("click", this.drawBoundingBox);
@@ -306,7 +306,7 @@ class DepthViewer extends Component {
             })
           }
           onMouseMove={e => {
-            if (mouseDown && !tools.depth) {
+            if (mouseDown && !tools.currentTool) {
               const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, depthCanvas);
               storeParameters({
                 canvasParams: {

@@ -7,7 +7,10 @@ import { selectors as imageSelectors } from "store/image";
 import { Button, UncontrolledCollapse, CardBody, Card, FormGroup, Label, Input } from "reactstrap";
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
-import { MdCrop, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import { MdCropDin, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import { RiCheckboxMultipleBlankLine } from "react-icons/ri";
+import { BiIntersect } from "react-icons/bi";
+import { BsSubtract } from "react-icons/bs";
 import { editBoundingArea, editHighlightPixelArea } from "utils/canvasUtils";
 
 export function SidePane({
@@ -77,28 +80,44 @@ export function SidePane({
                   <div
                     onClick={() => {
                       if (tempDepthCanvas) {
-                        selectTool("depth");
+                        selectTool("singleSelection");
                       }
                     }}
-                    className={tools.depth && tempDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
+                    className={tools.singleSelection && tempDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
                   >
-                    <MdCrop />
-                    Draw
+                    <MdCropDin />
+                  </div>
+                  <div
+                    onClick={() => {
+                      if (tempDepthCanvas) {
+                        selectTool("addSelection");
+                      }
+                    }}
+                    className={tools.addSelection && tempDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
+                  >
+                    <RiCheckboxMultipleBlankLine />
+                  </div>
+                  <div
+                    onClick={() => {
+                      if (tempDepthCanvas) {
+                        selectTool("subtractSelection");
+                      }
+                    }}
+                    className={tools.subtractSelection && tempDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
+                  >
+                    <BsSubtract />
+                  </div>
+                  <div
+                    onClick={() => {
+                      if (tempDepthCanvas) {
+                        selectTool("intersectSelection");
+                      }
+                    }}
+                    className={tools.intersectSelection && tempDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
+                  >
+                    <BiIntersect />
                   </div>
                 </div>
-                <FormGroup className="w-100 my-3">
-                  <Label for="depthBoxIntensity">Box Intensity</Label>
-                  <Input
-                    disabled={!tempDepthCanvas || !parameters.croppedArea}
-                    onMouseUp={onHandleChange}
-                    className="w-100"
-                    id="depthBoxIntensity"
-                    name="depthBoxIntensity"
-                    min="-100"
-                    max="100"
-                    type="range"
-                  />
-                </FormGroup>
                 <FormGroup className="w-100 my-3">
                   <Label for="depthRangeIntensity">Depth Intensity</Label>
                   <Input

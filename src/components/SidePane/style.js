@@ -69,8 +69,8 @@ const SidePaneStyle = styled.div`
               flex-wrap: wrap;
               .card-tool {
                 flex-shrink: 0;
-                width: 72px;
-                height: 72px;
+                width: 50px;
+                height: 50px;
                 color: #7e838e;
                 font-size: 12px;
                 line-height: 1rem;

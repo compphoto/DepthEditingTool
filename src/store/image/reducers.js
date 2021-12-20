@@ -13,7 +13,10 @@ const initialState = {
   depthCanvasDimension: null,
   tools: {
     currentTool: null,
-    depth: false
+    singleSelection: false,
+    addSelection: false,
+    subtractSelection: false,
+    intersectSelection: false
   },
   toolsParameters: {
     depthBoxIntensity: 0,
@@ -259,7 +262,10 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         depthCanvasDimension: null,
         tools: {
           currentTool: null,
-          depth: false
+          singleSelection: false,
+          addSelection: false,
+          subtractSelection: false,
+          intersectSelection: false
         },
         toolsParameters: {
           depthBoxIntensity: 0,

@@ -117,8 +117,8 @@ class RgbViewer extends Component {
         });
       }
     }
-    if (prevProps.tools.depth !== tools.depth) {
-      if (!tools.depth) {
+    if (prevProps.tools.currentTool !== tools.currentTool) {
+      if (!tools.currentTool) {
         removeOperation({
           name: "rgbStack",
           value: drawBox
