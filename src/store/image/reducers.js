@@ -180,6 +180,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         parameters: {
+          ...state.parameters,
           croppedCanvasImage: null,
           croppedArea: null,
           histogramParams: {
@@ -189,7 +190,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
             update: [0, 255]
           },
           canvasParams: {
-            translatePos: {},
+            ...state.parameters.canvasParams,
+            translatePos: {
+              x: state.depthCanvasDimension[0],
+              y: state.depthCanvasDimension[1]
+            },
             scale: 1.0,
             scaleMultiplier: 0.8,
             startDragOffset: {},
@@ -208,6 +213,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         parameters: {
+          ...state.parameters,
           croppedCanvasImage: null,
           croppedArea: null,
           histogramParams: {
@@ -217,7 +223,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
             update: [0, 255]
           },
           canvasParams: {
-            translatePos: {},
+            ...state.parameters.canvasParams,
+            translatePos: {
+              x: state.depthCanvasDimension[0],
+              y: state.depthCanvasDimension[1]
+            },
             scale: 1.0,
             scaleMultiplier: 0.8,
             startDragOffset: {},
