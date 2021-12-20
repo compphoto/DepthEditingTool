@@ -88,8 +88,8 @@ class DepthViewer extends Component {
           ...parameters,
           canvasParams: {
             translatePos: {
-              x: centerShift_x,
-              y: centerShift_y
+              x: 0,
+              y: 0
             },
             scale: 1.0,
             scaleMultiplier: 0.8,
@@ -194,8 +194,8 @@ class DepthViewer extends Component {
           ...parameters,
           canvasParams: {
             translatePos: {
-              x: centerShift_x,
-              y: centerShift_y
+              x: 0,
+              y: 0
             },
             scale: 1.0,
             scaleMultiplier: 0.8,

@@ -195,8 +195,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           canvasParams: {
             ...state.parameters.canvasParams,
             translatePos: {
-              x: state.depthCanvasDimension[0],
-              y: state.depthCanvasDimension[1]
+              x: 0,
+              y: 0
             },
             scale: 1.0,
             scaleMultiplier: 0.8,
@@ -228,8 +228,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           canvasParams: {
             ...state.parameters.canvasParams,
             translatePos: {
-              x: state.depthCanvasDimension[0],
-              y: state.depthCanvasDimension[1]
+              x: 0,
+              y: 0
             },
             scale: 1.0,
             scaleMultiplier: 0.8,
