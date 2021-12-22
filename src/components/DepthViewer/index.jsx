@@ -15,7 +15,8 @@ import {
   getRatio,
   getDimension,
   drawBox,
-  drawScaledCanvasImage
+  drawScaledCanvasImage,
+  modifyBitmap
 } from "utils/canvasUtils";
 import { runCanvasOperations, runTempDepthOperations } from "utils/stackOperations";
 import { addEffect } from "@react-three/fiber";
@@ -33,6 +34,10 @@ class DepthViewer extends Component {
     initBoundingBox: null
   };
   componentDidMount() {
+    const { bitmapCanvas } = this.props;
+    const depthCanvas = this.depthImageRef.current;
+    bitmapCanvas.width = depthCanvas.width;
+    bitmapCanvas.height = depthCanvas.height;
     this.handleResize();
     window.addEventListener("resize", this.handleResize);
   }
@@ -42,8 +47,9 @@ class DepthViewer extends Component {
       depthImageUrl,
       mainDepthCanvas,
       tempDepthCanvas,
-      depthCanvasDimension,
       prevDepthSize,
+      depthCanvasDimension,
+      bitmapCanvas,
       tools,
       toolsParameters,
       parameters,
@@ -157,6 +163,8 @@ class DepthViewer extends Component {
         depthCanvas.addEventListener("click", this.drawBoundingBox);
       } else {
         depthCanvas.removeEventListener("click", this.drawBoundingBox);
+        const bitmapContext = bitmapCanvas.getContext("2d");
+        bitmapContext.clearRect(0, 0, bitmapCanvas.width, bitmapCanvas.height);
         removeOperation({
           name: "depthStack",
           value: drawBox
@@ -183,11 +191,13 @@ class DepthViewer extends Component {
   handleResize = () => {
     this.setState({ ...this.state, windowWidth: window.innerWidth });
     const { depthImageRef } = this;
-    const { mainDepthCanvas, parameters, operationStack, initImage, addEffect } = this.props;
+    const { mainDepthCanvas, bitmapCanvas, parameters, operationStack, initImage, addEffect } = this.props;
     const depthCanvas = depthImageRef.current;
     if (depthCanvas && mainDepthCanvas) {
       depthCanvas.width = (window.innerWidth / 1500) * 521;
       depthCanvas.height = (window.innerHeight / 1200) * 352;
+      bitmapCanvas.width = depthCanvas.width;
+      bitmapCanvas.height = depthCanvas.height;
       const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, depthCanvas);
       initImage({
         parameters: {
@@ -338,6 +348,7 @@ const mapStateToProps = state => ({
   tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
   prevDepthSize: imageSelectors.prevDepthSize(state),
   depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
+  bitmapCanvas: imageSelectors.bitmapCanvas(state),
   tools: imageSelectors.tools(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),

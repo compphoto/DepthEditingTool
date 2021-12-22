@@ -11,6 +11,7 @@ const initialState = {
   prevDepthSize: { width: null, height: null },
   rgbCanvasDimension: null,
   depthCanvasDimension: null,
+  bitmapCanvas: document.createElement("canvas"),
   tools: {
     currentTool: null,
     singleSelection: false,
@@ -260,6 +261,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         prevDepthSize: { width: null, height: null },
         rgbCanvasDimension: null,
         depthCanvasDimension: null,
+        bitmapCanvas: document.createElement("canvas"),
         tools: {
           currentTool: null,
           singleSelection: false,

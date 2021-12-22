@@ -11,7 +11,15 @@ import { MdCropDin, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icon
 import { RiCheckboxMultipleBlankLine } from "react-icons/ri";
 import { BiIntersect } from "react-icons/bi";
 import { BsSubtract } from "react-icons/bs";
-import { editBoundingArea, editHighlightPixelArea } from "utils/canvasUtils";
+import {
+  canvasToImage,
+  cloneCanvas,
+  cropCanvas,
+  drawBox,
+  editHighlightPixelArea,
+  highlightPixelArea,
+  modifyBitmap
+} from "utils/canvasUtils";
 
 export function SidePane({
   toolExtOpen,
@@ -19,12 +27,15 @@ export function SidePane({
   mainDepthCanvas,
   tempDepthCanvas,
   depthCanvasDimension,
+  bitmapCanvas,
   tools,
   toolsParameters,
   parameters,
   selectTool,
   storeToolParameters,
-  addEffect
+  storeParameters,
+  addEffect,
+  removeOperation
 }) {
   const [activeTool, setActiveTool] = useState(0);
   const toggleTool = index => {
@@ -34,33 +45,45 @@ export function SidePane({
     let { name, value } = e.target;
     storeToolParameters({ [name]: value });
   };
-  useEffect(() => {
-    if (parameters.croppedArea) {
-      addEffect({
-        name: "depthStack",
-        value: { func: editBoundingArea, params: [parameters.croppedArea, toolsParameters.depthBoxIntensity] }
-      });
+  const onModifyBitmap = () => {
+    const { croppedCanvasImage, croppedArea, histogramParams } = parameters;
+    let newArea = null;
+    let newCroppedCanvasImage = null;
+    if (croppedArea) {
+      newArea = croppedArea;
+      newCroppedCanvasImage = croppedCanvasImage;
+    } else {
+      newArea = [
+        depthCanvasDimension[0],
+        depthCanvasDimension[1],
+        depthCanvasDimension[2] - depthCanvasDimension[0],
+        depthCanvasDimension[3] - depthCanvasDimension[1]
+      ];
+      newCroppedCanvasImage = cropCanvas(tempDepthCanvas, newArea);
     }
-  }, [toolsParameters.depthBoxIntensity]);
+    modifyBitmap(bitmapCanvas, newCroppedCanvasImage, newArea, tools.currentTool, histogramParams.pixelRange);
+    removeOperation({
+      name: "depthStack",
+      value: drawBox
+    });
+    storeParameters({
+      croppedCanvasImage: null,
+      croppedArea: null,
+      histogramParams: {
+        pixelRange: [0, 255],
+        domain: [0, 255],
+        values: [0, 255],
+        update: [0, 255]
+      }
+    });
+  };
   useEffect(() => {
     if (parameters.histogramParams.pixelRange && (parameters.croppedArea || depthCanvasDimension)) {
-      const { croppedArea, histogramParams } = parameters;
-      let newArea = null;
-      if (croppedArea) {
-        newArea = croppedArea;
-      } else {
-        newArea = [
-          depthCanvasDimension[0],
-          depthCanvasDimension[1],
-          depthCanvasDimension[2] - depthCanvasDimension[0],
-          depthCanvasDimension[3] - depthCanvasDimension[1]
-        ];
-      }
       addEffect({
         name: "depthStack",
         value: {
           func: editHighlightPixelArea,
-          params: [newArea, histogramParams.pixelRange, toolsParameters.depthRangeIntensity]
+          params: [cloneCanvas(bitmapCanvas), toolsParameters.depthRangeIntensity]
         }
       });
     }
@@ -117,6 +140,28 @@ export function SidePane({
                   >
                     <BiIntersect />
                   </div>
+                </div>
+                <div className="d-flex">
+                  <Button disabled={!tools.currentTool} className="mx-2" color="secondary" onClick={onModifyBitmap}>
+                    {tools.singleSelection || tools.addSelection
+                      ? "Add"
+                      : tools.subtractSelection
+                      ? "Subtract"
+                      : tools.intersectSelection
+                      ? "Intersect"
+                      : "Select"}
+                  </Button>
+                  <Button
+                    disabled={!tools.currentTool}
+                    className="mx-2"
+                    color="secondary"
+                    onClick={() => {
+                      const bitmapContext = bitmapCanvas.getContext("2d");
+                      bitmapContext.clearRect(0, 0, bitmapCanvas.width, bitmapCanvas.height);
+                    }}
+                  >
+                    Clear
+                  </Button>
                 </div>
                 <FormGroup className="w-100 my-3">
                   <Label for="depthRangeIntensity">Depth Intensity</Label>
@@ -323,6 +368,7 @@ const mapStateToProps = state => ({
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
   depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
+  bitmapCanvas: imageSelectors.bitmapCanvas(state),
   tools: imageSelectors.tools(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state)
@@ -332,6 +378,8 @@ const mapDispatchToProps = {
   toolExtActions: toolExtActions.toggleToolExt,
   selectTool: imageActions.selectTool,
   addEffect: imageActions.addEffect,
+  removeOperation: imageActions.removeOperation,
+  storeParameters: imageActions.storeParameters,
   storeToolParameters: imageActions.storeToolParameters
 };
 

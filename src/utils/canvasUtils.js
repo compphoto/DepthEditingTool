@@ -128,32 +128,47 @@ export const highlightPixelAreaRgb = (image, rgbContext, depthContext, boundingB
   }
 };
 
-export const editBoundingArea = (image, context, boundingBox, depth) => {
-  if (context && boundingBox && depth) {
-    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
+export const editHighlightPixelArea = (image, context, canvas, depth) => {
+  if (context && canvas && depth) {
+    const bitmapCanvas = cloneCanvas(canvas);
+    const bitmapContext = bitmapCanvas.getContext("2d");
+    const imageData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
-      src[i] += 255 * (depth / 100);
-      src[i + 1] += 255 * (depth / 100);
-      src[i + 2] += 255 * (depth / 100);
-    }
-    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
-  }
-};
-
-export const editHighlightPixelArea = (image, context, boundingBox, pixelRange, depth) => {
-  if (boundingBox && context) {
-    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
-    const src = imageData.data;
-    for (let i = 0; i < src.length; i += 4) {
-      if (src[i] >= pixelRange[0] && src[i] <= pixelRange[1]) {
+      if (src[i + 3] !== 0) {
         src[i] += 255 * (depth / 100);
         src[i + 1] += 255 * (depth / 100);
         src[i + 2] += 255 * (depth / 100);
       }
     }
-    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
+    bitmapContext.putImageData(imageData, 0, 0);
+    context.globalCompositeOperation = "source-over";
+    context.drawImage(bitmapCanvas, 0, 0);
   }
+};
+
+export const modifyBitmap = (bitmapCanvas, croppedCanvas, box, currentTool, pixelRange) => {
+  const bitmapContext = bitmapCanvas.getContext("2d");
+  const croppedContext = croppedCanvas.getContext("2d");
+  if (currentTool === "singleSelection") {
+    bitmapContext.clearRect(0, 0, bitmapCanvas.width, bitmapCanvas.height);
+  }
+  const imageData = croppedContext.getImageData(0, 0, croppedCanvas.width, croppedCanvas.height);
+  const src = imageData.data;
+  for (let i = 0; i < src.length; i += 4) {
+    if (src[i] < pixelRange[0] || src[i] > pixelRange[1]) {
+      src[i + 3] = 0;
+    }
+  }
+  croppedContext.putImageData(imageData, 0, 0);
+  bitmapContext.globalCompositeOperation = "source-over";
+  if (currentTool === "subtractSelection") {
+    bitmapContext.globalCompositeOperation = "destination-out";
+  }
+  if (currentTool === "intersectSelection") {
+    bitmapContext.globalCompositeOperation = "source-in";
+  }
+  bitmapContext.drawImage(croppedCanvas, box[0], box[1]);
 };
 
 export const cropCanvas = (oldCanvas, boundingBox) => {
