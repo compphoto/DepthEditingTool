@@ -204,6 +204,8 @@ class PointCurve extends Component {
           height="200px"
           ref={pointCurveRef}
           onMouseUp={e => selectedControl && this.setState({ selectedControl: null })}
+          onMouseOver={e => selectedControl && this.setState({ selectedControl: null })}
+          onMouseOut={e => selectedControl && this.setState({ selectedControl: null })}
         ></canvas>
       </PointCurveStyle>
     );
