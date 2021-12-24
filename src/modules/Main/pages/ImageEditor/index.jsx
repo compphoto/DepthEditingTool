@@ -5,6 +5,7 @@ import { selectors as imageSelectors } from "store/image";
 import { Helmet } from "react-helmet";
 import { Container, Button } from "reactstrap";
 import { RiDownloadLine } from "react-icons/ri";
+import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { ImUndo2 } from "react-icons/im";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
@@ -38,47 +39,60 @@ export function ImageEditor({
               <Button
                 onClick={() => {
                   let { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
-                  storeParameters({
-                    canvasParams: {
-                      ...parameters.canvasParams,
-                      scale: scale / scaleMultiplier
-                    }
-                  });
                   addOperation({
                     name: "moveStack",
                     value: {
                       func: drawScaledCanvasImage,
-                      params: [tempDepthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos]
+                      params: [
+                        tempDepthCanvas,
+                        ratio,
+                        centerShift_x,
+                        centerShift_y,
+                        scale * scaleMultiplier,
+                        translatePos
+                      ]
                     }
                   });
-                }}
-                size="sm"
-                color="secondary"
-              >
-                Plus
-              </Button>
-              <Button
-                onClick={() => {
-                  let { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
                   storeParameters({
                     canvasParams: {
                       ...parameters.canvasParams,
                       scale: scale * scaleMultiplier
                     }
                   });
+                }}
+                size="sm"
+                color="outline"
+              >
+                <AiOutlineMinus />
+              </Button>
+              <Button
+                onClick={() => {
+                  let { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
                   addOperation({
                     name: "moveStack",
                     value: {
                       func: drawScaledCanvasImage,
-                      params: [tempDepthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos]
+                      params: [
+                        tempDepthCanvas,
+                        ratio,
+                        centerShift_x,
+                        centerShift_y,
+                        scale / scaleMultiplier,
+                        translatePos
+                      ]
+                    }
+                  });
+                  storeParameters({
+                    canvasParams: {
+                      ...parameters.canvasParams,
+                      scale: scale / scaleMultiplier
                     }
                   });
                 }}
                 size="sm"
-                color="secondary"
-                className="mx-3"
+                color="outline"
               >
-                Minus
+                <AiOutlinePlus />
               </Button>
               <Button
                 onClick={() => {

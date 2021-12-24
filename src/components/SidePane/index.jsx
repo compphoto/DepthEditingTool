@@ -20,6 +20,7 @@ import {
   highlightPixelArea,
   modifyBitmap
 } from "utils/canvasUtils";
+import PointCurve from "components/PointCurve";
 
 export function SidePane({
   toolExtOpen,
@@ -180,26 +181,12 @@ export function SidePane({
             </Card>
           </UncontrolledCollapse>
           <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="depth-rotate-toggler">
-            Rotate
+            Point Curve
           </Button>
           <UncontrolledCollapse toggler="#depth-rotate-toggler">
             <Card className="tool-ext-card">
               <CardBody className="tool-ext-card-body">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
-                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
-                Minus, alias.
-              </CardBody>
-            </Card>
-          </UncontrolledCollapse>
-          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="depth-resize-toggler">
-            Resize
-          </Button>
-          <UncontrolledCollapse toggler="#depth-resize-toggler">
-            <Card className="tool-ext-card">
-              <CardBody className="tool-ext-card-body">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
-                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
-                Minus, alias.
+                <PointCurve />
               </CardBody>
             </Card>
           </UncontrolledCollapse>
