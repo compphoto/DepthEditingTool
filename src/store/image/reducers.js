@@ -20,8 +20,11 @@ const initialState = {
     intersectSelection: false
   },
   toolsParameters: {
-    depthBoxIntensity: 0,
-    depthRangeIntensity: 0
+    depthRangeIntensity: 0,
+    brightness: 0,
+    contrast: 0,
+    saturation: 0,
+    sharpness: 0
   },
   parameters: {
     croppedCanvasImage: null,
@@ -270,8 +273,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           intersectSelection: false
         },
         toolsParameters: {
-          depthBoxIntensity: 0,
-          depthRangeIntensity: 0
+          depthRangeIntensity: 0,
+          brightness: 0,
+          contrast: 0,
+          saturation: 0,
+          sharpness: 0
         },
         parameters: {
           croppedCanvasImage: null,

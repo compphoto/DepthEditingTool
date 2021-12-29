@@ -50,24 +50,23 @@ const SidePaneStyle = styled.div`
       overflow-x: hidden;
       overflow-y: auto;
       .tool-ext {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        .dropdown-button {
-          width: 100%;
-        }
-        .tool-ext-card {
-          background: transparent;
-          .tool-ext-card-body {
+        .tool-ext-section {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          .dropdown-button {
+            width: 100%;
+          }
+          .tool-ext-selection {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            .tool-ext-card-body-icons {
+            .tool-ext-selection-icons {
               width: 100%;
               display: flex;
               flex-wrap: wrap;
-              .card-tool {
+              .selection-tool {
                 flex-shrink: 0;
                 width: 50px;
                 height: 50px;
@@ -89,10 +88,19 @@ const SidePaneStyle = styled.div`
                   color: #fff;
                 }
               }
-              .card-tool-active {
+              .selection-tool-active {
                 background: #2b2c2f;
                 color: #fff;
               }
+            }
+          }
+          .tool-ext-card {
+            background: transparent;
+            .tool-ext-card-body {
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
             }
           }
         }

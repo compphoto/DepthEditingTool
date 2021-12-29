@@ -1,17 +1,8 @@
-import { imageActions } from "store/image";
-import store from "store/store";
+import { solveCubic } from "./calculation";
 
-// const store = require("store/store");
-//   store.default.dispatch(
-//     imageActions.initImage({
-//       [type === "depth" ? depthImageDimension : rgbImageDimension]: [x1, y1, x2, y2],
-//       scaleParams: {
-//         ratio: ratio,
-//         centerShift_x: centerShift_x,
-//         centerShift_y: centerShift_y
-//       }
-//     })
-//   );
+export const dimensionToBox = dimension => {
+  return [dimension[0], dimension[1], dimension[2] - dimension[0], dimension[3] - dimension[1]];
+};
 
 export const canvasToImage = canvas => {
   if (canvas) return canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
@@ -46,6 +37,28 @@ export const getDimension = (image, ratio, centerShift_x, centerShift_y) => {
   let x2 = centerShift_x + image.width * ratio;
   let y2 = centerShift_y + image.height * ratio;
   return [x1, y1, x2, y2];
+};
+
+export const cropCanvas = (oldCanvas, boundingBox) => {
+  if (oldCanvas && boundingBox) {
+    const newCanvas = document.createElement("canvas");
+    newCanvas.width = boundingBox[2];
+    newCanvas.height = boundingBox[3];
+    const context = newCanvas.getContext("2d");
+    context.drawImage(
+      oldCanvas,
+      boundingBox[0],
+      boundingBox[1],
+      boundingBox[2],
+      boundingBox[3],
+      0,
+      0,
+      boundingBox[2],
+      boundingBox[3]
+    );
+    return newCanvas;
+  }
+  return null;
 };
 
 export const drawCanvasImage = (image, context, ratio, centerShift_x, centerShift_y) => {
@@ -128,25 +141,6 @@ export const highlightPixelAreaRgb = (image, rgbContext, depthContext, boundingB
   }
 };
 
-export const editHighlightPixelArea = (image, context, canvas, depth) => {
-  if (context && canvas && depth) {
-    const bitmapCanvas = cloneCanvas(canvas);
-    const bitmapContext = bitmapCanvas.getContext("2d");
-    const imageData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
-    const src = imageData.data;
-    for (let i = 0; i < src.length; i += 4) {
-      if (src[i + 3] !== 0) {
-        src[i] += 255 * (depth / 100);
-        src[i + 1] += 255 * (depth / 100);
-        src[i + 2] += 255 * (depth / 100);
-      }
-    }
-    bitmapContext.putImageData(imageData, 0, 0);
-    context.globalCompositeOperation = "source-over";
-    context.drawImage(bitmapCanvas, 0, 0);
-  }
-};
-
 export const modifyBitmap = (bitmapCanvas, croppedCanvas, box, currentTool, pixelRange) => {
   const bitmapContext = bitmapCanvas.getContext("2d");
   const croppedContext = croppedCanvas.getContext("2d");
@@ -171,24 +165,86 @@ export const modifyBitmap = (bitmapCanvas, croppedCanvas, box, currentTool, pixe
   bitmapContext.drawImage(croppedCanvas, box[0], box[1]);
 };
 
-export const cropCanvas = (oldCanvas, boundingBox) => {
-  if (oldCanvas && boundingBox) {
-    const newCanvas = document.createElement("canvas");
-    newCanvas.width = boundingBox[2];
-    newCanvas.height = boundingBox[3];
-    const context = newCanvas.getContext("2d");
-    context.drawImage(
-      oldCanvas,
-      boundingBox[0],
-      boundingBox[1],
-      boundingBox[2],
-      boundingBox[3],
-      0,
-      0,
-      boundingBox[2],
-      boundingBox[3]
-    );
-    return newCanvas;
+export const editHighlightPixelArea = (image, context, canvas, depth) => {
+  if (context && canvas && depth) {
+    const bitmapCanvas = cloneCanvas(canvas);
+    const bitmapContext = bitmapCanvas.getContext("2d");
+    const imageData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
+    const src = imageData.data;
+    for (let i = 0; i < src.length; i += 4) {
+      if (src[i + 3] !== 0) {
+        src[i] += 255 * (depth / 100);
+        src[i + 1] += 255 * (depth / 100);
+        src[i + 2] += 255 * (depth / 100);
+      }
+    }
+    bitmapContext.putImageData(imageData, 0, 0);
+    context.globalCompositeOperation = "source-over";
+    context.drawImage(bitmapCanvas, 0, 0);
   }
-  return null;
+};
+
+export const editBrightness = (image, context, boundingBox, brightness) => {
+  if (context && boundingBox && brightness) {
+    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
+    const src = imageData.data;
+    for (let i = 0; i < src.length; i += 4) {
+      src[i] += 255 * (brightness / 100);
+      src[i + 1] += 255 * (brightness / 100);
+      src[i + 2] += 255 * (brightness / 100);
+    }
+    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
+  }
+};
+
+export const editContrast = (image, context, boundingBox, contrast) => {
+  function truncateColor(value) {
+    if (value < 0) {
+      value = 0;
+    } else if (value > 255) {
+      value = 255;
+    }
+    return value;
+  }
+
+  if (context && boundingBox && contrast) {
+    const factor = (259.0 * (contrast + 255.0)) / (255.0 * (259.0 - contrast));
+    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
+    const src = imageData.data;
+    for (let i = 0; i < src.length; i += 4) {
+      src[i] = truncateColor(factor * (src[i] - 128.0) + 128.0);
+      src[i + 1] = truncateColor(factor * (src[i + 1] - 128.0) + 128.0);
+      src[i + 2] = truncateColor(factor * (src[i + 2] - 128.0) + 128.0);
+    }
+    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
+  }
+};
+
+export const adjustTone = (image, context, boundingBox, cpS, cp1, cp2, cpE) => {
+  function getT(x, cpSx, cp1x, cp2x, cpEx) {
+    let a = -cpSx + 3 * cp1x - 3 * cp2x + cpEx;
+    let b = 3 * cpSx - 6 * cp1x + 3 * cp2x;
+    let c = -3 * cpSx + 3 * cp1x;
+    let d = cpSx - x;
+    return solveCubic(a, b, c, d)[0];
+  }
+  function getD(t, cpSy, cp1y, cp2y, cpEy) {
+    let y =
+      Math.pow(1 - t, 3) * cpSy +
+      3 * Math.pow(1 - t, 2) * t * cp1y +
+      3 * (1 - t) * Math.pow(t, 2) * cp2y +
+      Math.pow(t, 3) * cpEy;
+    return y;
+  }
+
+  if (context && boundingBox && contrast) {
+    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
+    const src = imageData.data;
+    for (let i = 0; i < src.length; i += 4) {
+      src[i] = getD(getT(src[i], cpS.x, cp1.x, cp2.x, cpE.x), cpS.y, cp1.y, cp2.y, cpE.y);
+      src[i + 1] = getD(getT(src[i + 1], cpS.x, cp1.x, cp2.x, cpE.x), cpS.y, cp1.y, cp2.y, cpE.y);
+      src[i + 2] = getD(getT(src[i + 2], cpS.x, cp1.x, cp2.x, cpE.x), cpS.y, cp1.y, cp2.y, cpE.y);
+    }
+    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
+  }
 };

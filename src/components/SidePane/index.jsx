@@ -15,7 +15,10 @@ import {
   canvasToImage,
   cloneCanvas,
   cropCanvas,
+  dimensionToBox,
   drawBox,
+  editBrightness,
+  editContrast,
   editHighlightPixelArea,
   highlightPixelArea,
   modifyBitmap
@@ -54,12 +57,7 @@ export function SidePane({
       newArea = croppedArea;
       newCroppedCanvasImage = croppedCanvasImage;
     } else {
-      newArea = [
-        depthCanvasDimension[0],
-        depthCanvasDimension[1],
-        depthCanvasDimension[2] - depthCanvasDimension[0],
-        depthCanvasDimension[3] - depthCanvasDimension[1]
-      ];
+      newArea = dimensionToBox(depthCanvasDimension);
       newCroppedCanvasImage = cropCanvas(tempDepthCanvas, newArea);
     }
     modifyBitmap(bitmapCanvas, newCroppedCanvasImage, newArea, tools.currentTool, histogramParams.pixelRange);
@@ -89,107 +87,269 @@ export function SidePane({
       });
     }
   }, [toolsParameters.depthRangeIntensity]);
+  useEffect(() => {
+    const { croppedArea } = parameters;
+    if (croppedArea || depthCanvasDimension) {
+      let newArea = null;
+      if (croppedArea) {
+        newArea = croppedArea;
+      } else {
+        newArea = dimensionToBox(depthCanvasDimension);
+      }
+      addEffect({
+        name: "depthStack",
+        value: {
+          func: editBrightness,
+          params: [newArea, toolsParameters.brightness]
+        }
+      });
+    }
+  }, [toolsParameters.brightness]);
+  useEffect(() => {
+    const { croppedArea } = parameters;
+    if (croppedArea || depthCanvasDimension) {
+      let newArea = null;
+      if (croppedArea) {
+        newArea = croppedArea;
+      } else {
+        newArea = dimensionToBox(depthCanvasDimension);
+      }
+      addEffect({
+        name: "depthStack",
+        value: {
+          func: editContrast,
+          params: [newArea, toolsParameters.contrast]
+        }
+      });
+    }
+  }, [toolsParameters.contrast]);
   const adjust = () => {
     return (
       <>
-        <div className="tool-ext mt-4 w-100">
-          <p className="mb-3 text-white">Depth</p>
-          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="depth-area-toggler">
-            Select Area
-          </Button>
-          <UncontrolledCollapse style={{ width: "100%" }} toggler="#depth-area-toggler">
-            <Card className="tool-ext-card">
-              <CardBody className="tool-ext-card-body">
-                <div className="tool-ext-card-body-icons">
-                  <div
-                    onClick={() => {
-                      if (tempDepthCanvas) {
-                        selectTool("singleSelection");
-                      }
-                    }}
-                    className={tools.singleSelection && tempDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
-                  >
-                    <MdCropDin />
-                  </div>
-                  <div
-                    onClick={() => {
-                      if (tempDepthCanvas) {
-                        selectTool("addSelection");
-                      }
-                    }}
-                    className={tools.addSelection && tempDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
-                  >
-                    <RiCheckboxMultipleBlankLine />
-                  </div>
-                  <div
-                    onClick={() => {
-                      if (tempDepthCanvas) {
-                        selectTool("subtractSelection");
-                      }
-                    }}
-                    className={tools.subtractSelection && tempDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
-                  >
-                    <BsSubtract />
-                  </div>
-                  <div
-                    onClick={() => {
-                      if (tempDepthCanvas) {
-                        selectTool("intersectSelection");
-                      }
-                    }}
-                    className={tools.intersectSelection && tempDepthCanvas ? "card-tool card-tool-active" : "card-tool"}
-                  >
-                    <BiIntersect />
-                  </div>
+        <div className="tool-ext w-100">
+          <div className="w-100 mt-3 tool-ext-section">
+            <p className="mb-3 text-white">Depth Selection</p>
+            <div className="tool-ext-selection">
+              <div className="tool-ext-selection-icons">
+                <div
+                  onClick={() => {
+                    if (tempDepthCanvas) {
+                      selectTool("singleSelection");
+                    }
+                  }}
+                  className={
+                    tools.singleSelection && tempDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
+                  }
+                >
+                  <MdCropDin />
                 </div>
-                <div className="d-flex">
-                  <Button disabled={!tools.currentTool} className="mx-2" color="secondary" onClick={onModifyBitmap}>
-                    {tools.singleSelection || tools.addSelection
-                      ? "Add"
-                      : tools.subtractSelection
-                      ? "Subtract"
-                      : tools.intersectSelection
-                      ? "Intersect"
-                      : "Select"}
-                  </Button>
-                  <Button
-                    disabled={!tools.currentTool}
-                    className="mx-2"
-                    color="secondary"
-                    onClick={() => {
-                      const bitmapContext = bitmapCanvas.getContext("2d");
-                      bitmapContext.clearRect(0, 0, bitmapCanvas.width, bitmapCanvas.height);
-                    }}
-                  >
-                    Clear
-                  </Button>
+                <div
+                  onClick={() => {
+                    if (tempDepthCanvas) {
+                      selectTool("addSelection");
+                    }
+                  }}
+                  className={
+                    tools.addSelection && tempDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
+                  }
+                >
+                  <RiCheckboxMultipleBlankLine />
                 </div>
-                <FormGroup className="w-100 my-3">
-                  <Label for="depthRangeIntensity">Depth Intensity</Label>
-                  <Input
-                    disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
-                    onMouseUp={onHandleChange}
-                    className="w-100"
-                    id="depthRangeIntensity"
-                    name="depthRangeIntensity"
-                    min="-100"
-                    max="100"
-                    type="range"
-                  />
-                </FormGroup>
-              </CardBody>
-            </Card>
-          </UncontrolledCollapse>
-          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="depth-rotate-toggler">
-            Point Curve
-          </Button>
-          <UncontrolledCollapse toggler="#depth-rotate-toggler">
-            <Card className="tool-ext-card">
-              <CardBody className="tool-ext-card-body">
-                <PointCurve />
-              </CardBody>
-            </Card>
-          </UncontrolledCollapse>
+                <div
+                  onClick={() => {
+                    if (tempDepthCanvas) {
+                      selectTool("subtractSelection");
+                    }
+                  }}
+                  className={
+                    tools.subtractSelection && tempDepthCanvas
+                      ? "selection-tool selection-tool-active"
+                      : "selection-tool"
+                  }
+                >
+                  <BsSubtract />
+                </div>
+                <div
+                  onClick={() => {
+                    if (tempDepthCanvas) {
+                      selectTool("intersectSelection");
+                    }
+                  }}
+                  className={
+                    tools.intersectSelection && tempDepthCanvas
+                      ? "selection-tool selection-tool-active"
+                      : "selection-tool"
+                  }
+                >
+                  <BiIntersect />
+                </div>
+              </div>
+              <div className="d-flex">
+                <Button disabled={!tools.currentTool} className="mx-2" color="secondary" onClick={onModifyBitmap}>
+                  {tools.singleSelection || tools.addSelection
+                    ? "Add"
+                    : tools.subtractSelection
+                    ? "Subtract"
+                    : tools.intersectSelection
+                    ? "Intersect"
+                    : "Select"}
+                </Button>
+                <Button
+                  disabled={!tools.currentTool}
+                  className="mx-2"
+                  color="secondary"
+                  onClick={() => {
+                    const bitmapContext = bitmapCanvas.getContext("2d");
+                    bitmapContext.clearRect(0, 0, bitmapCanvas.width, bitmapCanvas.height);
+                  }}
+                >
+                  Clear
+                </Button>
+              </div>
+            </div>
+            <Button className="mt-4 mb-2 dropdown-button" color="secondary" id="depth-adjust-toggler">
+              Adjust Selection
+            </Button>
+            <UncontrolledCollapse style={{ width: "100%" }} toggler="#depth-adjust-toggler">
+              <Card className="tool-ext-card">
+                <CardBody className="tool-ext-card-body">
+                  <FormGroup className="w-100">
+                    <Label for="depthRangeIntensity">Depth Intensity</Label>
+                    <Input
+                      disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                      onMouseUp={onHandleChange}
+                      className="w-100"
+                      id="depthRangeIntensity"
+                      name="depthRangeIntensity"
+                      min="-100"
+                      max="100"
+                      type="range"
+                    />
+                  </FormGroup>
+                </CardBody>
+              </Card>
+            </UncontrolledCollapse>
+          </div>
+          <div className="w-100 mt-3 tool-ext-section">
+            <p className="mb-1 text-white">Brightness &#38; Color</p>
+            <Button className="mt-4 mb-2 dropdown-button" color="secondary" id="basic-adjust-toggler">
+              Basic Adjust
+            </Button>
+            <UncontrolledCollapse style={{ width: "100%" }} toggler="#basic-adjust-toggler">
+              <Card className="tool-ext-card">
+                <CardBody className="tool-ext-card-body">
+                  <FormGroup className="w-100">
+                    <Label for="brightness">Brightness</Label>
+                    <Input
+                      disabled={!tempDepthCanvas}
+                      onMouseUp={onHandleChange}
+                      className="w-100"
+                      id="brightness"
+                      name="brightness"
+                      min="-100"
+                      max="100"
+                      type="range"
+                    />
+                  </FormGroup>
+                  <FormGroup className="w-100">
+                    <Label for="contrast">Contrast</Label>
+                    <Input
+                      disabled={!tempDepthCanvas}
+                      onMouseUp={onHandleChange}
+                      className="w-100"
+                      id="contrast"
+                      name="contrast"
+                      min="0"
+                      max="100"
+                      type="range"
+                    />
+                  </FormGroup>
+                  <FormGroup className="w-100">
+                    <Label for="saturation">Saturation</Label>
+                    <Input
+                      disabled={!tempDepthCanvas}
+                      onMouseUp={onHandleChange}
+                      className="w-100"
+                      id="saturation"
+                      name="saturation"
+                      min="-100"
+                      max="100"
+                      type="range"
+                    />
+                  </FormGroup>
+                  <FormGroup className="w-100">
+                    <Label for="sharpness">Sharpness</Label>
+                    <Input
+                      disabled={!tempDepthCanvas}
+                      onMouseUp={onHandleChange}
+                      className="w-100"
+                      id="sharpness"
+                      name="sharpness"
+                      min="-100"
+                      max="100"
+                      type="range"
+                    />
+                  </FormGroup>
+                </CardBody>
+              </Card>
+            </UncontrolledCollapse>
+            <Button className="mt-4 mb-2 dropdown-button" color="secondary" id="fine-tune-toggler">
+              Fine Tune
+            </Button>
+            <UncontrolledCollapse style={{ width: "100%" }} toggler="#fine-tune-toggler">
+              <Card className="tool-ext-card">
+                <CardBody className="tool-ext-card-body">
+                  <FormGroup className="w-100">
+                    <Label for="depthRangeIntensity">Depth Intensity</Label>
+                    <Input
+                      disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                      onMouseUp={onHandleChange}
+                      className="w-100"
+                      id="depthRangeIntensity"
+                      name="depthRangeIntensity"
+                      min="-100"
+                      max="100"
+                      type="range"
+                    />
+                  </FormGroup>
+                </CardBody>
+              </Card>
+            </UncontrolledCollapse>
+            <Button className="mt-4 mb-2 dropdown-button" color="secondary" id="color-adjust-toggler">
+              Color
+            </Button>
+            <UncontrolledCollapse style={{ width: "100%" }} toggler="#color-adjust-toggler">
+              <Card className="tool-ext-card">
+                <CardBody className="tool-ext-card-body">
+                  <FormGroup className="w-100">
+                    <Label for="depthRangeIntensity">Depth Intensity</Label>
+                    <Input
+                      disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                      onMouseUp={onHandleChange}
+                      className="w-100"
+                      id="depthRangeIntensity"
+                      name="depthRangeIntensity"
+                      min="-100"
+                      max="100"
+                      type="range"
+                    />
+                  </FormGroup>
+                </CardBody>
+              </Card>
+            </UncontrolledCollapse>
+          </div>
+          <div className="w-100 mt-3 tool-ext-section">
+            <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="depth-rotate-toggler">
+              Point Curve
+            </Button>
+            <UncontrolledCollapse toggler="#depth-rotate-toggler">
+              <Card className="tool-ext-card">
+                <CardBody className="tool-ext-card-body">
+                  <PointCurve />
+                </CardBody>
+              </Card>
+            </UncontrolledCollapse>
+          </div>
 
           {/* <p className="my-3 text-white">Size</p>
           <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-crop-toggler">

@@ -16,7 +16,9 @@ import {
   getDimension,
   drawBox,
   drawScaledCanvasImage,
-  modifyBitmap
+  modifyBitmap,
+  dimensionToBox,
+  adjustTone
 } from "utils/canvasUtils";
 import { runCanvasOperations, runTempDepthOperations } from "utils/stackOperations";
 import { addEffect } from "@react-three/fiber";
@@ -120,72 +122,37 @@ class PointCurve extends Component {
       pointCurveCanvas.addEventListener("mousemove", this.moveCurve);
     });
   }
-  // componentDidUpdate(prevProps, prevState) {
-  //   let { pointCurveRef } = this;
-  //   let {
-  //     pointCurveUrl,
-  //     mainDepthCanvas,
-  //     tempDepthCanvas,
-  //     prevDepthSize,
-  //     depthCanvasDimension,
-  //     bitmapCanvas,
-  //     tools,
-  //     toolsParameters,
-  //     parameters,
-  //     operationStack,
-  //     initImage,
-  //     storeParameters,
-  //     addOperation,
-  //     removeOperation,
-  //     addEffect
-  //   } = this.props;
-  //   let depthCanvas = pointCurveRef.current;
-  //   let depthContext = depthCanvas.getContext("2d");
-
-  //   if (prevProps.tools.currentTool !== tools.currentTool) {
-  //     if (tools.currentTool) {
-  //       depthCanvas.addEventListener("click", this.drawBoundingBox);
-  //     } else {
-  //       depthCanvas.removeEventListener("click", this.drawBoundingBox);
-  //       const bitmapContext = bitmapCanvas.getContext("2d");
-  //       bitmapContext.clearRect(0, 0, bitmapCanvas.width, bitmapCanvas.height);
-  //       removeOperation({
-  //         name: "depthStack",
-  //         value: drawBox
-  //       });
-  //       storeParameters({
-  //         croppedCanvasImage: null,
-  //         croppedArea: null,
-  //         histogramParams: {
-  //           pixelRange: [0, 255],
-  //           domain: [0, 255],
-  //           values: [0, 255],
-  //           update: [0, 255]
-  //         }
-  //       });
-  //     }
-  //   }
-  //   if (
-  //     prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage ||
-  //     prevProps.tempDepthCanvas !== tempDepthCanvas
-  //   ) {
-  //     if (parameters.croppedCanvasImage) {
-  //       let histDepthData = getImageData(parameters.croppedCanvasImage);
-  //       this.setState({ data: histDepthData });
-  //     } else {
-  //       if (tempDepthCanvas) {
-  //         const boundingBox = [
-  //           depthCanvasDimension[0],
-  //           depthCanvasDimension[1],
-  //           depthCanvasDimension[2] - depthCanvasDimension[0],
-  //           depthCanvasDimension[3] - depthCanvasDimension[1]
-  //         ];
-  //         let histDepthData = getImageData(cropCanvas(tempDepthCanvas, boundingBox));
-  //         this.setState({ data: histDepthData });
-  //       }
-  //     }
-  //   }
-  // }
+  componentDidUpdate(prevProps, prevState) {
+    const pointCurveCanvas = this.pointCurveRef.current;
+    const { cp1, cp2 } = this.state;
+    const { depthCanvasDimension, parameters, addEffect } = this.props;
+    if (prevState.cp1 !== this.state.cp1 || prevState.cp2 !== this.state.cp2) {
+      const { croppedArea } = parameters;
+      if (parameters.croppedArea || depthCanvasDimension) {
+        let newArea = null;
+        let cpS = {
+          x: 0,
+          y: 0
+        };
+        let cpE = {
+          x: pointCurveCanvas.width,
+          y: pointCurveCanvas.height
+        };
+        if (croppedArea) {
+          newArea = croppedArea;
+        } else {
+          newArea = dimensionToBox(depthCanvasDimension);
+        }
+        addEffect({
+          name: "depthStack",
+          value: {
+            func: adjustTone,
+            params: [newArea, cpS, cp1, cp2, cpE]
+          }
+        });
+      }
+    }
+  }
   componentWillUnmount() {
     const pointCurveCanvas = this.pointCurveRef.current;
     pointCurveCanvas.removeEventListener("mousedown", this.selectCurve);
@@ -213,16 +180,15 @@ class PointCurve extends Component {
 }
 
 const mapStateToProps = state => ({
-  // pointCurveUrl: imageSelectors.pointCurveUrl(state),
-  // mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  // tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  // prevDepthSize: imageSelectors.prevDepthSize(state),
-  // depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
-  // bitmapCanvas: imageSelectors.bitmapCanvas(state),
-  // tools: imageSelectors.tools(state),
-  // toolsParameters: imageSelectors.toolsParameters(state),
-  // parameters: imageSelectors.parameters(state),
-  // operationStack: imageSelectors.operationStack(state)
+  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
+  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
+  prevDepthSize: imageSelectors.prevDepthSize(state),
+  depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
+  bitmapCanvas: imageSelectors.bitmapCanvas(state),
+  tools: imageSelectors.tools(state),
+  toolsParameters: imageSelectors.toolsParameters(state),
+  parameters: imageSelectors.parameters(state),
+  operationStack: imageSelectors.operationStack(state)
 });
 
 const mapDispatchToProps = {
