@@ -226,7 +226,12 @@ export const adjustTone = (image, context, boundingBox, cpS, cp1, cp2, cpE) => {
     let b = 3 * cpSx - 6 * cp1x + 3 * cp2x;
     let c = -3 * cpSx + 3 * cp1x;
     let d = cpSx - x;
-    return solveCubic(a, b, c, d)[0];
+    let solution = solveCubic(a, b, c, d);
+    for (let i = 0; i < solution.length; i++) {
+      if (solution[i] >= 0 && solution[i] <= 1.09) {
+        return solution[i];
+      }
+    }
   }
   function getD(t, cpSy, cp1y, cp2y, cpEy) {
     let y =
@@ -236,14 +241,26 @@ export const adjustTone = (image, context, boundingBox, cpS, cp1, cp2, cpE) => {
       Math.pow(t, 3) * cpEy;
     return y;
   }
-
+  function getX(x, w = 200) {
+    return (255 * x) / w;
+  }
+  function getY(y, h = 200) {
+    return (255 * (h - y)) / h;
+  }
   if (context && boundingBox && contrast) {
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
-      src[i] = getD(getT(src[i], cpS.x, cp1.x, cp2.x, cpE.x), cpS.y, cp1.y, cp2.y, cpE.y);
-      src[i + 1] = getD(getT(src[i + 1], cpS.x, cp1.x, cp2.x, cpE.x), cpS.y, cp1.y, cp2.y, cpE.y);
-      src[i + 2] = getD(getT(src[i + 2], cpS.x, cp1.x, cp2.x, cpE.x), cpS.y, cp1.y, cp2.y, cpE.y);
+      let output = getD(
+        getT(src[i], getX(cpS.x), getX(cp1.x), getX(cp2.x), getX(cpE.x)),
+        getY(cpS.y),
+        getY(cp1.y),
+        getY(cp2.y),
+        getY(cpE.y)
+      );
+      src[i] = output;
+      src[i + 1] = output;
+      src[i + 2] = output;
     }
     context.putImageData(imageData, boundingBox[0], boundingBox[1]);
   }

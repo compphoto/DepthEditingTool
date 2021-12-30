@@ -34,6 +34,10 @@ class PointCurve extends Component {
   }
   state = {
     initBoundingBox: null,
+    cpS: {
+      x: 0,
+      y: 0
+    },
     cp1: {
       x: 0,
       y: 0
@@ -42,25 +46,29 @@ class PointCurve extends Component {
       x: 0,
       y: 0
     },
+    cpE: {
+      x: 0,
+      y: 0
+    },
     selectedControl: null
   };
   drawPointCurve = () => {
-    const { cp1, cp2 } = this.state;
+    const { cpS, cp1, cp2, cpE } = this.state;
     const pointCurveCanvas = this.pointCurveRef.current;
     const pointCurveContext = pointCurveCanvas.getContext("2d");
 
     pointCurveContext.clearRect(0, 0, pointCurveCanvas.width, pointCurveCanvas.height);
     pointCurveContext.beginPath();
-    pointCurveContext.moveTo(0, 0);
-    pointCurveContext.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, pointCurveCanvas.width, pointCurveCanvas.height);
+    pointCurveContext.moveTo(cpS.x, cpS.y);
+    pointCurveContext.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, cpE.x, cpE.y);
     pointCurveContext.stroke();
 
     // Start and end points
 
     pointCurveContext.fillStyle = "blue";
     pointCurveContext.beginPath();
-    pointCurveContext.arc(0, 0, 5, 0, 2 * Math.PI); // Start point
-    pointCurveContext.arc(pointCurveCanvas.width, pointCurveCanvas.height, 5, 0, 2 * Math.PI); // End point
+    pointCurveContext.arc(cpS.x, cpS.y, 5, 0, 2 * Math.PI); // Start point
+    pointCurveContext.arc(cpE.x, cpE.y, 5, 0, 2 * Math.PI); // End point
     pointCurveContext.fill();
 
     // Control points
@@ -116,43 +124,25 @@ class PointCurve extends Component {
   };
   componentDidMount() {
     const pointCurveCanvas = this.pointCurveRef.current;
-    this.setState({ cp2: { x: pointCurveCanvas.width, y: pointCurveCanvas.height } }, () => {
-      this.drawPointCurve();
-      pointCurveCanvas.addEventListener("mousedown", this.selectCurve);
-      pointCurveCanvas.addEventListener("mousemove", this.moveCurve);
-    });
-  }
-  componentDidUpdate(prevProps, prevState) {
-    const pointCurveCanvas = this.pointCurveRef.current;
-    const { cp1, cp2 } = this.state;
-    const { depthCanvasDimension, parameters, addEffect } = this.props;
-    if (prevState.cp1 !== this.state.cp1 || prevState.cp2 !== this.state.cp2) {
-      const { croppedArea } = parameters;
-      if (parameters.croppedArea || depthCanvasDimension) {
-        let newArea = null;
-        let cpS = {
-          x: 0,
-          y: 0
-        };
-        let cpE = {
-          x: pointCurveCanvas.width,
-          y: pointCurveCanvas.height
-        };
-        if (croppedArea) {
-          newArea = croppedArea;
-        } else {
-          newArea = dimensionToBox(depthCanvasDimension);
-        }
-        addEffect({
-          name: "depthStack",
-          value: {
-            func: adjustTone,
-            params: [newArea, cpS, cp1, cp2, cpE]
-          }
-        });
+    this.setState(
+      {
+        cpS: { x: 0, y: pointCurveCanvas.width },
+        cp1: { x: 0, y: pointCurveCanvas.width },
+        cp2: { x: pointCurveCanvas.width, y: 0 },
+        cpE: { x: pointCurveCanvas.width, y: 0 }
+      },
+      () => {
+        this.drawPointCurve();
+        pointCurveCanvas.addEventListener("mousedown", this.selectCurve);
+        pointCurveCanvas.addEventListener("mousemove", this.moveCurve);
       }
-    }
+    );
   }
+  // componentDidUpdate(prevProps, prevState) {
+
+  //   if (prevState.cp1 !== this.state.cp1 || prevState.cp2 !== this.state.cp2) {
+  //   }
+  // }
   componentWillUnmount() {
     const pointCurveCanvas = this.pointCurveRef.current;
     pointCurveCanvas.removeEventListener("mousedown", this.selectCurve);
@@ -160,7 +150,8 @@ class PointCurve extends Component {
   }
   render() {
     const { pointCurveRef } = this;
-    const { selectedControl } = this.state;
+    const { cpS, cp1, cp2, cpE, selectedControl } = this.state;
+    const { depthCanvasDimension, parameters, addEffect } = this.props;
     // const depthCanvas = pointCurveRef.current;
     // const { mainDepthCanvas, parameters, tools, storeParameters, addOperation } = this.props;
     // const { scale, translatePos, startDragOffset, mouseDown } = parameters.canvasParams;
@@ -170,9 +161,29 @@ class PointCurve extends Component {
           width="200px"
           height="200px"
           ref={pointCurveRef}
-          onMouseUp={e => selectedControl && this.setState({ selectedControl: null })}
-          onMouseOver={e => selectedControl && this.setState({ selectedControl: null })}
           onMouseOut={e => selectedControl && this.setState({ selectedControl: null })}
+          onMouseOver={e => selectedControl && this.setState({ selectedControl: null })}
+          onMouseUp={e => {
+            if (selectedControl) {
+              const { croppedArea } = parameters;
+              if (parameters.croppedArea || depthCanvasDimension) {
+                let newArea = null;
+                if (croppedArea) {
+                  newArea = croppedArea;
+                } else {
+                  newArea = dimensionToBox(depthCanvasDimension);
+                }
+                addEffect({
+                  name: "depthStack",
+                  value: {
+                    func: adjustTone,
+                    params: [newArea, cpS, cp1, cp2, cpE]
+                  }
+                });
+              }
+              this.setState({ selectedControl: null });
+            }
+          }}
         ></canvas>
       </PointCurveStyle>
     );
