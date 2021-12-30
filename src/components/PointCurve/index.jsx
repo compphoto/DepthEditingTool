@@ -3,25 +3,7 @@ import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import PointCurveStyle from "./style";
-import { getImageUrl } from "utils/getImageFromFile";
-import {
-  cloneCanvas,
-  drawCanvasImage,
-  drawMainImage,
-  cropCanvas,
-  editBoundingArea,
-  highlightPixelArea,
-  editHighlightPixelArea,
-  getRatio,
-  getDimension,
-  drawBox,
-  drawScaledCanvasImage,
-  modifyBitmap,
-  dimensionToBox,
-  adjustTone
-} from "utils/canvasUtils";
-import { runCanvasOperations, runTempDepthOperations } from "utils/stackOperations";
-import { addEffect } from "@react-three/fiber";
+import { dimensionToBox, adjustTone } from "utils/canvasUtils";
 
 let objectUrl = null;
 let circle1 = new Path2D();
@@ -51,6 +33,12 @@ class PointCurve extends Component {
       y: 0
     },
     selectedControl: null
+  };
+  isPointInPath = (x1, y1, x2, y2) => {
+    if (x2 >= x1 - 15 && x2 <= x1 + 15 && y2 >= y1 - 15 && y2 <= y1 + 15) {
+      return true;
+    }
+    return false;
   };
   drawPointCurve = () => {
     const { cpS, cp1, cp2, cpE } = this.state;
@@ -111,13 +99,12 @@ class PointCurve extends Component {
     }
   };
   selectCurve = e => {
-    const pointCurveCanvas = this.pointCurveRef.current;
-    const pointCurveContext = pointCurveCanvas.getContext("2d");
+    const { cp1, cp2 } = this.state;
     let sc = null;
-    if (pointCurveContext.isPointInPath(circle1, e.layerX, e.layerY)) {
+    if (this.isPointInPath(cp1.x, cp1.y, e.layerX, e.layerY)) {
       sc = "cp1";
     }
-    if (pointCurveContext.isPointInPath(circle2, e.layerX, e.layerY)) {
+    if (this.isPointInPath(cp2.x, cp2.y, e.layerX, e.layerY)) {
       sc = "cp2";
     }
     this.setState({ selectedControl: sc });
@@ -138,11 +125,6 @@ class PointCurve extends Component {
       }
     );
   }
-  // componentDidUpdate(prevProps, prevState) {
-
-  //   if (prevState.cp1 !== this.state.cp1 || prevState.cp2 !== this.state.cp2) {
-  //   }
-  // }
   componentWillUnmount() {
     const pointCurveCanvas = this.pointCurveRef.current;
     pointCurveCanvas.removeEventListener("mousedown", this.selectCurve);
@@ -152,9 +134,6 @@ class PointCurve extends Component {
     const { pointCurveRef } = this;
     const { cpS, cp1, cp2, cpE, selectedControl } = this.state;
     const { depthCanvasDimension, parameters, addEffect } = this.props;
-    // const depthCanvas = pointCurveRef.current;
-    // const { mainDepthCanvas, parameters, tools, storeParameters, addOperation } = this.props;
-    // const { scale, translatePos, startDragOffset, mouseDown } = parameters.canvasParams;
     return (
       <PointCurveStyle>
         <canvas
@@ -191,22 +170,11 @@ class PointCurve extends Component {
 }
 
 const mapStateToProps = state => ({
-  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  prevDepthSize: imageSelectors.prevDepthSize(state),
   depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
-  bitmapCanvas: imageSelectors.bitmapCanvas(state),
-  tools: imageSelectors.tools(state),
-  toolsParameters: imageSelectors.toolsParameters(state),
-  parameters: imageSelectors.parameters(state),
-  operationStack: imageSelectors.operationStack(state)
+  parameters: imageSelectors.parameters(state)
 });
 
 const mapDispatchToProps = {
-  initImage: imageActions.initImage,
-  storeParameters: imageActions.storeParameters,
-  addOperation: imageActions.addOperation,
-  removeOperation: imageActions.removeOperation,
   addEffect: imageActions.addEffect
 };
 
