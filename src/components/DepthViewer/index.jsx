@@ -107,6 +107,7 @@ class DepthViewer extends Component {
     }
     // If operation is added to the stack, rerun all operations in operation stack
     if (prevProps.operationStack.depthStack !== operationStack.depthStack) {
+      depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
       runCanvasOperations("depthStack", mainDepthCanvas, depthContext);
       runTempDepthOperations("depthStack", mainDepthCanvas, depthCanvas.width, depthCanvas.height);
     }
