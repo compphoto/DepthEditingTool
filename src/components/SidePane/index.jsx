@@ -42,12 +42,28 @@ export function SidePane({
   removeOperation
 }) {
   const [activeTool, setActiveTool] = useState(0);
+  const [tempToolsParams, setTempToolsParams] = useState({
+    depthRangeIntensity: 0,
+    brightness: 0,
+    contrast: 0,
+    sharpness: 0
+  });
   const toggleTool = index => {
     setActiveTool(index);
   };
   const onHandleChange = e => {
     let { name, value } = e.target;
-    storeToolParameters({ [name]: value });
+    setTempToolsParams({ ...tempToolsParams, [name]: value });
+  };
+  const onHandleUpdate = e => {
+    let { name } = e.target;
+    storeToolParameters({ [name]: tempToolsParams[name] });
+  };
+  const onHandleEnter = e => {
+    let { name } = e.target;
+    if (e.key === "Enter") {
+      storeToolParameters({ [name]: tempToolsParams[name] });
+    }
   };
   const onModifyBitmap = () => {
     const { croppedCanvasImage, croppedArea, histogramParams } = parameters;
@@ -215,16 +231,31 @@ export function SidePane({
                 <CardBody className="tool-ext-card-body">
                   <FormGroup className="w-100">
                     <Label for="depthRangeIntensity">Depth Intensity</Label>
-                    <Input
-                      disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
-                      onMouseUp={onHandleChange}
-                      className="w-100"
-                      id="depthRangeIntensity"
-                      name="depthRangeIntensity"
-                      min="-100"
-                      max="100"
-                      type="range"
-                    />
+                    <div className="tool-ext-input d-flex justify-content-between w-100">
+                      <Input
+                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        onChange={onHandleChange}
+                        onMouseUp={onHandleUpdate}
+                        className="tool-ext-input-slider"
+                        id="depthRangeIntensity"
+                        name="depthRangeIntensity"
+                        min="-100"
+                        max="100"
+                        type="range"
+                        value={tempToolsParams.depthRangeIntensity}
+                      />
+                      <Input
+                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        onChange={onHandleChange}
+                        onMouseLeave={onHandleUpdate}
+                        onKeyDown={onHandleEnter}
+                        className="tool-ext-input-number"
+                        id="depthRangeIntensity"
+                        name="depthRangeIntensity"
+                        type="number"
+                        value={tempToolsParams.depthRangeIntensity}
+                      />
+                    </div>
                   </FormGroup>
                 </CardBody>
               </Card>
@@ -240,99 +271,87 @@ export function SidePane({
                 <CardBody className="tool-ext-card-body">
                   <FormGroup className="w-100">
                     <Label for="brightness">Brightness</Label>
-                    <Input
-                      disabled={!tempDepthCanvas}
-                      onMouseUp={onHandleChange}
-                      className="w-100"
-                      id="brightness"
-                      name="brightness"
-                      min="-100"
-                      max="100"
-                      type="range"
-                    />
+                    <div className="tool-ext-input d-flex justify-content-between w-100">
+                      <Input
+                        disabled={!tempDepthCanvas}
+                        onChange={onHandleChange}
+                        onMouseUp={onHandleUpdate}
+                        className="tool-ext-input-slider"
+                        id="brightness"
+                        name="brightness"
+                        min="-100"
+                        max="100"
+                        type="range"
+                        value={tempToolsParams.brightness}
+                      />
+                      <Input
+                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        onChange={onHandleChange}
+                        onMouseLeave={onHandleUpdate}
+                        onKeyDown={onHandleEnter}
+                        className="tool-ext-input-number"
+                        id="brightness"
+                        name="brightness"
+                        type="number"
+                        value={tempToolsParams.brightness}
+                      />
+                    </div>
                   </FormGroup>
                   <FormGroup className="w-100">
                     <Label for="contrast">Contrast</Label>
-                    <Input
-                      disabled={!tempDepthCanvas}
-                      onMouseUp={onHandleChange}
-                      className="w-100"
-                      id="contrast"
-                      name="contrast"
-                      min="0"
-                      max="100"
-                      type="range"
-                    />
-                  </FormGroup>
-                  <FormGroup className="w-100">
-                    <Label for="saturation">Saturation</Label>
-                    <Input
-                      disabled={!tempDepthCanvas}
-                      onMouseUp={onHandleChange}
-                      className="w-100"
-                      id="saturation"
-                      name="saturation"
-                      min="-100"
-                      max="100"
-                      type="range"
-                    />
+                    <div className="tool-ext-input d-flex justify-content-between w-100">
+                      <Input
+                        disabled={!tempDepthCanvas}
+                        onChange={onHandleChange}
+                        onMouseUp={onHandleUpdate}
+                        className="tool-ext-input-slider"
+                        id="contrast"
+                        name="contrast"
+                        min="0"
+                        max="100"
+                        type="range"
+                        value={tempToolsParams.contrast}
+                      />
+                      <Input
+                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        onChange={onHandleChange}
+                        onMouseLeave={onHandleUpdate}
+                        onKeyDown={onHandleEnter}
+                        className="tool-ext-input-number"
+                        id="contrast"
+                        name="contrast"
+                        type="number"
+                        value={tempToolsParams.contrast}
+                      />
+                    </div>
                   </FormGroup>
                   <FormGroup className="w-100">
                     <Label for="sharpness">Sharpness</Label>
-                    <Input
-                      disabled={!tempDepthCanvas}
-                      onMouseUp={onHandleChange}
-                      className="w-100"
-                      id="sharpness"
-                      name="sharpness"
-                      min="-100"
-                      max="100"
-                      type="range"
-                    />
-                  </FormGroup>
-                </CardBody>
-              </Card>
-            </UncontrolledCollapse>
-            <Button className="mt-4 mb-2 dropdown-button" color="secondary" id="fine-tune-toggler">
-              Fine Tune
-            </Button>
-            <UncontrolledCollapse style={{ width: "100%" }} toggler="#fine-tune-toggler">
-              <Card className="tool-ext-card">
-                <CardBody className="tool-ext-card-body">
-                  <FormGroup className="w-100">
-                    <Label for="depthRangeIntensity">Depth Intensity</Label>
-                    <Input
-                      disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
-                      onMouseUp={onHandleChange}
-                      className="w-100"
-                      id="depthRangeIntensity"
-                      name="depthRangeIntensity"
-                      min="-100"
-                      max="100"
-                      type="range"
-                    />
-                  </FormGroup>
-                </CardBody>
-              </Card>
-            </UncontrolledCollapse>
-            <Button className="mt-4 mb-2 dropdown-button" color="secondary" id="color-adjust-toggler">
-              Color
-            </Button>
-            <UncontrolledCollapse style={{ width: "100%" }} toggler="#color-adjust-toggler">
-              <Card className="tool-ext-card">
-                <CardBody className="tool-ext-card-body">
-                  <FormGroup className="w-100">
-                    <Label for="depthRangeIntensity">Depth Intensity</Label>
-                    <Input
-                      disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
-                      onMouseUp={onHandleChange}
-                      className="w-100"
-                      id="depthRangeIntensity"
-                      name="depthRangeIntensity"
-                      min="-100"
-                      max="100"
-                      type="range"
-                    />
+                    <div className="tool-ext-input d-flex justify-content-between w-100">
+                      <Input
+                        disabled={!tempDepthCanvas}
+                        onChange={onHandleChange}
+                        onMouseUp={onHandleUpdate}
+                        className="tool-ext-input-slider"
+                        id="sharpness"
+                        name="sharpness"
+                        min="-100"
+                        max="100"
+                        type="range"
+                        value={tempToolsParams.sharpness}
+                      />
+                      <Input
+                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        onChange={onHandleChange}
+                        onMouseLeave={onHandleUpdate}
+                        onKeyDown={onHandleEnter}
+                        className="tool-ext-input-number"
+                        id="sharpness"
+                        name="sharpness"
+                        type="number"
+                        value={tempToolsParams.sharpness}
+                      />
+                    </div>
                   </FormGroup>
                 </CardBody>
               </Card>

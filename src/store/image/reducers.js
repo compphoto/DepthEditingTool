@@ -23,7 +23,6 @@ const initialState = {
     depthRangeIntensity: 0,
     brightness: 0,
     contrast: 0,
-    saturation: 0,
     sharpness: 0
   },
   parameters: {
@@ -276,7 +275,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           depthRangeIntensity: 0,
           brightness: 0,
           contrast: 0,
-          saturation: 0,
           sharpness: 0
         },
         parameters: {

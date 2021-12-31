@@ -102,9 +102,19 @@ const SidePaneStyle = styled.div`
               justify-content: center;
               align-items: center;
             }
+            .tool-ext-input {
+              .tool-ext-input-slider {
+                width: 70%;
+              }
+              .tool-ext-input-number {
+                width: 25%;
+                padding: 0.2em;
+              }
+            }
           }
         }
       }
+
       .toggle-button {
         z-index: 1000;
         width: 14px;
