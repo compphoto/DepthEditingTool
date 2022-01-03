@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, Points } from "@react-three/drei";
 import { ToneMapping, EffectComposer } from "@react-three/postprocessing";
 import { useControls } from "leva";
 import { TextureLoader } from "three/src/loaders/TextureLoader";
@@ -8,9 +8,12 @@ import { DoubleSide } from "three";
 import { Input } from "reactstrap";
 import ThreeDViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
+import TestPCD from "assets/test.pcd";
+import PCDLoader from "utils/PCDLoader";
 
 export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   const [imageDimension, setImageDimension] = useState(1.0);
+  const [pcdPoints, setPcdPoints] = useState(false);
   const [colorMap, setColorMap] = useState(false);
   const [displacementMap, setDisplacementMap] = useState(false);
   const [angle, setAngle] = useState({
@@ -47,6 +50,16 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
     let displacementMap = new TextureLoader().setCrossOrigin("").load(depthImageCanvas);
     setDisplacementMap(displacementMap);
   }, [depthImageCanvas]);
+
+  useEffect(() => {
+    const loader = new PCDLoader();
+    loader.load(TestPCD, function (points) {
+      points.geometry.center();
+      points.geometry.rotateX(Math.PI);
+      // scene.add(points);
+      setPcdPoints(points);
+    });
+  }, []);
 
   return (
     <ThreeDViewerStyle>
