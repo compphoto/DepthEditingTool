@@ -184,6 +184,35 @@ export const editHighlightPixelArea = (image, context, canvas, depth) => {
   }
 };
 
+export const scaleSelection = (image, context, canvas, scale) => {
+  if (context && canvas && scale) {
+    const bitmapCanvas = cloneCanvas(canvas);
+    const bitmapContext = bitmapCanvas.getContext("2d");
+    const imageData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
+    const src = imageData.data;
+    let sum = 0;
+    let count = 0;
+    for (let i = 0; i < src.length; i += 4) {
+      if (src[i + 3] !== 0) {
+        sum += src[i];
+        count += 1;
+      }
+    }
+    let mean = sum / count;
+    for (let i = 0; i < src.length; i += 4) {
+      if (src[i + 3] !== 0) {
+        let output = mean + scale * (src[i] - mean);
+        src[i] = output;
+        src[i + 1] = output;
+        src[i + 2] = output;
+      }
+    }
+    bitmapContext.putImageData(imageData, 0, 0);
+    context.globalCompositeOperation = "source-over";
+    context.drawImage(bitmapCanvas, 0, 0);
+  }
+};
+
 export const editBrightness = (image, context, boundingBox, brightness) => {
   if (context && boundingBox && brightness) {
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);

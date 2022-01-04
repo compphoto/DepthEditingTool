@@ -21,7 +21,8 @@ import {
   editContrast,
   editHighlightPixelArea,
   highlightPixelArea,
-  modifyBitmap
+  modifyBitmap,
+  scaleSelection
 } from "utils/canvasUtils";
 import PointCurve from "components/PointCurve";
 
@@ -44,6 +45,7 @@ export function SidePane({
   const [activeTool, setActiveTool] = useState(0);
   const [tempToolsParams, setTempToolsParams] = useState({
     depthRangeIntensity: 0,
+    depthScale: 0,
     brightness: 0,
     contrast: 0,
     sharpness: 0
@@ -103,6 +105,17 @@ export function SidePane({
       });
     }
   }, [toolsParameters.depthRangeIntensity]);
+  useEffect(() => {
+    if (parameters.histogramParams.pixelRange && (parameters.croppedArea || depthCanvasDimension)) {
+      addEffect({
+        name: "depthStack",
+        value: {
+          func: scaleSelection,
+          params: [cloneCanvas(bitmapCanvas), toolsParameters.depthScale]
+        }
+      });
+    }
+  }, [toolsParameters.depthScale]);
   useEffect(() => {
     const { croppedArea } = parameters;
     if (croppedArea || depthCanvasDimension) {
@@ -254,6 +267,35 @@ export function SidePane({
                         name="depthRangeIntensity"
                         type="number"
                         value={tempToolsParams.depthRangeIntensity}
+                      />
+                    </div>
+                  </FormGroup>
+                  <FormGroup className="w-100">
+                    <Label for="depthScale">Depth Scale</Label>
+                    <div className="tool-ext-input d-flex justify-content-between w-100">
+                      <Input
+                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        onChange={onHandleChange}
+                        onMouseUp={onHandleUpdate}
+                        className="tool-ext-input-slider"
+                        id="depthScale"
+                        name="depthScale"
+                        min="0"
+                        max="1"
+                        step={0.01}
+                        type="range"
+                        value={tempToolsParams.depthScale}
+                      />
+                      <Input
+                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        onChange={onHandleChange}
+                        onMouseLeave={onHandleUpdate}
+                        onKeyDown={onHandleEnter}
+                        className="tool-ext-input-number"
+                        id="depthScale"
+                        name="depthScale"
+                        type="number"
+                        value={tempToolsParams.depthScale}
                       />
                     </div>
                   </FormGroup>

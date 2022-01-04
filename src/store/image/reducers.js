@@ -21,6 +21,7 @@ const initialState = {
   },
   toolsParameters: {
     depthRangeIntensity: 0,
+    depthScale: 0,
     brightness: 0,
     contrast: 0,
     sharpness: 0
@@ -273,6 +274,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         },
         toolsParameters: {
           depthRangeIntensity: 0,
+          depthScale: 0,
           brightness: 0,
           contrast: 0,
           sharpness: 0
