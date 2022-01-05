@@ -11,15 +11,18 @@ import { MdCropDin, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icon
 import { RiCheckboxMultipleBlankLine } from "react-icons/ri";
 import { BiIntersect } from "react-icons/bi";
 import { BsSubtract } from "react-icons/bs";
+import { IoIosArrowDown } from "react-icons/io";
 import {
   canvasToImage,
   cloneCanvas,
   cropCanvas,
   dimensionToBox,
   drawBox,
+  drawCanvasImage,
   editBrightness,
   editContrast,
   editHighlightPixelArea,
+  getRatio,
   highlightPixelArea,
   modifyBitmap,
   scaleSelection
@@ -36,9 +39,11 @@ export function SidePane({
   tools,
   toolsParameters,
   parameters,
+  operationStack,
   selectTool,
   storeToolParameters,
   storeParameters,
+  addLayer,
   addEffect,
   removeOperation
 }) {
@@ -94,6 +99,26 @@ export function SidePane({
       }
     });
   };
+  useEffect(() => {
+    if (activeTool === 1) {
+      const mainDiv = document.getElementById("tool-ext-layers");
+      while (mainDiv !== null && mainDiv.firstChild) {
+        mainDiv.removeChild(mainDiv.firstChild);
+      }
+      operationStack.layerStack.forEach(element => {
+        let canvas = document.createElement("canvas");
+        canvas.width = 150;
+        canvas.height = 100;
+        let context = canvas.getContext("2d");
+        let { ratio, centerShift_x, centerShift_y } = getRatio(element.bitmap, canvas);
+        drawCanvasImage(element.bitmap, context, ratio, centerShift_x, centerShift_y);
+        let div = document.createElement("div");
+        div.classList.add("tool-ext-layer");
+        div.appendChild(canvas);
+        mainDiv.appendChild(div);
+      });
+    }
+  }, [operationStack.layerStack, activeTool]);
   useEffect(() => {
     if (parameters.histogramParams.pixelRange && (parameters.croppedArea || depthCanvasDimension)) {
       addEffect({
@@ -457,43 +482,26 @@ export function SidePane({
     return (
       <>
         <div className="tool-ext mt-4 w-100">
-          <p className="mb-3 text-white">Size</p>
-          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-crop-toggler">
-            Crop
-          </Button>
-          <UncontrolledCollapse toggler="#adjust-crop-toggler">
-            <Card className="tool-ext-card">
-              <CardBody className="tool-ext-card-body">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
-                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
-                Minus, alias.
-              </CardBody>
-            </Card>
-          </UncontrolledCollapse>
-          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-rotate-toggler">
-            Rotate
-          </Button>
-          <UncontrolledCollapse toggler="#adjust-rotate-toggler">
-            <Card className="tool-ext-card">
-              <CardBody className="tool-ext-card-body">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
-                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
-                Minus, alias.
-              </CardBody>
-            </Card>
-          </UncontrolledCollapse>
-          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-resize-toggler">
-            Resize
-          </Button>
-          <UncontrolledCollapse toggler="#adjust-resize-toggler">
-            <Card className="tool-ext-card">
-              <CardBody className="tool-ext-card-body">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
-                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
-                Minus, alias.
-              </CardBody>
-            </Card>
-          </UncontrolledCollapse>
+          <div className="w-100 mt-3 tool-ext-section">
+            <Button className="mb-2 dropdown-button" color="secondary" id="depth-adjust-toggler">
+              Layers <IoIosArrowDown />
+            </Button>
+            <UncontrolledCollapse style={{ width: "100%" }} toggler="#depth-adjust-toggler">
+              <Card className="tool-ext-card">
+                <CardBody className="tool-ext-card-body">
+                  <div className="d-flex">
+                    <Button className="mx-2" size="sm" color="secondary" onClick={addLayer}>
+                      Add
+                    </Button>
+                    <Button className="mx-2" size="sm" color="secondary" onClick={addLayer}>
+                      Remove all
+                    </Button>
+                  </div>
+                  <div id="tool-ext-layers" className="my-3 tool-ext-layers"></div>
+                </CardBody>
+              </Card>
+            </UncontrolledCollapse>
+          </div>
         </div>
       </>
     );
@@ -579,7 +587,8 @@ const mapStateToProps = state => ({
   bitmapCanvas: imageSelectors.bitmapCanvas(state),
   tools: imageSelectors.tools(state),
   toolsParameters: imageSelectors.toolsParameters(state),
-  parameters: imageSelectors.parameters(state)
+  parameters: imageSelectors.parameters(state),
+  operationStack: imageSelectors.operationStack(state)
 });
 
 const mapDispatchToProps = {
@@ -588,6 +597,7 @@ const mapDispatchToProps = {
   addEffect: imageActions.addEffect,
   removeOperation: imageActions.removeOperation,
   storeParameters: imageActions.storeParameters,
+  addLayer: imageActions.addLayer,
   storeToolParameters: imageActions.storeToolParameters
 };
 

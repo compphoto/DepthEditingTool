@@ -13,6 +13,7 @@ export const selectors = {
   bitmapCanvas: state => state.image.bitmapCanvas,
   tools: state => state.image.tools,
   toolsParameters: state => state.image.toolsParameters,
+  layerParameters: state => state.image.layerParameters,
   parameters: state => state.image.parameters,
   operationStack: state => state.image.operationStack
 };

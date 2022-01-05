@@ -1,3 +1,4 @@
+import { cloneCanvas } from "utils/canvasUtils";
 import { types } from "./constants";
 
 const initialState = {
@@ -46,7 +47,8 @@ const initialState = {
   operationStack: {
     rgbStack: [],
     depthStack: [],
-    moveStack: []
+    moveStack: [],
+    layerStack: []
   }
 };
 
@@ -104,6 +106,14 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         parameters: {
           ...state.parameters,
           ...payload
+        }
+      };
+    case types.ADD_LAYER:
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          layerStack: [...state.operationStack.layerStack, { depth: 0, bitmap: cloneCanvas(state.bitmapCanvas) }]
         }
       };
     case types.ADD_OPERATION:
@@ -299,7 +309,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         operationStack: {
           rgbStack: [],
           depthStack: [],
-          moveStack: []
+          moveStack: [],
+          layerStack: []
         }
       };
       return {

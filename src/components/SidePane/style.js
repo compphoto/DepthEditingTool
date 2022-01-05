@@ -112,6 +112,15 @@ const SidePaneStyle = styled.div`
               }
             }
           }
+          .tool-ext-layers {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            .tool-ext-layer {
+              border: 2px solid white;
+            }
+          }
         }
       }
 
