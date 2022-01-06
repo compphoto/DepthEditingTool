@@ -134,7 +134,7 @@ export function ImageEditor({
               </Button>
               <Button
                 onClick={() => {
-                  let image = canvasToImage(mainDepthCanvas);
+                  let image = canvasToImage(tempDepthCanvas);
                   window.location.href = image;
                 }}
                 size="sm"
