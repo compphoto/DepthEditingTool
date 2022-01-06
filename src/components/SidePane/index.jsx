@@ -13,6 +13,7 @@ import { BiIntersect } from "react-icons/bi";
 import { BsSubtract } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
 import {
+  addScaleShift,
   canvasToImage,
   cloneCanvas,
   cropCanvas,
@@ -187,6 +188,24 @@ export function SidePane({
       });
     }
   }, [toolsParameters.contrast]);
+  useEffect(() => {
+    const { croppedArea } = parameters;
+    if (croppedArea || depthCanvasDimension) {
+      let newArea = null;
+      if (croppedArea) {
+        newArea = croppedArea;
+      } else {
+        newArea = dimensionToBox(depthCanvasDimension);
+      }
+      addEffect({
+        name: "depthStack",
+        value: {
+          func: addScaleShift,
+          params: [newArea, toolsParameters.aConstant, toolsParameters.bConstant]
+        }
+      });
+    }
+  }, [toolsParameters.aConstant, toolsParameters.bConstant]);
   const adjust = () => {
     return (
       <>
@@ -453,7 +472,8 @@ export function SidePane({
                         id="aConstant"
                         name="aConstant"
                         min="0"
-                        max="100"
+                        max="2"
+                        step={0.01}
                         type="range"
                         value={tempToolsParams.aConstant}
                       />
@@ -481,7 +501,8 @@ export function SidePane({
                         id="bConstant"
                         name="bConstant"
                         min="0"
-                        max="100"
+                        max="2"
+                        step={0.01}
                         type="range"
                         value={tempToolsParams.bConstant}
                       />
