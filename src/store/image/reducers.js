@@ -118,6 +118,26 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           layerStack: [...state.operationStack.layerStack, { depth: 0, bitmap: cloneCanvas(state.bitmapCanvas) }]
         }
       };
+    case types.REMOVE_LAYER:
+      var newLayerStack = [...state.operationStack.layerStack];
+      if (payload !== -1) {
+        newLayerStack.splice(payload, 1);
+      }
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          layerStack: newLayerStack
+        }
+      };
+    case types.REMOVE_ALL_LAYER:
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          layerStack: []
+        }
+      };
     case types.ADD_OPERATION:
       var { name, value } = payload;
       var array = state.operationStack[name];

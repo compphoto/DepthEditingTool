@@ -45,6 +45,8 @@ export function SidePane({
   storeToolParameters,
   storeParameters,
   addLayer,
+  removeLayer,
+  removeAllLayers,
   addEffect,
   removeOperation
 }) {
@@ -119,6 +121,7 @@ export function SidePane({
             <div
               onClick={e => {
                 e.stopPropagation();
+                removeLayer(key);
               }}
               className="remove-layer"
             >
@@ -580,7 +583,7 @@ export function SidePane({
                     <Button className="mx-2" size="sm" color="secondary" onClick={addLayer}>
                       Add
                     </Button>
-                    <Button className="mx-2" size="sm" color="secondary" onClick={addLayer}>
+                    <Button className="mx-2" size="sm" color="secondary" onClick={removeAllLayers}>
                       Remove all
                     </Button>
                   </div>
@@ -687,6 +690,8 @@ const mapDispatchToProps = {
   removeOperation: imageActions.removeOperation,
   storeParameters: imageActions.storeParameters,
   addLayer: imageActions.addLayer,
+  removeLayer: imageActions.removeLayer,
+  removeAllLayers: imageActions.removeAllLayers,
   storeToolParameters: imageActions.storeToolParameters
 };
 
