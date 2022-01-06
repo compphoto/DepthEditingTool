@@ -7,7 +7,7 @@ import { selectors as imageSelectors } from "store/image";
 import { Button, UncontrolledCollapse, CardBody, Card, FormGroup, Label, Input } from "reactstrap";
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
-import { MdCropDin, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import { MdCropDin, MdKeyboardArrowLeft, MdKeyboardArrowRight, MdCancel } from "react-icons/md";
 import { RiCheckboxMultipleBlankLine } from "react-icons/ri";
 import { BiIntersect } from "react-icons/bi";
 import { BsSubtract } from "react-icons/bs";
@@ -48,6 +48,7 @@ export function SidePane({
   removeOperation
 }) {
   const [activeTool, setActiveTool] = useState(0);
+  const [layers, setLayers] = useState(null);
   const [tempToolsParams, setTempToolsParams] = useState({
     depthRangeIntensity: 0,
     depthScale: 0,
@@ -101,22 +102,29 @@ export function SidePane({
   };
   useEffect(() => {
     if (activeTool === 1) {
-      const mainDiv = document.getElementById("tool-ext-layers");
-      while (mainDiv !== null && mainDiv.firstChild) {
-        mainDiv.removeChild(mainDiv.firstChild);
-      }
-      operationStack.layerStack.forEach(element => {
+      let tempLayer = operationStack.layerStack.map((element, key) => {
         let canvas = document.createElement("canvas");
         canvas.width = 150;
         canvas.height = 100;
         let context = canvas.getContext("2d");
         let { ratio, centerShift_x, centerShift_y } = getRatio(element.bitmap, canvas);
         drawCanvasImage(element.bitmap, context, ratio, centerShift_x, centerShift_y);
-        let div = document.createElement("div");
-        div.classList.add("tool-ext-layer");
-        div.appendChild(canvas);
-        mainDiv.appendChild(div);
+        let image = canvasToImage(canvas);
+        return (
+          <div key={key} className="my-2 tool-ext-layer">
+            <img src={image} width="150px" height="auto" />
+            <div
+              onClick={e => {
+                e.stopPropagation();
+              }}
+              className="remove-layer"
+            >
+              <MdCancel />
+            </div>
+          </div>
+        );
       });
+      setLayers(tempLayer);
     }
   }, [operationStack.layerStack, activeTool]);
   useEffect(() => {
@@ -497,7 +505,9 @@ export function SidePane({
                       Remove all
                     </Button>
                   </div>
-                  <div id="tool-ext-layers" className="my-3 tool-ext-layers"></div>
+                  <div id="tool-ext-layers" className="my-3 tool-ext-layers">
+                    {layers || null}
+                  </div>
                 </CardBody>
               </Card>
             </UncontrolledCollapse>
