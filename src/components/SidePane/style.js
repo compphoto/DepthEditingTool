@@ -123,6 +123,9 @@ const SidePaneStyle = styled.div`
               border-radius: 4px;
               width: 100%;
               overflow: hidden;
+              img {
+                width: 100%;
+              }
               .remove-layer {
                 display: none;
                 color: #7e838e;

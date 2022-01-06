@@ -115,7 +115,7 @@ export function SidePane({
         let image = canvasToImage(canvas);
         return (
           <div key={key} className="my-2 tool-ext-layer">
-            <img src={image} width="150px" height="auto" />
+            <img src={image} />
             <div
               onClick={e => {
                 e.stopPropagation();
