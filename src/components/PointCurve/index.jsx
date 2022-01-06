@@ -145,7 +145,7 @@ class PointCurve extends Component {
           onMouseUp={e => {
             if (selectedControl) {
               const { croppedArea } = parameters;
-              if (parameters.croppedArea || depthCanvasDimension) {
+              if (croppedArea || depthCanvasDimension) {
                 let newArea = null;
                 if (croppedArea) {
                   newArea = croppedArea;
