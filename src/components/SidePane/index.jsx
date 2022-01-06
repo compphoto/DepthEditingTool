@@ -64,7 +64,7 @@ export function SidePane({
   };
   const onHandleChange = e => {
     let { name, value } = e.target;
-    setTempToolsParams({ ...tempToolsParams, [name]: value });
+    setTempToolsParams({ ...tempToolsParams, [name]: +value });
   };
   const onHandleUpdate = e => {
     let { name } = e.target;

@@ -296,11 +296,11 @@ export const adjustTone = (image, context, boundingBox, cpS, cp1, cp2, cpE) => {
 };
 
 export const addScaleShift = (image, context, boundingBox, a, b) => {
-  if (context && boundingBox && a && b) {
+  if (context && boundingBox) {
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
-      let output = a * src[i] + b;
+      let output = a * src[i] + 255 * (b / 2);
       src[i] = output;
       src[i + 1] = output;
       src[i + 2] = output;
