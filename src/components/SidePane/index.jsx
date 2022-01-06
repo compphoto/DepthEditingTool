@@ -54,7 +54,9 @@ export function SidePane({
     depthScale: 0,
     brightness: 0,
     contrast: 0,
-    sharpness: 0
+    sharpness: 0,
+    aConstant: 0,
+    bConstant: 0
   });
   const toggleTool = index => {
     setActiveTool(index);
@@ -440,6 +442,62 @@ export function SidePane({
               <Card className="tool-ext-card">
                 <CardBody className="tool-ext-card-body">
                   <PointCurve />
+                  <FormGroup className="w-100">
+                    <Label for="aConstant">A</Label>
+                    <div className="tool-ext-input d-flex justify-content-between w-100">
+                      <Input
+                        disabled={!tempDepthCanvas}
+                        onChange={onHandleChange}
+                        onMouseUp={onHandleUpdate}
+                        className="tool-ext-input-slider"
+                        id="aConstant"
+                        name="aConstant"
+                        min="0"
+                        max="100"
+                        type="range"
+                        value={tempToolsParams.aConstant}
+                      />
+                      <Input
+                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        onChange={onHandleChange}
+                        onMouseLeave={onHandleUpdate}
+                        onKeyDown={onHandleEnter}
+                        className="tool-ext-input-number"
+                        id="aConstant"
+                        name="aConstant"
+                        type="number"
+                        value={tempToolsParams.aConstant}
+                      />
+                    </div>
+                  </FormGroup>
+                  <FormGroup className="w-100">
+                    <Label for="bConstant">B</Label>
+                    <div className="tool-ext-input d-flex justify-content-between w-100">
+                      <Input
+                        disabled={!tempDepthCanvas}
+                        onChange={onHandleChange}
+                        onMouseUp={onHandleUpdate}
+                        className="tool-ext-input-slider"
+                        id="bConstant"
+                        name="bConstant"
+                        min="0"
+                        max="100"
+                        type="range"
+                        value={tempToolsParams.bConstant}
+                      />
+                      <Input
+                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        onChange={onHandleChange}
+                        onMouseLeave={onHandleUpdate}
+                        onKeyDown={onHandleEnter}
+                        className="tool-ext-input-number"
+                        id="bConstant"
+                        name="bConstant"
+                        type="number"
+                        value={tempToolsParams.bConstant}
+                      />
+                    </div>
+                  </FormGroup>
                 </CardBody>
               </Card>
             </UncontrolledCollapse>

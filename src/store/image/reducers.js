@@ -25,7 +25,9 @@ const initialState = {
     depthScale: 0,
     brightness: 0,
     contrast: 0,
-    sharpness: 0
+    sharpness: 0,
+    aConstant: 0,
+    bConstant: 0
   },
   parameters: {
     croppedCanvasImage: null,
@@ -287,7 +289,9 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           depthScale: 0,
           brightness: 0,
           contrast: 0,
-          sharpness: 0
+          sharpness: 0,
+          aConstant: 0,
+          bConstant: 0
         },
         parameters: {
           croppedCanvasImage: null,
