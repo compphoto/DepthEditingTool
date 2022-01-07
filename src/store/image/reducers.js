@@ -13,6 +13,7 @@ const initialState = {
   rgbCanvasDimension: null,
   depthCanvasDimension: null,
   bitmapCanvas: document.createElement("canvas"),
+  layerMode: false,
   tools: {
     currentTool: null,
     singleSelection: false,
@@ -109,6 +110,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           ...state.parameters,
           ...payload
         }
+      };
+    case types.TOGGLE_LAYER_MODE:
+      return {
+        ...state,
+        layerMode: !state.layerMode
       };
     case types.ADD_LAYER:
       return {
@@ -297,6 +303,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         rgbCanvasDimension: null,
         depthCanvasDimension: null,
         bitmapCanvas: document.createElement("canvas"),
+        layerMode: false,
         tools: {
           currentTool: null,
           singleSelection: false,

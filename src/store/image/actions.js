@@ -6,6 +6,7 @@ export const imageActions = {
   selectTool: payload => ({ type: types.SELECT_TOOL, payload: payload }),
   storeToolParameters: payload => ({ type: types.STORE_TOOL_PARAMETERS, payload: payload }),
   storeParameters: payload => ({ type: types.STORE_PARAMETERS, payload: payload }),
+  toggleLayerMode: () => ({ type: types.TOGGLE_LAYER_MODE }),
   addLayer: () => ({ type: types.ADD_LAYER }),
   removeLayer: key => ({ type: types.REMOVE_LAYER, payload: key }),
   removeAllLayers: () => ({ type: types.REMOVE_ALL_LAYER }),

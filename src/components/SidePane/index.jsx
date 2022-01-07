@@ -37,6 +37,7 @@ export function SidePane({
   tempDepthCanvas,
   depthCanvasDimension,
   bitmapCanvas,
+  layerMode,
   tools,
   toolsParameters,
   parameters,
@@ -44,6 +45,7 @@ export function SidePane({
   selectTool,
   storeToolParameters,
   storeParameters,
+  toggleLayerMode,
   addLayer,
   removeLayer,
   removeAllLayers,
@@ -579,10 +581,14 @@ export function SidePane({
             <UncontrolledCollapse style={{ width: "100%" }} toggler="#depth-adjust-toggler">
               <Card className="tool-ext-card">
                 <CardBody className="tool-ext-card-body">
+                  <Button className="mb-4" size="sm" color="secondary" onClick={toggleLayerMode}>
+                    Layer Mode ({layerMode ? "ON" : "OFF"})
+                  </Button>
                   <div className="d-flex">
                     <Button className="mx-2" size="sm" color="secondary" onClick={addLayer}>
                       Add
                     </Button>
+
                     <Button className="mx-2" size="sm" color="secondary" onClick={removeAllLayers}>
                       Remove all
                     </Button>
@@ -677,6 +683,7 @@ const mapStateToProps = state => ({
   tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
   depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
   bitmapCanvas: imageSelectors.bitmapCanvas(state),
+  layerMode: imageSelectors.layerMode(state),
   tools: imageSelectors.tools(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),
@@ -689,6 +696,7 @@ const mapDispatchToProps = {
   addEffect: imageActions.addEffect,
   removeOperation: imageActions.removeOperation,
   storeParameters: imageActions.storeParameters,
+  toggleLayerMode: imageActions.toggleLayerMode,
   addLayer: imageActions.addLayer,
   removeLayer: imageActions.removeLayer,
   removeAllLayers: imageActions.removeAllLayers,

@@ -11,6 +11,7 @@ export const selectors = {
   depthCanvasDimension: state => state.image.depthCanvasDimension,
   depthCanvasDimension: state => state.image.depthCanvasDimension,
   bitmapCanvas: state => state.image.bitmapCanvas,
+  layerMode: state => state.image.layerMode,
   tools: state => state.image.tools,
   toolsParameters: state => state.image.toolsParameters,
   layerParameters: state => state.image.layerParameters,

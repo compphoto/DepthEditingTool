@@ -18,8 +18,12 @@ import {
   drawScaledCanvasImage,
   modifyBitmap
 } from "utils/canvasUtils";
-import { runCanvasOperations, runTempDepthOperations } from "utils/stackOperations";
-import { addEffect } from "@react-three/fiber";
+import {
+  runCanvasOperations,
+  runLayerOperations,
+  runTempDepthOperations,
+  runTempLayerOperations
+} from "utils/stackOperations";
 
 let objectUrl = null;
 
@@ -50,6 +54,7 @@ class DepthViewer extends Component {
       prevDepthSize,
       depthCanvasDimension,
       bitmapCanvas,
+      layerMode,
       tools,
       toolsParameters,
       parameters,
@@ -106,10 +111,19 @@ class DepthViewer extends Component {
       });
     }
     // If operation is added to the stack, rerun all operations in operation stack
-    if (prevProps.operationStack.depthStack !== operationStack.depthStack) {
-      depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
-      runCanvasOperations("depthStack", mainDepthCanvas, depthContext);
-      runTempDepthOperations("depthStack", mainDepthCanvas, depthCanvas.width, depthCanvas.height);
+    if (prevProps.operationStack.depthStack !== operationStack.depthStack || prevProps.layerMode !== layerMode) {
+      if (!layerMode) {
+        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
+        runCanvasOperations("depthStack", mainDepthCanvas, depthContext);
+        runTempDepthOperations("depthStack", mainDepthCanvas, depthCanvas.width, depthCanvas.height);
+      }
+    }
+    if (prevProps.operationStack.layerStack !== operationStack.layerStack || prevProps.layerMode !== layerMode) {
+      if (layerMode) {
+        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
+        runLayerOperations(depthContext);
+        runTempLayerOperations(depthCanvas.width, depthCanvas.height);
+      }
     }
     // If operation is added to the move stack, rerun all operations in operation stack
     if (prevProps.operationStack.moveStack !== operationStack.moveStack) {
@@ -137,27 +151,6 @@ class DepthViewer extends Component {
         });
       }
     }
-    // if (prevProps.toolsParameters.depthRangeIntensity !== toolsParameters.depthRangeIntensity) {
-    //   if (
-    //     toolsParameters.depthRangeIntensity &&
-    //     parameters.histogramParams.pixelRange &&
-    //     (parameters.croppedArea || depthCanvasDimension)
-    //   ) {
-    //     const { croppedArea, histogramParams.pixelRange } = parameters;
-    //     let newArea = null;
-    //     if (croppedArea) {
-    //       newArea = croppedArea;
-    //     } else {
-    //       newArea = [
-    //         depthCanvasDimension[0],
-    //         depthCanvasDimension[1],
-    //         depthCanvasDimension[2] - depthCanvasDimension[0],
-    //         depthCanvasDimension[3] - depthCanvasDimension[1]
-    //       ];
-    //     }
-    //     editHighlightPixelArea(newArea, depthContext, histogramParams.pixelRange, toolsParameters.depthRangeIntensity);
-    //   }
-    // }
     // Listens for mouse movements around the depth canvas and draw bounding box
     if (prevProps.tools.currentTool !== tools.currentTool) {
       if (tools.currentTool) {
@@ -350,6 +343,7 @@ const mapStateToProps = state => ({
   prevDepthSize: imageSelectors.prevDepthSize(state),
   depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
   bitmapCanvas: imageSelectors.bitmapCanvas(state),
+  layerMode: imageSelectors.layerMode(state),
   tools: imageSelectors.tools(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),

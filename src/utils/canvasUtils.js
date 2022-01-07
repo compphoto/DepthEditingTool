@@ -111,7 +111,7 @@ export const drawBox = (image, context, new_x, new_y, new_w, new_h) => {
 };
 
 export const highlightPixelArea = (image, context, boundingBox, pixelRange) => {
-  if (context && boundingBox && pixelRange) {
+  if (context && boundingBox) {
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
@@ -126,7 +126,7 @@ export const highlightPixelArea = (image, context, boundingBox, pixelRange) => {
 };
 
 export const highlightPixelAreaRgb = (image, rgbContext, depthContext, boundingBox, pixelRange) => {
-  if (rgbContext && depthContext && boundingBox && pixelRange) {
+  if (rgbContext && depthContext && boundingBox) {
     const imageData = rgbContext.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const rgbSrc = imageData.data;
     const depthSrc = depthContext.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]).data;
@@ -166,7 +166,7 @@ export const modifyBitmap = (bitmapCanvas, croppedCanvas, box, currentTool, pixe
 };
 
 export const editHighlightPixelArea = (image, context, canvas, depth) => {
-  if (context && canvas && depth) {
+  if (context && canvas) {
     const bitmapCanvas = cloneCanvas(canvas);
     const bitmapContext = bitmapCanvas.getContext("2d");
     const imageData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
@@ -185,7 +185,7 @@ export const editHighlightPixelArea = (image, context, canvas, depth) => {
 };
 
 export const scaleSelection = (image, context, canvas, scale) => {
-  if (context && canvas && scale) {
+  if (context && canvas) {
     const bitmapCanvas = cloneCanvas(canvas);
     const bitmapContext = bitmapCanvas.getContext("2d");
     const imageData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
@@ -214,7 +214,7 @@ export const scaleSelection = (image, context, canvas, scale) => {
 };
 
 export const editBrightness = (image, context, boundingBox, brightness) => {
-  if (context && boundingBox && brightness) {
+  if (context && boundingBox) {
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
@@ -236,7 +236,7 @@ export const editContrast = (image, context, boundingBox, contrast) => {
     return value;
   }
 
-  if (context && boundingBox && contrast) {
+  if (context && boundingBox) {
     const factor = (259.0 * (contrast + 255.0)) / (255.0 * (259.0 - contrast));
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const src = imageData.data;
@@ -276,7 +276,7 @@ export const adjustTone = (image, context, boundingBox, cpS, cp1, cp2, cpE) => {
   function getY(y, h = 200) {
     return (255 * (h - y)) / h;
   }
-  if (context && boundingBox && contrast) {
+  if (context && boundingBox) {
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
