@@ -34,7 +34,12 @@ export const runTempDepthOperations = (name, image, width, height) => {
     }
   });
   const storeAction = require("store/store");
-  storeAction.default.dispatch(imageActions.initImage({ tempDepthCanvas: cloneCanvas(canvas) }));
+  let bitmapCanvas = store.getState().image.bitmapCanvas;
+  let data = {
+    tempDepthCanvas: cloneCanvas(canvas),
+    bitmapCanvas: bitmapCanvas === null ? cloneCanvas(canvas) : bitmapCanvas
+  };
+  storeAction.default.dispatch(imageActions.initImage(data));
 };
 
 export const runLayerOperations = context => {

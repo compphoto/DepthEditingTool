@@ -38,10 +38,6 @@ class DepthViewer extends Component {
     initBoundingBox: null
   };
   componentDidMount() {
-    const { bitmapCanvas } = this.props;
-    const depthCanvas = this.depthImageRef.current;
-    bitmapCanvas.width = depthCanvas.width;
-    bitmapCanvas.height = depthCanvas.height;
     this.handleResize();
     window.addEventListener("resize", this.handleResize);
   }

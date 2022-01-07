@@ -12,7 +12,7 @@ const initialState = {
   prevDepthSize: { width: null, height: null },
   rgbCanvasDimension: null,
   depthCanvasDimension: null,
-  bitmapCanvas: document.createElement("canvas"),
+  bitmapCanvas: null,
   layerMode: false,
   tools: {
     currentTool: null,
@@ -302,7 +302,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         prevDepthSize: { width: null, height: null },
         rgbCanvasDimension: null,
         depthCanvasDimension: null,
-        bitmapCanvas: document.createElement("canvas"),
+        bitmapCanvas: null,
         layerMode: false,
         tools: {
           currentTool: null,
