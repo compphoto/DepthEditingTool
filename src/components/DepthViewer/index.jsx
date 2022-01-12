@@ -20,9 +20,9 @@ import {
 } from "utils/canvasUtils";
 import {
   runCanvasOperations,
-  runLayerOperations,
+  runDepthLayerOperations,
   runTempDepthOperations,
-  runTempLayerOperations
+  runTempDepthLayerOperations
 } from "utils/stackOperations";
 
 let objectUrl = null;
@@ -117,8 +117,8 @@ class DepthViewer extends Component {
     if (prevProps.operationStack.layerStack !== operationStack.layerStack || prevProps.layerMode !== layerMode) {
       if (layerMode) {
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
-        runLayerOperations(depthContext);
-        runTempLayerOperations(depthCanvas.width, depthCanvas.height);
+        runDepthLayerOperations(depthContext);
+        runTempDepthLayerOperations(depthCanvas.width, depthCanvas.height);
       }
     }
     // If operation is added to the move stack, rerun all operations in operation stack
@@ -218,6 +218,7 @@ class DepthViewer extends Component {
     }
   };
   drawBoundingBox = event => {
+    let depthCanvas = this.depthImageRef.current;
     let { initBoundingBox } = this.state;
     let { tempDepthCanvas, depthCanvasDimension, storeParameters, addOperation, removeOperation } = this.props;
     if (tempDepthCanvas) {
@@ -231,6 +232,7 @@ class DepthViewer extends Component {
         let new_h = Math.min(Math.max(initBoundingBox.y, y), image_y2) - new_y;
         let croppedArea = [new_x, new_y, new_w, new_h];
         this.setState({ initBoundingBox: null }, () => {
+          depthCanvas.style.cursor = "default";
           storeParameters({ croppedCanvasImage: cropCanvas(tempDepthCanvas, croppedArea), croppedArea: croppedArea });
           addOperation({
             name: "depthStack",
@@ -239,6 +241,7 @@ class DepthViewer extends Component {
         });
       } else {
         this.setState({ initBoundingBox: { x, y } }, () => {
+          depthCanvas.style.cursor = "crosshair";
           storeParameters({
             histogramParams: {
               pixelRange: [0, 255],

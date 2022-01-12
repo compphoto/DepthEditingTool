@@ -110,6 +110,13 @@ export const drawBox = (image, context, new_x, new_y, new_w, new_h) => {
   context.stroke();
 };
 
+export const getRgbBitmap = (bitmapCanvas, rgbCanvas) => {
+  const bitmapContext = bitmapCanvas.getContext("2d");
+  bitmapContext.globalCompositeOperation = "source-in";
+  bitmapContext.drawImage(rgbCanvas, 0, 0);
+  return bitmapCanvas;
+};
+
 export const highlightPixelArea = (image, context, boundingBox, pixelRange) => {
   if (context && boundingBox) {
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
@@ -181,6 +188,7 @@ export const editHighlightPixelArea = (image, context, canvas, depth) => {
     bitmapContext.putImageData(imageData, 0, 0);
     context.globalCompositeOperation = "source-over";
     context.drawImage(bitmapCanvas, 0, 0);
+    return bitmapCanvas;
   }
 };
 
@@ -210,6 +218,7 @@ export const scaleSelection = (image, context, canvas, scale) => {
     bitmapContext.putImageData(imageData, 0, 0);
     context.globalCompositeOperation = "source-over";
     context.drawImage(bitmapCanvas, 0, 0);
+    return bitmapCanvas;
   }
 };
 

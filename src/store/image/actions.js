@@ -8,6 +8,7 @@ export const imageActions = {
   storeParameters: payload => ({ type: types.STORE_PARAMETERS, payload: payload }),
   toggleLayerMode: () => ({ type: types.TOGGLE_LAYER_MODE }),
   addLayer: () => ({ type: types.ADD_LAYER }),
+  updateLayer: layer => ({ type: types.UPDATE_LAYER, payload: layer }),
   removeLayer: key => ({ type: types.REMOVE_LAYER, payload: key }),
   removeAllLayers: () => ({ type: types.REMOVE_ALL_LAYER }),
   addOperation: payload => ({ type: types.ADD_OPERATION, payload: payload }),

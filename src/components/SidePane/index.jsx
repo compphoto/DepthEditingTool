@@ -47,6 +47,7 @@ export function SidePane({
   storeParameters,
   toggleLayerMode,
   addLayer,
+  updateLayer,
   removeLayer,
   removeAllLayers,
   addEffect,
@@ -63,6 +64,7 @@ export function SidePane({
     aConstant: 0,
     bConstant: 0
   });
+  const [tempLayerStack, setTempLayerStack] = useState([]);
   const toggleTool = index => {
     setActiveTool(index);
   };
@@ -78,6 +80,25 @@ export function SidePane({
     let { name } = e.target;
     if (e.key === "Enter") {
       storeToolParameters({ [name]: tempToolsParams[name] });
+    }
+  };
+  const onHandleLayerChange = e => {
+    let { name, value } = e.target;
+    let [key, index] = name.split("-");
+    let items = [...tempLayerStack];
+    let item = {
+      ...tempLayerStack[+index],
+      [key]: +value
+    };
+    items[+index] = item;
+    setTempLayerStack(items);
+  };
+  const onHandleLayerUpdate = e => {
+    updateLayer(tempLayerStack);
+  };
+  const onHandleLayerEnter = e => {
+    if (e.key === "Enter") {
+      updateLayer(tempLayerStack);
     }
   };
   const onModifyBitmap = () => {
@@ -96,6 +117,10 @@ export function SidePane({
       name: "depthStack",
       value: drawBox
     });
+    removeOperation({
+      name: "rgbStack",
+      value: drawBox
+    });
     storeParameters({
       croppedCanvasImage: null,
       croppedArea: null,
@@ -108,8 +133,11 @@ export function SidePane({
     });
   };
   useEffect(() => {
+    setTempLayerStack([...operationStack.layerStack]);
+  }, [operationStack.layerStack]);
+  useEffect(() => {
     if (activeTool === 1) {
-      let tempLayer = operationStack.layerStack.map((element, key) => {
+      let tempLayer = tempLayerStack.map((element, key) => {
         let canvas = document.createElement("canvas");
         canvas.width = 150;
         canvas.height = 100;
@@ -118,7 +146,7 @@ export function SidePane({
         drawCanvasImage(element.bitmap, context, ratio, centerShift_x, centerShift_y);
         let image = canvasToImage(canvas);
         return (
-          <div key={key} className="my-2 tool-ext-layer">
+          <div key={key} className="p-2 my-2 tool-ext-layer">
             <img src={image} />
             <div
               onClick={e => {
@@ -129,12 +157,67 @@ export function SidePane({
             >
               <MdCancel />
             </div>
+            <FormGroup className="w-100">
+              <Label for={`depth-${key}`}>Depth</Label>
+              <div className="tool-ext-input d-flex justify-content-between w-100">
+                <Input
+                  onChange={onHandleLayerChange}
+                  onMouseUp={onHandleLayerUpdate}
+                  className="tool-ext-input-slider"
+                  id={`depth-${key}`}
+                  name={`depth-${key}`}
+                  min="-100"
+                  max="100"
+                  type="range"
+                  value={tempLayerStack[key]["depth"]}
+                />
+                <Input
+                  onChange={onHandleLayerChange}
+                  onMouseLeave={onHandleLayerUpdate}
+                  onKeyDown={onHandleLayerEnter}
+                  size="sm"
+                  className="tool-ext-input-number"
+                  id={`depth-${key}`}
+                  name={`depth-${key}`}
+                  type="number"
+                  value={tempLayerStack[key]["depth"]}
+                />
+              </div>
+            </FormGroup>
+            <FormGroup className="w-100">
+              <Label for={`detail-${key}`}>Detail</Label>
+              <div className="mt-2 tool-ext-input d-flex justify-content-between w-100">
+                <Input
+                  onChange={onHandleLayerChange}
+                  onMouseUp={onHandleLayerUpdate}
+                  className="tool-ext-input-slider"
+                  id={`detail-${key}`}
+                  name={`detail-${key}`}
+                  min="0"
+                  max="1"
+                  step={0.01}
+                  type="range"
+                  value={tempLayerStack[key]["detail"]}
+                />
+                <Input
+                  onChange={onHandleLayerChange}
+                  onMouseLeave={onHandleLayerUpdate}
+                  onKeyDown={onHandleLayerEnter}
+                  size="sm"
+                  className="tool-ext-input-number"
+                  id={`detail-${key}`}
+                  name={`detail-${key}`}
+                  type="number"
+                  value={tempLayerStack[key]["detail"]}
+                />
+              </div>
+            </FormGroup>
           </div>
         );
       });
       setLayers(tempLayer);
     }
-  }, [operationStack.layerStack, activeTool]);
+  }, [tempLayerStack, activeTool]);
   useEffect(() => {
     if (parameters.histogramParams.pixelRange && (parameters.croppedArea || depthCanvasDimension)) {
       addEffect({
@@ -330,7 +413,7 @@ export function SidePane({
                     </div>
                   </FormGroup>
                   <FormGroup className="w-100">
-                    <Label for="depthScale">Depth Scale</Label>
+                    <Label for="depthScale">Depth Detail</Label>
                     <div className="tool-ext-input d-flex justify-content-between w-100">
                       <Input
                         disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
@@ -698,6 +781,7 @@ const mapDispatchToProps = {
   storeParameters: imageActions.storeParameters,
   toggleLayerMode: imageActions.toggleLayerMode,
   addLayer: imageActions.addLayer,
+  updateLayer: imageActions.updateLayer,
   removeLayer: imageActions.removeLayer,
   removeAllLayers: imageActions.removeAllLayers,
   storeToolParameters: imageActions.storeToolParameters

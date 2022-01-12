@@ -1,4 +1,4 @@
-import { cloneCanvas } from "utils/canvasUtils";
+import { cloneCanvas, getRgbBitmap } from "utils/canvasUtils";
 import { types } from "./constants";
 
 const initialState = {
@@ -121,7 +121,23 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         ...state,
         operationStack: {
           ...state.operationStack,
-          layerStack: [...state.operationStack.layerStack, { depth: 0, bitmap: cloneCanvas(state.bitmapCanvas) }]
+          layerStack: [
+            ...state.operationStack.layerStack,
+            {
+              depth: 0,
+              detail: 1,
+              bitmap: cloneCanvas(state.bitmapCanvas),
+              rgbBitmap: getRgbBitmap(cloneCanvas(state.bitmapCanvas), cloneCanvas(state.tempRgbCanvas))
+            }
+          ]
+        }
+      };
+    case types.UPDATE_LAYER:
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          layerStack: [...payload]
         }
       };
     case types.REMOVE_LAYER:

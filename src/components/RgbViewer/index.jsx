@@ -12,7 +12,12 @@ import {
   getRatio,
   highlightPixelAreaRgb
 } from "utils/canvasUtils";
-import { runCanvasOperations, runTempRgbOperations } from "utils/stackOperations";
+import {
+  runCanvasOperations,
+  runRgbLayerOperations,
+  runTempRgbLayerOperations,
+  runTempRgbOperations
+} from "utils/stackOperations";
 
 let objectUrl = null;
 
@@ -38,6 +43,8 @@ class RgbViewer extends Component {
       tempRgbCanvas,
       tempDepthCanvas,
       rgbCanvasDimension,
+      bitmapCanvas,
+      layerMode,
       prevRgbSize,
       tools,
       toolsParameters,
@@ -81,9 +88,22 @@ class RgbViewer extends Component {
       });
     }
     // If operation is added to the stack, rerun all operations in operation stack
-    if (prevProps.operationStack.rgbStack !== operationStack.rgbStack) {
-      runCanvasOperations("rgbStack", mainRgbCanvas, rgbContext);
-      runTempRgbOperations("rgbStack", mainRgbCanvas, rgbCanvas.width, rgbCanvas.height);
+    if (prevProps.operationStack.rgbStack !== operationStack.rgbStack || prevProps.layerMode !== layerMode) {
+      if (!layerMode) {
+        rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
+        runCanvasOperations("rgbStack", mainRgbCanvas, rgbContext);
+        runTempRgbOperations("rgbStack", mainRgbCanvas, rgbCanvas.width, rgbCanvas.height);
+      }
+    }
+    if (
+      prevProps.operationStack.layerStack.length !== operationStack.layerStack.length ||
+      prevProps.layerMode !== layerMode
+    ) {
+      if (layerMode) {
+        rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
+        runRgbLayerOperations(rgbContext);
+        runTempRgbLayerOperations(rgbCanvas.width, rgbCanvas.height);
+      }
     }
     // Highlight pixel range from specified range for either cropped image or initial full image
     if (prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange) {
@@ -175,6 +195,8 @@ const mapStateToProps = state => ({
   tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
   prevRgbSize: imageSelectors.prevRgbSize(state),
   rgbCanvasDimension: imageSelectors.rgbCanvasDimension(state),
+  bitmapCanvas: imageSelectors.bitmapCanvas(state),
+  layerMode: imageSelectors.layerMode(state),
   tools: imageSelectors.tools(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),
