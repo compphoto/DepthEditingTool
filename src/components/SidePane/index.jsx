@@ -24,6 +24,7 @@ import {
   editContrast,
   editHighlightPixelArea,
   getRatio,
+  getRgbBitmap,
   highlightPixelArea,
   modifyBitmap,
   scaleSelection
@@ -34,6 +35,7 @@ export function SidePane({
   toolExtOpen,
   toolExtActions,
   mainDepthCanvas,
+  tempRgbCanvas,
   tempDepthCanvas,
   depthCanvasDimension,
   bitmapCanvas,
@@ -43,6 +45,7 @@ export function SidePane({
   parameters,
   operationStack,
   selectTool,
+  initImage,
   storeToolParameters,
   storeParameters,
   toggleLayerMode,
@@ -113,6 +116,7 @@ export function SidePane({
       newCroppedCanvasImage = cropCanvas(tempDepthCanvas, newArea);
     }
     modifyBitmap(bitmapCanvas, newCroppedCanvasImage, newArea, tools.currentTool, histogramParams.pixelRange);
+    initImage({ rgbBitmapCanvas: getRgbBitmap(cloneCanvas(bitmapCanvas), cloneCanvas(tempRgbCanvas)) });
     removeOperation({
       name: "depthStack",
       value: drawBox
@@ -763,6 +767,7 @@ export function SidePane({
 const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
+  tempRgbCanvas: imageSelectors.tempRgbCanvas(state),
   tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
   depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
   bitmapCanvas: imageSelectors.bitmapCanvas(state),
@@ -775,6 +780,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   toolExtActions: toolExtActions.toggleToolExt,
+  initImage: imageActions.initImage,
   selectTool: imageActions.selectTool,
   addEffect: imageActions.addEffect,
   removeOperation: imageActions.removeOperation,

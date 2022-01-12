@@ -13,6 +13,7 @@ const initialState = {
   rgbCanvasDimension: null,
   depthCanvasDimension: null,
   bitmapCanvas: null,
+  rgbBitmapCanvas: null,
   layerMode: false,
   tools: {
     currentTool: null,
@@ -127,7 +128,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
               depth: 0,
               detail: 1,
               bitmap: cloneCanvas(state.bitmapCanvas),
-              rgbBitmap: getRgbBitmap(cloneCanvas(state.bitmapCanvas), cloneCanvas(state.tempRgbCanvas))
+              rgbBitmap: cloneCanvas(state.rgbBitmapCanvas)
             }
           ]
         }
@@ -319,6 +320,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         rgbCanvasDimension: null,
         depthCanvasDimension: null,
         bitmapCanvas: null,
+        rgbBitmapCanvas: null,
         layerMode: false,
         tools: {
           currentTool: null,
