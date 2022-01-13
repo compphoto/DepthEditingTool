@@ -16,7 +16,8 @@ import {
   getDimension,
   drawBox,
   drawScaledCanvasImage,
-  modifyBitmap
+  modifyBitmap,
+  dimensionToBox
 } from "utils/canvasUtils";
 import {
   runCanvasOperations,
@@ -136,12 +137,7 @@ class DepthViewer extends Component {
         if (croppedArea) {
           newArea = croppedArea;
         } else {
-          newArea = [
-            depthCanvasDimension[0],
-            depthCanvasDimension[1],
-            depthCanvasDimension[2] - depthCanvasDimension[0],
-            depthCanvasDimension[3] - depthCanvasDimension[1]
-          ];
+          newArea = dimensionToBox(depthCanvasDimension);
         }
         addOperation({
           name: "depthStack",
@@ -232,15 +228,17 @@ class DepthViewer extends Component {
         let new_y = Math.max(Math.min(initBoundingBox.y, y), image_y1);
         let new_w = Math.min(Math.max(initBoundingBox.x, x), image_x2) - new_x;
         let new_h = Math.min(Math.max(initBoundingBox.y, y), image_y2) - new_y;
-        let croppedArea = [new_x, new_y, new_w, new_h];
-        this.setState({ initBoundingBox: null }, () => {
-          depthCanvas.style.cursor = "default";
-          storeParameters({ croppedCanvasImage: cropCanvas(tempDepthCanvas, croppedArea), croppedArea: croppedArea });
-          addOperation({
-            name: "depthStack",
-            value: { func: drawBox, params: croppedArea }
+        if (new_w !== 0 || new_w !== 0) {
+          let croppedArea = [new_x, new_y, new_w, new_h];
+          this.setState({ initBoundingBox: null }, () => {
+            depthCanvas.style.cursor = "default";
+            storeParameters({ croppedCanvasImage: cropCanvas(tempDepthCanvas, croppedArea), croppedArea: croppedArea });
+            addOperation({
+              name: "depthStack",
+              value: { func: drawBox, params: croppedArea }
+            });
           });
-        });
+        }
       } else {
         this.setState({ initBoundingBox: { x, y } }, () => {
           depthCanvas.style.cursor = "crosshair";

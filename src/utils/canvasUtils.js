@@ -1,7 +1,14 @@
 import { solveCubic } from "./calculation";
 
 export const dimensionToBox = dimension => {
-  return [dimension[0], dimension[1], dimension[2] - dimension[0], dimension[3] - dimension[1]];
+  let x = dimension[0];
+  let y = dimension[1];
+  let w = dimension[2] - dimension[0];
+  let h = dimension[3] - dimension[1];
+  if (w === 0 || h === 0) {
+    return null;
+  }
+  return [x, y, w, h];
 };
 
 export const canvasToImage = canvas => {

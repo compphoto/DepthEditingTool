@@ -6,6 +6,7 @@ import RgbViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
 import {
   cloneCanvas,
+  dimensionToBox,
   drawBox,
   drawCanvasImage,
   getDimension,
@@ -115,12 +116,7 @@ class RgbViewer extends Component {
         if (croppedArea) {
           newArea = croppedArea;
         } else {
-          newArea = [
-            rgbCanvasDimension[0],
-            rgbCanvasDimension[1],
-            rgbCanvasDimension[2] - rgbCanvasDimension[0],
-            rgbCanvasDimension[3] - rgbCanvasDimension[1]
-          ];
+          newArea = dimensionToBox(rgbCanvasDimension);
         }
         addOperation({
           name: "rgbStack",
