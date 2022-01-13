@@ -23,6 +23,7 @@ import {
   editBrightness,
   editContrast,
   editHighlightPixelArea,
+  getImageFromCanvas,
   getRatio,
   getRgbBitmap,
   highlightPixelArea,
@@ -57,6 +58,7 @@ export function SidePane({
   removeOperation
 }) {
   const [activeTool, setActiveTool] = useState(0);
+  const [bitmapImage, setBitmapImage] = useState(null);
   const [layers, setLayers] = useState(null);
   const [tempToolsParams, setTempToolsParams] = useState({
     depthRangeIntensity: 0,
@@ -116,6 +118,7 @@ export function SidePane({
       newCroppedCanvasImage = cropCanvas(tempDepthCanvas, newArea);
     }
     modifyBitmap(bitmapCanvas, newCroppedCanvasImage, newArea, tools.currentTool, histogramParams.pixelRange);
+    setBitmapImage(getImageFromCanvas(bitmapCanvas));
     initImage({ rgbBitmapCanvas: getRgbBitmap(cloneCanvas(bitmapCanvas), cloneCanvas(tempRgbCanvas)) });
     removeOperation({
       name: "depthStack",
@@ -137,18 +140,17 @@ export function SidePane({
     });
   };
   useEffect(() => {
+    if (bitmapCanvas) {
+      setBitmapImage(getImageFromCanvas(bitmapCanvas));
+    }
+  }, [bitmapCanvas]);
+  useEffect(() => {
     setTempLayerStack([...operationStack.layerStack]);
   }, [operationStack.layerStack]);
   useEffect(() => {
     if (activeTool === 1) {
       let tempLayer = tempLayerStack.map((element, key) => {
-        let canvas = document.createElement("canvas");
-        canvas.width = 150;
-        canvas.height = 100;
-        let context = canvas.getContext("2d");
-        let { ratio, centerShift_x, centerShift_y } = getRatio(element.bitmap, canvas);
-        drawCanvasImage(element.bitmap, context, ratio, centerShift_x, centerShift_y);
-        let image = canvasToImage(canvas);
+        let image = getImageFromCanvas(element.bitmap);
         return (
           <div key={key} className="p-2 my-2 tool-ext-layer">
             <img src={image} />
@@ -305,6 +307,7 @@ export function SidePane({
           <div className="w-100 mt-3 tool-ext-section">
             <p className="mb-3 text-white">Depth Selection</p>
             <div className="tool-ext-selection">
+              <img src={bitmapImage} />
               <div className="tool-ext-selection-icons">
                 <div
                   onClick={() => {

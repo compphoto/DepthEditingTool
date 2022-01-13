@@ -30,6 +30,15 @@ export const getRatio = (image, canvas) => {
     centerShift_y: centerShift_y
   };
 };
+export const getImageFromCanvas = bitmap => {
+  let canvas = document.createElement("canvas");
+  canvas.width = 190;
+  canvas.height = 132;
+  let context = canvas.getContext("2d");
+  let { ratio, centerShift_x, centerShift_y } = getRatio(bitmap, canvas);
+  drawCanvasImage(bitmap, context, ratio, centerShift_x, centerShift_y);
+  return canvasToImage(canvas);
+};
 
 export const getDimension = (image, ratio, centerShift_x, centerShift_y) => {
   let x1 = centerShift_x;
