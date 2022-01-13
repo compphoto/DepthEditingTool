@@ -379,6 +379,7 @@ export function SidePane({
                   onClick={() => {
                     const bitmapContext = bitmapCanvas.getContext("2d");
                     bitmapContext.clearRect(0, 0, bitmapCanvas.width, bitmapCanvas.height);
+                    setBitmapImage(getImageFromCanvas(bitmapCanvas));
                   }}
                 >
                   Clear
