@@ -74,6 +74,8 @@ class DepthViewer extends Component {
           mainDepthCanvas: cloneCanvas(depthImage), // Draw original canvas
           tempDepthCanvas: null,
           depthCanvasDimension: null,
+          bitmapCanvas: null,
+          rgbBitmapCanvas: null,
           operationStack: {
             ...operationStack,
             depthStack: []

@@ -5,7 +5,7 @@ import { selectors as imageSelectors } from "store/image";
 import RangeSlider from "./rangeslider";
 import HistViewerStyle from "./style";
 import { getCanvasImageData, getImageData } from "utils/drawHistogram";
-import { cropCanvas, getDimension, getRatio } from "utils/canvasUtils";
+import { cropCanvas, dimensionToBox, getDimension, getRatio } from "utils/canvasUtils";
 
 class HistViewer extends Component {
   constructor() {
@@ -27,12 +27,7 @@ class HistViewer extends Component {
         this.setState({ data: histDepthData });
       } else {
         if (tempDepthCanvas) {
-          const boundingBox = [
-            depthCanvasDimension[0],
-            depthCanvasDimension[1],
-            depthCanvasDimension[2] - depthCanvasDimension[0],
-            depthCanvasDimension[3] - depthCanvasDimension[1]
-          ];
+          const boundingBox = dimensionToBox(depthCanvasDimension);
           let histDepthData = getImageData(cropCanvas(tempDepthCanvas, boundingBox));
           this.setState({ data: histDepthData });
         }
