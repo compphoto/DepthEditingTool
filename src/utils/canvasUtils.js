@@ -119,6 +119,10 @@ export const drawScaledCanvasImage = (
   context.restore();
 };
 
+export const drawLayerCanvas = (image, context, canvas) => {
+  context.drawImage(canvas, 0, 0);
+};
+
 export const drawBox = (image, context, new_x, new_y, new_w, new_h) => {
   context.beginPath();
   context.strokeStyle = "red";

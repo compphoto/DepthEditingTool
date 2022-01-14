@@ -20,6 +20,7 @@ import {
   dimensionToBox,
   drawBox,
   drawCanvasImage,
+  drawLayerCanvas,
   editBrightness,
   editContrast,
   editHighlightPixelArea,
@@ -619,44 +620,6 @@ export function SidePane({
               </Card>
             </UncontrolledCollapse>
           </div>
-
-          {/* <p className="my-3 text-white">Size</p>
-          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-crop-toggler">
-            Crop
-          </Button>
-          <UncontrolledCollapse toggler="#adjust-crop-toggler">
-            <Card className="tool-ext-card">
-              <CardBody className="tool-ext-card-body">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
-                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
-                Minus, alias.
-              </CardBody>
-            </Card>
-          </UncontrolledCollapse>
-          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-rotate-toggler">
-            Rotate
-          </Button>
-          <UncontrolledCollapse toggler="#adjust-rotate-toggler">
-            <Card className="tool-ext-card">
-              <CardBody className="tool-ext-card-body">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
-                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
-                Minus, alias.
-              </CardBody>
-            </Card>
-          </UncontrolledCollapse>
-          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-resize-toggler">
-            Resize
-          </Button>
-          <UncontrolledCollapse toggler="#adjust-resize-toggler">
-            <Card className="tool-ext-card">
-              <CardBody className="tool-ext-card-body">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
-                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
-                Minus, alias.
-              </CardBody>
-            </Card>
-          </UncontrolledCollapse> */}
         </div>
       </>
     );
@@ -679,7 +642,6 @@ export function SidePane({
                     <Button className="mx-2" size="sm" color="secondary" onClick={addLayer}>
                       Add
                     </Button>
-
                     <Button className="mx-2" size="sm" color="secondary" onClick={removeAllLayers}>
                       Remove all
                     </Button>
@@ -687,6 +649,23 @@ export function SidePane({
                   <div id="tool-ext-layers" className="my-3 tool-ext-layers">
                     {layers || null}
                   </div>
+                  <Button
+                    className="mx-2"
+                    size="sm"
+                    color="secondary"
+                    disabled={tempLayerStack === undefined || tempLayerStack.length == 0}
+                    onClick={() => {
+                      addEffect({
+                        name: "depthStack",
+                        value: {
+                          func: drawLayerCanvas,
+                          params: [cloneCanvas(tempDepthCanvas)]
+                        }
+                      });
+                    }}
+                  >
+                    Apply
+                  </Button>
                 </CardBody>
               </Card>
             </UncontrolledCollapse>
