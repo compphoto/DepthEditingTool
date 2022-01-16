@@ -13,12 +13,8 @@ import {
   getRatio,
   highlightPixelAreaRgb
 } from "utils/canvasUtils";
-import {
-  runCanvasOperations,
-  runRgbLayerOperations,
-  runTempRgbLayerOperations,
-  runTempRgbOperations
-} from "utils/stackOperations";
+import { runCanvasOperations, runTempRgbOperations } from "utils/stackOperations";
+import { runRgbLayerOperations, runTempRgbLayerOperations } from "utils/layerOperations";
 
 let objectUrl = null;
 

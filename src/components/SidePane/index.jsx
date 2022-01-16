@@ -29,6 +29,7 @@ import {
   getRgbBitmap,
   highlightPixelArea,
   modifyBitmap,
+  scaleBox,
   scaleSelection
 } from "utils/canvasUtils";
 import PointCurve from "components/PointCurve";
@@ -39,8 +40,10 @@ export function SidePane({
   mainDepthCanvas,
   tempRgbCanvas,
   tempDepthCanvas,
+  savedDepthCanvas,
   depthCanvasDimension,
   bitmapCanvas,
+  saveBitmapCanvas,
   layerMode,
   tools,
   toolsParameters,
@@ -108,37 +111,53 @@ export function SidePane({
     }
   };
   const onModifyBitmap = () => {
-    const { croppedCanvasImage, croppedArea, histogramParams } = parameters;
-    let newArea = null;
-    let newCroppedCanvasImage = null;
-    if (croppedArea) {
-      newArea = croppedArea;
-      newCroppedCanvasImage = croppedCanvasImage;
-    } else {
-      newArea = dimensionToBox(depthCanvasDimension);
-      newCroppedCanvasImage = cropCanvas(tempDepthCanvas, newArea);
-    }
-    modifyBitmap(bitmapCanvas, newCroppedCanvasImage, newArea, tools.currentTool, histogramParams.pixelRange);
-    setBitmapImage(getImageFromCanvas(bitmapCanvas));
-    initImage({ rgbBitmapCanvas: getRgbBitmap(cloneCanvas(bitmapCanvas), cloneCanvas(tempRgbCanvas)) });
-    removeOperation({
-      name: "depthStack",
-      value: drawBox
-    });
-    removeOperation({
-      name: "rgbStack",
-      value: drawBox
-    });
-    storeParameters({
-      croppedCanvasImage: null,
-      croppedArea: null,
-      histogramParams: {
-        pixelRange: [0, 255],
-        domain: [0, 255],
-        values: [0, 255],
-        update: [0, 255]
+    if (tempDepthCanvas) {
+      const { croppedCanvasImage, croppedArea, histogramParams } = parameters;
+      const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
+      let newArea = null;
+      let newCroppedCanvasImage = null;
+      let saveNewArea = null;
+      let saveNewCroppedCanvasImage = null;
+      if (croppedArea) {
+        newArea = croppedArea;
+        newCroppedCanvasImage = croppedCanvasImage;
+        saveNewArea = scaleBox(newArea, ratio, centerShift_x, centerShift_y);
+        saveNewCroppedCanvasImage = cropCanvas(savedDepthCanvas, saveNewArea);
+      } else {
+        newArea = dimensionToBox(depthCanvasDimension);
+        newCroppedCanvasImage = cropCanvas(tempDepthCanvas, newArea);
+        saveNewArea = scaleBox(newArea, ratio, centerShift_x, centerShift_y);
+        saveNewCroppedCanvasImage = cropCanvas(savedDepthCanvas, saveNewArea);
       }
-    });
+      modifyBitmap(bitmapCanvas, newCroppedCanvasImage, newArea, tools.currentTool, histogramParams.pixelRange);
+      modifyBitmap(
+        saveBitmapCanvas,
+        saveNewCroppedCanvasImage,
+        saveNewArea,
+        tools.currentTool,
+        histogramParams.pixelRange
+      );
+      setBitmapImage(getImageFromCanvas(bitmapCanvas));
+      initImage({ rgbBitmapCanvas: getRgbBitmap(cloneCanvas(bitmapCanvas), cloneCanvas(tempRgbCanvas)) });
+      removeOperation({
+        name: "depthStack",
+        value: drawBox
+      });
+      removeOperation({
+        name: "rgbStack",
+        value: drawBox
+      });
+      storeParameters({
+        croppedCanvasImage: null,
+        croppedArea: null,
+        histogramParams: {
+          pixelRange: [0, 255],
+          domain: [0, 255],
+          values: [0, 255],
+          update: [0, 255]
+        }
+      });
+    }
   };
   useEffect(() => {
     if (bitmapCanvas) {
@@ -234,6 +253,13 @@ export function SidePane({
           params: [cloneCanvas(bitmapCanvas), toolsParameters.depthRangeIntensity]
         }
       });
+      addEffect({
+        name: "saveStack",
+        value: {
+          func: editHighlightPixelArea,
+          params: [cloneCanvas(saveBitmapCanvas), toolsParameters.depthRangeIntensity]
+        }
+      });
     }
   }, [toolsParameters.depthRangeIntensity]);
   useEffect(() => {
@@ -245,60 +271,102 @@ export function SidePane({
           params: [cloneCanvas(bitmapCanvas), toolsParameters.depthScale]
         }
       });
+      addEffect({
+        name: "saveStack",
+        value: {
+          func: scaleSelection,
+          params: [cloneCanvas(saveBitmapCanvas), toolsParameters.depthScale]
+        }
+      });
     }
   }, [toolsParameters.depthScale]);
   useEffect(() => {
-    const { croppedArea } = parameters;
-    if (croppedArea || depthCanvasDimension) {
-      let newArea = null;
-      if (croppedArea) {
-        newArea = croppedArea;
-      } else {
-        newArea = dimensionToBox(depthCanvasDimension);
-      }
-      addEffect({
-        name: "depthStack",
-        value: {
-          func: editBrightness,
-          params: [newArea, toolsParameters.brightness]
+    if (tempDepthCanvas) {
+      const { croppedArea } = parameters;
+      const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
+      if (croppedArea || depthCanvasDimension) {
+        let newArea = null;
+        if (croppedArea) {
+          newArea = croppedArea;
+        } else {
+          newArea = dimensionToBox(depthCanvasDimension);
         }
-      });
+        console.warn(scaleBox(newArea, ratio, centerShift_x, centerShift_y));
+        addEffect({
+          name: "depthStack",
+          value: {
+            func: editBrightness,
+            params: [newArea, toolsParameters.brightness]
+          }
+        });
+        addEffect({
+          name: "saveStack",
+          value: {
+            func: editBrightness,
+            params: [scaleBox(newArea, ratio, centerShift_x, centerShift_y), toolsParameters.brightness]
+          }
+        });
+      }
     }
   }, [toolsParameters.brightness]);
   useEffect(() => {
-    const { croppedArea } = parameters;
-    if (croppedArea || depthCanvasDimension) {
-      let newArea = null;
-      if (croppedArea) {
-        newArea = croppedArea;
-      } else {
-        newArea = dimensionToBox(depthCanvasDimension);
-      }
-      addEffect({
-        name: "depthStack",
-        value: {
-          func: editContrast,
-          params: [newArea, toolsParameters.contrast]
+    if (tempDepthCanvas) {
+      const { croppedArea } = parameters;
+      const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
+      if (croppedArea || depthCanvasDimension) {
+        let newArea = null;
+        if (croppedArea) {
+          newArea = croppedArea;
+        } else {
+          newArea = dimensionToBox(depthCanvasDimension);
         }
-      });
+        addEffect({
+          name: "depthStack",
+          value: {
+            func: editContrast,
+            params: [newArea, toolsParameters.contrast]
+          }
+        });
+        addEffect({
+          name: "saveStack",
+          value: {
+            func: editContrast,
+            params: [scaleBox(newArea, ratio, centerShift_x, centerShift_y), toolsParameters.contrast]
+          }
+        });
+      }
     }
   }, [toolsParameters.contrast]);
   useEffect(() => {
-    const { croppedArea } = parameters;
-    if (croppedArea || depthCanvasDimension) {
-      let newArea = null;
-      if (croppedArea) {
-        newArea = croppedArea;
-      } else {
-        newArea = dimensionToBox(depthCanvasDimension);
-      }
-      addEffect({
-        name: "depthStack",
-        value: {
-          func: addScaleShift,
-          params: [newArea, toolsParameters.aConstant, toolsParameters.bConstant]
+    if (tempDepthCanvas) {
+      const { croppedArea } = parameters;
+      const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
+      if (croppedArea || depthCanvasDimension) {
+        let newArea = null;
+        if (croppedArea) {
+          newArea = croppedArea;
+        } else {
+          newArea = dimensionToBox(depthCanvasDimension);
         }
-      });
+        addEffect({
+          name: "depthStack",
+          value: {
+            func: addScaleShift,
+            params: [newArea, toolsParameters.aConstant, toolsParameters.bConstant]
+          }
+        });
+        addEffect({
+          name: "saveStack",
+          value: {
+            func: addScaleShift,
+            params: [
+              scaleBox(newArea, ratio, centerShift_x, centerShift_y),
+              toolsParameters.aConstant,
+              toolsParameters.bConstant
+            ]
+          }
+        });
+      }
     }
   }, [toolsParameters.aConstant, toolsParameters.bConstant]);
   const adjust = () => {
@@ -380,6 +448,8 @@ export function SidePane({
                   onClick={() => {
                     const bitmapContext = bitmapCanvas.getContext("2d");
                     bitmapContext.clearRect(0, 0, bitmapCanvas.width, bitmapCanvas.height);
+                    const saveBitmapContext = saveBitmapCanvas.getContext("2d");
+                    saveBitmapContext.clearRect(0, 0, saveBitmapCanvas.width, saveBitmapCanvas.height);
                     setBitmapImage(getImageFromCanvas(bitmapCanvas));
                   }}
                 >
@@ -752,8 +822,10 @@ const mapStateToProps = state => ({
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   tempRgbCanvas: imageSelectors.tempRgbCanvas(state),
   tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
+  savedDepthCanvas: imageSelectors.savedDepthCanvas(state),
   depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
   bitmapCanvas: imageSelectors.bitmapCanvas(state),
+  saveBitmapCanvas: imageSelectors.saveBitmapCanvas(state),
   layerMode: imageSelectors.layerMode(state),
   tools: imageSelectors.tools(state),
   toolsParameters: imageSelectors.toolsParameters(state),

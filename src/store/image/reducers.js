@@ -1,4 +1,4 @@
-import { cloneCanvas, getRgbBitmap } from "utils/canvasUtils";
+import { cloneCanvas } from "utils/canvasUtils";
 import { types } from "./constants";
 
 const initialState = {
@@ -8,12 +8,14 @@ const initialState = {
   mainDepthCanvas: null, // use canvas to image to convert to image
   tempRgbCanvas: null, // global reference to depth canvas
   tempDepthCanvas: null, // global reference to depth canvas
+  savedDepthCanvas: null, // saved canvas to be downloaded
   prevRgbSize: { width: null, height: null },
   prevDepthSize: { width: null, height: null },
   rgbCanvasDimension: null,
   depthCanvasDimension: null,
   bitmapCanvas: null,
   rgbBitmapCanvas: null,
+  saveBitmapCanvas: null,
   layerMode: false,
   tools: {
     currentTool: null,
@@ -52,7 +54,8 @@ const initialState = {
     rgbStack: [],
     depthStack: [],
     moveStack: [],
-    layerStack: []
+    layerStack: [],
+    saveStack: []
   }
 };
 
@@ -225,11 +228,13 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           return x;
         }
       });
+      var saveStack = [...state.operationStack.saveStack].splice(-1);
       return {
         ...state,
         operationStack: {
           ...state.operationStack,
-          depthStack: [...newDepthStack]
+          depthStack: [...newDepthStack],
+          saveStack: saveStack
         }
       };
     case types.CLEAR:
@@ -272,6 +277,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
     case types.RESET:
       var rgbStack = [state.operationStack.rgbStack[0]];
       var depthStack = [state.operationStack.depthStack[0]];
+      var saveStack = [state.operationStack.saveStack[0]];
       return {
         ...state,
         parameters: {
@@ -299,7 +305,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         operationStack: {
           ...state.operationStack,
           rgbStack: [...rgbStack],
-          depthStack: [...depthStack]
+          depthStack: [...depthStack],
+          saveStack: [...saveStack]
         }
       };
     case types.REMOVE_ITEM:
@@ -314,13 +321,15 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         mainRgbCanvas: null, // use canvas to image to convert to image
         mainDepthCanvas: null, // use canvas to image to convert to image
         tempRgbCanvas: null, // global reference to depth canvas
-        tempDepthCanvas: null, // global reference to depth canvas
+        tempDepthCanvas: null, // global reference to depth
+        savedDepthCanvas: null,
         prevRgbSize: { width: null, height: null },
         prevDepthSize: { width: null, height: null },
         rgbCanvasDimension: null,
         depthCanvasDimension: null,
         bitmapCanvas: null,
         rgbBitmapCanvas: null,
+        saveBitmapCanvas: null,
         layerMode: false,
         tools: {
           currentTool: null,
@@ -359,7 +368,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           rgbStack: [],
           depthStack: [],
           moveStack: [],
-          layerStack: []
+          layerStack: [],
+          saveStack: []
         }
       };
       return {

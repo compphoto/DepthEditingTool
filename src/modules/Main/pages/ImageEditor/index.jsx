@@ -11,11 +11,14 @@ import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
 import { cloneCanvas, canvasToImage, getRatio, drawScaledCanvasImage } from "utils/canvasUtils";
+import { runSaveDepthOperations } from "utils/stackOperations";
 
 export function ImageEditor({
   mainDepthCanvas,
   tempDepthCanvas,
+  savedDepthCanvas,
   parameters,
+  operationStack,
   initImage,
   storeParameters,
   addOperation,
@@ -124,8 +127,9 @@ export function ImageEditor({
               </Button>
               <Button
                 onClick={() => {
-                  initImage({ mainDepthCanvas: cloneCanvas(tempDepthCanvas) });
+                  runSaveDepthOperations(cloneCanvas(mainDepthCanvas));
                 }}
+                disabled={operationStack.saveStack.length < 2}
                 size="sm"
                 color="secondary"
                 className="mx-3"
@@ -134,9 +138,10 @@ export function ImageEditor({
               </Button>
               <Button
                 onClick={() => {
-                  let image = canvasToImage(tempDepthCanvas);
+                  let image = canvasToImage(savedDepthCanvas);
                   window.location.href = image;
                 }}
+                disabled={savedDepthCanvas === null}
                 size="sm"
                 color="primary"
               >
@@ -158,7 +163,9 @@ export function ImageEditor({
 const mapStateToProps = state => ({
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  parameters: imageSelectors.parameters(state)
+  savedDepthCanvas: imageSelectors.savedDepthCanvas(state),
+  parameters: imageSelectors.parameters(state),
+  operationStack: imageSelectors.operationStack(state)
 });
 
 const mapDispatchToProps = {

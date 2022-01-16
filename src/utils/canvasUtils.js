@@ -1,16 +1,5 @@
 import { solveCubic } from "./calculation";
 
-export const dimensionToBox = dimension => {
-  let x = dimension[0];
-  let y = dimension[1];
-  let w = dimension[2] - dimension[0];
-  let h = dimension[3] - dimension[1];
-  if (w === 0 || h === 0) {
-    return null;
-  }
-  return [x, y, w, h];
-};
-
 export const canvasToImage = canvas => {
   if (canvas) return canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
   return null;
@@ -25,6 +14,25 @@ export const cloneCanvas = oldCanvas => {
   return newCanvas;
 };
 
+export const dimensionToBox = dimension => {
+  let x = dimension[0];
+  let y = dimension[1];
+  let w = dimension[2] - x;
+  let h = dimension[3] - y;
+  if (w === 0 || h === 0) {
+    return null;
+  }
+  return [x, y, w, h];
+};
+
+export const boxToDimension = box => {
+  let x1 = box[0];
+  let y1 = box[1];
+  let x2 = x1 + box[2];
+  let y2 = y1 + box[3];
+  return [x1, y1, x2, y2];
+};
+
 export const getRatio = (image, canvas) => {
   let hRatio = canvas.width / image.width;
   let vRatio = canvas.height / image.height;
@@ -37,14 +45,21 @@ export const getRatio = (image, canvas) => {
     centerShift_y: centerShift_y
   };
 };
-export const getImageFromCanvas = bitmap => {
-  let canvas = document.createElement("canvas");
-  canvas.width = 190;
-  canvas.height = 132;
-  let context = canvas.getContext("2d");
-  let { ratio, centerShift_x, centerShift_y } = getRatio(bitmap, canvas);
-  drawCanvasImage(bitmap, context, ratio, centerShift_x, centerShift_y);
-  return canvasToImage(canvas);
+
+export const scaleBox = (box, ratio, centerShift_x, centerShift_y) => {
+  let x = (box[0] - centerShift_x) / ratio;
+  let y = (box[1] - centerShift_y) / ratio;
+  let w = box[2] / ratio;
+  let h = box[3] / ratio;
+  return [x, y, w, h];
+};
+
+export const scaleDimension = (dimension, ratio, centerShift_x, centerShift_y) => {
+  let x1 = (dimension[0] - centerShift_x) / ratio;
+  let y1 = (dimension[1] - centerShift_y) / ratio;
+  let x2 = x1 + (dimension[2] - centerShift_x) / ratio;
+  let y2 = y1 + (dimension[3] - centerShift_y) / ratio;
+  return [x1, y1, x2, y2];
 };
 
 export const getDimension = (image, ratio, centerShift_x, centerShift_y) => {
@@ -53,6 +68,30 @@ export const getDimension = (image, ratio, centerShift_x, centerShift_y) => {
   let x2 = centerShift_x + image.width * ratio;
   let y2 = centerShift_y + image.height * ratio;
   return [x1, y1, x2, y2];
+};
+
+export const drawCanvasImage = (image, context, ratio, centerShift_x, centerShift_y) => {
+  context.drawImage(
+    image,
+    0,
+    0,
+    image.width,
+    image.height,
+    centerShift_x,
+    centerShift_y,
+    image.width * ratio,
+    image.height * ratio
+  );
+};
+
+export const getImageFromCanvas = bitmap => {
+  let canvas = document.createElement("canvas");
+  canvas.width = 190;
+  canvas.height = 132;
+  let context = canvas.getContext("2d");
+  let { ratio, centerShift_x, centerShift_y } = getRatio(bitmap, canvas);
+  drawCanvasImage(bitmap, context, ratio, centerShift_x, centerShift_y);
+  return canvasToImage(canvas);
 };
 
 export const cropCanvas = (oldCanvas, boundingBox) => {
@@ -75,20 +114,6 @@ export const cropCanvas = (oldCanvas, boundingBox) => {
     return newCanvas;
   }
   return null;
-};
-
-export const drawCanvasImage = (image, context, ratio, centerShift_x, centerShift_y) => {
-  context.drawImage(
-    image,
-    0,
-    0,
-    image.width,
-    image.height,
-    centerShift_x,
-    centerShift_y,
-    image.width * ratio,
-    image.height * ratio
-  );
 };
 
 export const drawScaledCanvasImage = (

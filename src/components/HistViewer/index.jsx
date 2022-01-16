@@ -1,11 +1,10 @@
-import React, { Component, createRef } from "react";
+import React, { Component } from "react";
 import { connect } from "react-redux";
-import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import RangeSlider from "./rangeslider";
 import HistViewerStyle from "./style";
-import { getCanvasImageData, getImageData } from "utils/drawHistogram";
-import { cropCanvas, dimensionToBox, getDimension, getRatio } from "utils/canvasUtils";
+import { getImageData } from "utils/drawHistogram";
+import { cropCanvas, dimensionToBox } from "utils/canvasUtils";
 
 class HistViewer extends Component {
   constructor() {
@@ -16,7 +15,7 @@ class HistViewer extends Component {
     windowHeight: window.innerHeight,
     data: []
   };
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     let { tempDepthCanvas, depthCanvasDimension, parameters } = this.props;
     if (
       prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage ||

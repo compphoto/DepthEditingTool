@@ -7,24 +7,16 @@ import { getImageUrl } from "utils/getImageFromFile";
 import {
   cloneCanvas,
   drawCanvasImage,
-  drawMainImage,
   cropCanvas,
-  editBoundingArea,
   highlightPixelArea,
-  editHighlightPixelArea,
   getRatio,
   getDimension,
   drawBox,
   drawScaledCanvasImage,
-  modifyBitmap,
   dimensionToBox
 } from "utils/canvasUtils";
-import {
-  runCanvasOperations,
-  runDepthLayerOperations,
-  runTempDepthOperations,
-  runTempDepthLayerOperations
-} from "utils/stackOperations";
+import { runCanvasOperations, runSaveDepthOperations, runTempDepthOperations } from "utils/stackOperations";
+import { runDepthLayerOperations, runTempDepthLayerOperations } from "utils/layerOperations";
 
 let objectUrl = null;
 
@@ -42,18 +34,17 @@ class DepthViewer extends Component {
     this.handleResize();
     window.addEventListener("resize", this.handleResize);
   }
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     let { depthImageRef } = this;
     let {
       depthImageUrl,
       mainDepthCanvas,
-      tempDepthCanvas,
+      savedDepthCanvas,
       prevDepthSize,
       depthCanvasDimension,
       bitmapCanvas,
       layerMode,
       tools,
-      toolsParameters,
       parameters,
       operationStack,
       initImage,
@@ -74,14 +65,17 @@ class DepthViewer extends Component {
         initImage({
           mainDepthCanvas: cloneCanvas(depthImage), // Draw original canvas
           tempDepthCanvas: null,
+          savedDepthCanvas: null,
           depthCanvasDimension: null,
           bitmapCanvas: null,
           rgbBitmapCanvas: null,
           operationStack: {
             ...operationStack,
-            depthStack: []
+            depthStack: [],
+            saveStack: []
           }
         });
+        runSaveDepthOperations(cloneCanvas(depthImage));
       };
     }
     // If main image changes, add draw/redraw canvas to operation
@@ -90,6 +84,10 @@ class DepthViewer extends Component {
       addEffect({
         name: "depthStack",
         value: { func: drawCanvasImage, params: [ratio, centerShift_x, centerShift_y] }
+      });
+      addEffect({
+        name: "saveStack",
+        value: { func: drawCanvasImage, params: [1, 0, 0] }
       });
       initImage({
         prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height },
@@ -112,9 +110,15 @@ class DepthViewer extends Component {
     // If operation is added to the stack, rerun all operations in operation stack
     if (prevProps.operationStack.depthStack !== operationStack.depthStack || prevProps.layerMode !== layerMode) {
       if (!layerMode) {
+        console.warn(savedDepthCanvas);
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
-        runCanvasOperations("depthStack", mainDepthCanvas, depthContext);
-        runTempDepthOperations("depthStack", mainDepthCanvas, depthCanvas.width, depthCanvas.height);
+        runCanvasOperations("depthStack", savedDepthCanvas || mainDepthCanvas, depthContext);
+        runTempDepthOperations(
+          "depthStack",
+          savedDepthCanvas || mainDepthCanvas,
+          depthCanvas.width,
+          depthCanvas.height
+        );
       }
     }
     if (prevProps.operationStack.layerStack !== operationStack.layerStack || prevProps.layerMode !== layerMode) {
@@ -339,6 +343,7 @@ const mapStateToProps = state => ({
   depthImageUrl: imageSelectors.depthImageUrl(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
+  savedDepthCanvas: imageSelectors.savedDepthCanvas(state),
   prevDepthSize: imageSelectors.prevDepthSize(state),
   depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
   bitmapCanvas: imageSelectors.bitmapCanvas(state),
