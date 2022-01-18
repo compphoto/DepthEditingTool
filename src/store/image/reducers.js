@@ -89,6 +89,21 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         ...payload
       };
     case types.INIT_RGB:
+      var rgbScaleParams = state.depthImageUrl
+        ? state.depthScaleParams
+        : {
+            ratio: 1,
+            centerShift_x: 0,
+            centerShift_y: 0,
+            translatePos: {
+              x: 0,
+              y: 0
+            },
+            scale: 1.0,
+            scaleMultiplier: 0.8,
+            startDragOffset: {},
+            mouseDown: false
+          };
       return {
         ...state,
         mainRgbCanvas: payload,
@@ -96,26 +111,28 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         cacheRgbCanvas: null,
         prevRgbSize: { width: null, height: null },
         rgbBitmapCanvas: null,
-        depthBitmapCanvas: null,
-        rgbScaleParams: {
-          ratio: 1,
-          centerShift_x: 0,
-          centerShift_y: 0,
-          translatePos: {
-            x: 0,
-            y: 0
-          },
-          scale: 1.0,
-          scaleMultiplier: 0.8,
-          startDragOffset: {},
-          mouseDown: false
-        },
+        rgbScaleParams: rgbScaleParams,
         operationStack: {
           ...state.operationStack,
           rgbStack: []
         }
       };
     case types.INIT_DEPTH:
+      var depthScaleParams = state.rgbImageUrl
+        ? state.rgbScaleParams
+        : {
+            ratio: 1,
+            centerShift_x: 0,
+            centerShift_y: 0,
+            translatePos: {
+              x: 0,
+              y: 0
+            },
+            scale: 1.0,
+            scaleMultiplier: 0.8,
+            startDragOffset: {},
+            mouseDown: false
+          };
       return {
         ...state,
         mainDepthCanvas: payload,
@@ -126,19 +143,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         rgbBitmapCanvas: null,
         depthBitmapCanvas: null,
         layerMode: false,
-        depthScaleParams: {
-          ratio: 1,
-          centerShift_x: 0,
-          centerShift_y: 0,
-          translatePos: {
-            x: 0,
-            y: 0
-          },
-          scale: 1.0,
-          scaleMultiplier: 0.8,
-          startDragOffset: {},
-          mouseDown: false
-        },
+        depthScaleParams: depthScaleParams,
         tools: {
           currentTool: null,
           singleSelection: false,
@@ -391,12 +396,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
     case types.RESET:
       var rgbStack = [state.operationStack.rgbStack[0]];
       var depthStack = [state.operationStack.depthStack[0]];
+      var layerStack = [];
       return {
         ...state,
         rgbScaleParams: {
-          ratio: 1,
-          centerShift_x: 0,
-          centerShift_y: 0,
+          ...state.rgbScaleParams,
           translatePos: {
             x: 0,
             y: 0
@@ -407,9 +411,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           mouseDown: false
         },
         depthScaleParams: {
-          ratio: 1,
-          centerShift_x: 0,
-          centerShift_y: 0,
+          ...state.depthScaleParams,
           translatePos: {
             x: 0,
             y: 0
@@ -433,7 +435,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         operationStack: {
           ...state.operationStack,
           rgbStack: [...rgbStack],
-          depthStack: [...depthStack]
+          depthStack: [...depthStack],
+          layerStack: layerStack
         }
       };
     case types.REMOVE_ITEM:

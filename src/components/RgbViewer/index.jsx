@@ -116,6 +116,9 @@ class RgbViewer extends Component {
             downScaleBox(parameters.croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
           );
         }
+      } else {
+        let rgbContext = rgbCanvas.getContext("2d");
+        rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
       }
     }
     // Highlight pixel range from specified range for either cropped image or initial full image

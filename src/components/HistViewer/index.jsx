@@ -21,14 +21,16 @@ class HistViewer extends Component {
       prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage ||
       prevProps.memoryDepthCanvas !== memoryDepthCanvas
     ) {
-      if (parameters.croppedCanvasImage) {
-        let histDepthData = getImageData(parameters.croppedCanvasImage);
-        this.setState({ data: histDepthData });
-      } else {
-        if (memoryDepthCanvas) {
+      if (memoryDepthCanvas) {
+        if (parameters.croppedCanvasImage) {
+          let histDepthData = getImageData(parameters.croppedCanvasImage);
+          this.setState({ data: histDepthData });
+        } else {
           let histDepthData = getImageData(memoryDepthCanvas);
           this.setState({ data: histDepthData });
         }
+      } else {
+        this.setState({ data: [] });
       }
     }
   }

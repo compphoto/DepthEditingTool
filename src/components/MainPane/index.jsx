@@ -86,7 +86,6 @@ class MainPane extends Component {
                       cacheRgbCanvas: null,
                       prevRgbSize: { width: null, height: null },
                       rgbBitmapCanvas: null,
-                      depthBitmapCanvas: null,
                       rgbScaleParams: {
                         ratio: 1,
                         centerShift_x: 0,

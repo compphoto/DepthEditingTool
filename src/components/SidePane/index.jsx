@@ -136,6 +136,8 @@ export function SidePane({
   useEffect(() => {
     if (depthBitmapCanvas) {
       setBitmapImage(getImageFromCanvas(depthBitmapCanvas));
+    } else {
+      setBitmapImage(null);
     }
   }, [depthBitmapCanvas]);
   useEffect(() => {
@@ -373,11 +375,9 @@ export function SidePane({
                   className="mx-2"
                   color="secondary"
                   onClick={() => {
-                    const bitmapContext = bitmapCanvas.getContext("2d");
-                    bitmapContext.clearRect(0, 0, bitmapCanvas.width, bitmapCanvas.height);
-                    const saveBitmapContext = saveBitmapCanvas.getContext("2d");
-                    saveBitmapContext.clearRect(0, 0, saveBitmapCanvas.width, saveBitmapCanvas.height);
-                    setBitmapImage(getImageFromCanvas(bitmapCanvas));
+                    const bitmapContext = depthBitmapCanvas.getContext("2d");
+                    bitmapContext.clearRect(0, 0, depthBitmapCanvas.width, depthBitmapCanvas.height);
+                    setBitmapImage(getImageFromCanvas(depthBitmapCanvas));
                   }}
                 >
                   Clear
@@ -746,7 +746,6 @@ export function SidePane({
 
 const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
-  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),

@@ -128,6 +128,9 @@ class DepthViewer extends Component {
             downScaleBox(parameters.croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
           );
         }
+      } else {
+        let depthContext = depthCanvas.getContext("2d");
+        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
       }
     }
     // Highlight pixel range from specified range for either cropped image or initial full image
@@ -153,12 +156,6 @@ class DepthViewer extends Component {
       } else {
         depthCanvas.style.cursor = "default";
         depthCanvas.removeEventListener("click", this.drawBoundingBox);
-        const bitmapContext = depthBitmapCanvas.getContext("2d");
-        bitmapContext.clearRect(0, 0, depthBitmapCanvas.width, depthBitmapCanvas.height);
-        removeOperation({
-          name: "depthStack",
-          value: drawBox
-        });
         storeParameters({
           croppedCanvasImage: null,
           croppedArea: null,
@@ -169,6 +166,10 @@ class DepthViewer extends Component {
             update: [0, 255]
           }
         });
+        if (depthBitmapCanvas) {
+          const bitmapContext = depthBitmapCanvas.getContext("2d");
+          bitmapContext.clearRect(0, 0, depthBitmapCanvas.width, depthBitmapCanvas.height);
+        }
       }
     }
   }
