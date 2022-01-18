@@ -16,18 +16,17 @@ class HistViewer extends Component {
     data: []
   };
   componentDidUpdate(prevProps) {
-    let { tempDepthCanvas, depthCanvasDimension, parameters } = this.props;
+    let { memoryDepthCanvas, parameters } = this.props;
     if (
       prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage ||
-      prevProps.tempDepthCanvas !== tempDepthCanvas
+      prevProps.memoryDepthCanvas !== memoryDepthCanvas
     ) {
       if (parameters.croppedCanvasImage) {
         let histDepthData = getImageData(parameters.croppedCanvasImage);
         this.setState({ data: histDepthData });
       } else {
-        if (tempDepthCanvas) {
-          const boundingBox = dimensionToBox(depthCanvasDimension);
-          let histDepthData = getImageData(cropCanvas(tempDepthCanvas, boundingBox));
+        if (memoryDepthCanvas) {
+          let histDepthData = getImageData(memoryDepthCanvas);
           this.setState({ data: histDepthData });
         }
       }
@@ -44,9 +43,7 @@ class HistViewer extends Component {
 }
 
 const mapStateToProps = state => ({
-  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
+  memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   parameters: imageSelectors.parameters(state)
 });
 

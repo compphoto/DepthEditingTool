@@ -6,27 +6,15 @@ import { Helmet } from "react-helmet";
 import { Container, Button } from "reactstrap";
 import { RiDownloadLine } from "react-icons/ri";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import { MdOutlinePanTool } from "react-icons/md";
 import { ImUndo2 } from "react-icons/im";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
-import { cloneCanvas, canvasToImage, getRatio, drawScaledCanvasImage } from "utils/canvasUtils";
-import { runSaveDepthOperations } from "utils/stackOperations";
+import { canvasToImage } from "utils/canvasUtils";
+import {} from "utils/stackOperations";
 
-export function ImageEditor({
-  mainDepthCanvas,
-  tempDepthCanvas,
-  savedDepthCanvas,
-  parameters,
-  operationStack,
-  initImage,
-  storeParameters,
-  addOperation,
-  undo,
-  clear,
-  reset
-}) {
-  const { scale, scaleMultiplier, translatePos } = parameters.canvasParams;
+export function ImageEditor({ memoryDepthCanvas, zoomIn, zoomOut, undo, clear, reset }) {
   return (
     <ImageEditorStyle>
       <Helmet>
@@ -39,29 +27,12 @@ export function ImageEditor({
               <h4>Image Editor</h4>
             </div>
             <div className="nav-button">
+              <Button onClick={() => {}} size="sm" color="outline">
+                <MdOutlinePanTool />
+              </Button>
               <Button
                 onClick={() => {
-                  let { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
-                  addOperation({
-                    name: "moveStack",
-                    value: {
-                      func: drawScaledCanvasImage,
-                      params: [
-                        tempDepthCanvas,
-                        ratio,
-                        centerShift_x,
-                        centerShift_y,
-                        scale * scaleMultiplier,
-                        translatePos
-                      ]
-                    }
-                  });
-                  storeParameters({
-                    canvasParams: {
-                      ...parameters.canvasParams,
-                      scale: scale * scaleMultiplier
-                    }
-                  });
+                  zoomOut();
                 }}
                 size="sm"
                 color="outline"
@@ -70,27 +41,7 @@ export function ImageEditor({
               </Button>
               <Button
                 onClick={() => {
-                  let { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
-                  addOperation({
-                    name: "moveStack",
-                    value: {
-                      func: drawScaledCanvasImage,
-                      params: [
-                        tempDepthCanvas,
-                        ratio,
-                        centerShift_x,
-                        centerShift_y,
-                        scale / scaleMultiplier,
-                        translatePos
-                      ]
-                    }
-                  });
-                  storeParameters({
-                    canvasParams: {
-                      ...parameters.canvasParams,
-                      scale: scale / scaleMultiplier
-                    }
-                  });
+                  zoomIn();
                 }}
                 size="sm"
                 color="outline"
@@ -112,7 +63,6 @@ export function ImageEditor({
                 }}
                 size="sm"
                 color="secondary"
-                className="mx-3"
               >
                 Clear
               </Button>
@@ -122,26 +72,16 @@ export function ImageEditor({
                 }}
                 size="sm"
                 color="secondary"
+                className="mx-3"
               >
                 Reset
               </Button>
               <Button
                 onClick={() => {
-                  runSaveDepthOperations(cloneCanvas(mainDepthCanvas));
-                }}
-                disabled={operationStack.saveStack.length < 2}
-                size="sm"
-                color="secondary"
-                className="mx-3"
-              >
-                Save
-              </Button>
-              <Button
-                onClick={() => {
-                  let image = canvasToImage(savedDepthCanvas);
+                  let image = canvasToImage(memoryDepthCanvas);
                   window.location.href = image;
                 }}
-                disabled={savedDepthCanvas === null}
+                disabled={memoryDepthCanvas === null}
                 size="sm"
                 color="primary"
               >
@@ -161,17 +101,12 @@ export function ImageEditor({
 }
 
 const mapStateToProps = state => ({
-  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  savedDepthCanvas: imageSelectors.savedDepthCanvas(state),
-  parameters: imageSelectors.parameters(state),
-  operationStack: imageSelectors.operationStack(state)
+  memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state)
 });
 
 const mapDispatchToProps = {
-  initImage: imageActions.initImage,
-  storeParameters: imageActions.storeParameters,
-  addOperation: imageActions.addOperation,
+  zoomIn: imageActions.zoomIn,
+  zoomOut: imageActions.zoomOut,
   undo: imageActions.undo,
   clear: imageActions.clear,
   reset: imageActions.reset

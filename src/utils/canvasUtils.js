@@ -6,12 +6,15 @@ export const canvasToImage = canvas => {
 };
 
 export const cloneCanvas = oldCanvas => {
-  const newCanvas = document.createElement("canvas");
-  const context = newCanvas.getContext("2d");
-  newCanvas.width = oldCanvas.width;
-  newCanvas.height = oldCanvas.height;
-  context.drawImage(oldCanvas, 0, 0);
-  return newCanvas;
+  if (oldCanvas) {
+    const newCanvas = document.createElement("canvas");
+    const context = newCanvas.getContext("2d");
+    newCanvas.width = oldCanvas.width;
+    newCanvas.height = oldCanvas.height;
+    context.drawImage(oldCanvas, 0, 0);
+    return newCanvas;
+  }
+  return null;
 };
 
 export const dimensionToBox = dimension => {
@@ -46,7 +49,7 @@ export const getRatio = (image, canvas) => {
   };
 };
 
-export const scaleBox = (box, ratio, centerShift_x, centerShift_y) => {
+export const upScaleBox = (box, ratio, centerShift_x, centerShift_y) => {
   let x = (box[0] - centerShift_x) / ratio;
   let y = (box[1] - centerShift_y) / ratio;
   let w = box[2] / ratio;
@@ -54,7 +57,7 @@ export const scaleBox = (box, ratio, centerShift_x, centerShift_y) => {
   return [x, y, w, h];
 };
 
-export const scaleDimension = (dimension, ratio, centerShift_x, centerShift_y) => {
+export const upScaleDimension = (dimension, ratio, centerShift_x, centerShift_y) => {
   let x1 = (dimension[0] - centerShift_x) / ratio;
   let y1 = (dimension[1] - centerShift_y) / ratio;
   let x2 = x1 + (dimension[2] - centerShift_x) / ratio;
@@ -62,15 +65,43 @@ export const scaleDimension = (dimension, ratio, centerShift_x, centerShift_y) =
   return [x1, y1, x2, y2];
 };
 
-export const getDimension = (image, ratio, centerShift_x, centerShift_y) => {
+export const downScaleBox = (box, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
+  let x = box[0] * ratio + centerShift_x;
+  let y = box[1] * ratio + centerShift_y;
+  let w = box[2] * ratio;
+  let h = box[3] * ratio;
+  return [x, y, w, h];
+};
+
+export const getDimension = (image, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
   let x1 = centerShift_x;
   let y1 = centerShift_y;
   let x2 = centerShift_x + image.width * ratio;
   let y2 = centerShift_y + image.height * ratio;
+  // let x1 = centerShift_x + translatePos.x;
+  // let y1 = centerShift_y + translatePos.y;
+  // let x2 = centerShift_x + translatePos.x + image.width * ratio;
+  // let y2 = centerShift_y + translatePos.y + image.height * ratio;
   return [x1, y1, x2, y2];
 };
 
-export const drawCanvasImage = (image, context, ratio, centerShift_x, centerShift_y) => {
+export const getBoundingArea = image => {
+  if (image) {
+    return [0, 0, image.width, image.height];
+  }
+  return null;
+};
+
+export const drawCanvasImage = (image, context) => {
+  context.drawImage(image, 0, 0);
+};
+
+export const drawScaledCanvasImage = (image, canvas, ratio, centerShift_x, centerShift_y, scale, translatePos) => {
+  let context = canvas.getContext("2d");
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.save();
+  context.translate(translatePos.x, translatePos.y);
+  context.scale(scale, scale);
   context.drawImage(
     image,
     0,
@@ -82,15 +113,15 @@ export const drawCanvasImage = (image, context, ratio, centerShift_x, centerShif
     image.width * ratio,
     image.height * ratio
   );
+  context.restore();
 };
 
 export const getImageFromCanvas = bitmap => {
   let canvas = document.createElement("canvas");
   canvas.width = 190;
   canvas.height = 132;
-  let context = canvas.getContext("2d");
   let { ratio, centerShift_x, centerShift_y } = getRatio(bitmap, canvas);
-  drawCanvasImage(bitmap, context, ratio, centerShift_x, centerShift_y);
+  drawScaledCanvasImage(bitmap, canvas, ratio, centerShift_x, centerShift_y, 1, { x: 0, y: 0 });
   return canvasToImage(canvas);
 };
 
@@ -116,39 +147,13 @@ export const cropCanvas = (oldCanvas, boundingBox) => {
   return null;
 };
 
-export const drawScaledCanvasImage = (
-  image,
-  context,
-  canvas,
-  ratio,
-  centerShift_x,
-  centerShift_y,
-  scale,
-  translatePos
-) => {
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  context.save();
-  context.translate(translatePos.x, translatePos.y);
-  context.scale(scale, scale);
-  context.drawImage(
-    image,
-    0,
-    0,
-    image.width,
-    image.height,
-    centerShift_x,
-    centerShift_y,
-    image.width * ratio,
-    image.height * ratio
-  );
-  context.restore();
-};
-
 export const drawLayerCanvas = (image, context, canvas) => {
   context.drawImage(canvas, 0, 0);
 };
 
-export const drawBox = (image, context, new_x, new_y, new_w, new_h) => {
+export const drawBox = (canvas, box) => {
+  const [new_x, new_y, new_w, new_h] = box;
+  const context = canvas.getContext("2d");
   context.beginPath();
   context.strokeStyle = "red";
   context.rect(new_x, new_y, new_w, new_h);

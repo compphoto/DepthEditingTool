@@ -13,10 +13,12 @@ import {
   getDimension,
   drawBox,
   drawScaledCanvasImage,
-  dimensionToBox
+  getBoundingArea,
+  upScaleBox,
+  downScaleBox
 } from "utils/canvasUtils";
-import { runCanvasOperations, runSaveDepthOperations, runTempDepthOperations } from "utils/stackOperations";
-import { runDepthLayerOperations, runTempDepthLayerOperations } from "utils/layerOperations";
+import { runDepthOperations, runCachedDepthOperations } from "utils/stackOperations";
+import { runDepthLayerOperations } from "utils/layerOperations";
 
 let objectUrl = null;
 
@@ -39,15 +41,17 @@ class DepthViewer extends Component {
     let {
       depthImageUrl,
       mainDepthCanvas,
-      savedDepthCanvas,
+      displayDepthCanvas,
       prevDepthSize,
-      depthCanvasDimension,
-      bitmapCanvas,
+      depthBitmapCanvas,
       layerMode,
+      depthScaleParams,
       tools,
       parameters,
       operationStack,
       initImage,
+      initDepth,
+      storeScaleParams,
       storeParameters,
       addOperation,
       removeOperation,
@@ -55,93 +59,86 @@ class DepthViewer extends Component {
     } = this.props;
     let depthCanvas = depthImageRef.current;
     let depthContext = depthCanvas.getContext("2d");
-    // Load image and initialize all canvas images
+    // Load image and initialize main depth canvas
     if (prevProps.depthImageUrl !== depthImageUrl) {
       depthContext.clearRect(0, 0, prevDepthSize.width, prevDepthSize.height);
       let depthImage = new Image();
       objectUrl = getImageUrl(depthImageUrl);
       depthImage.src = objectUrl;
       depthImage.onload = () => {
-        initImage({
-          mainDepthCanvas: cloneCanvas(depthImage), // Draw original canvas
-          tempDepthCanvas: null,
-          savedDepthCanvas: null,
-          depthCanvasDimension: null,
-          bitmapCanvas: null,
-          rgbBitmapCanvas: null,
-          operationStack: {
-            ...operationStack,
-            depthStack: [],
-            saveStack: []
-          }
-        });
-        runSaveDepthOperations(cloneCanvas(depthImage));
+        initDepth(cloneCanvas(depthImage));
       };
     }
     // If main image changes, add draw/redraw canvas to operation
     if (prevProps.mainDepthCanvas !== mainDepthCanvas) {
-      const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, depthCanvas);
-      addEffect({
-        name: "depthStack",
-        value: { func: drawCanvasImage, params: [ratio, centerShift_x, centerShift_y] }
-      });
-      addEffect({
-        name: "saveStack",
-        value: { func: drawCanvasImage, params: [1, 0, 0] }
-      });
-      initImage({
-        prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height },
-        depthCanvasDimension: getDimension(mainDepthCanvas, ratio, centerShift_x, centerShift_y),
-        parameters: {
-          ...parameters,
-          canvasParams: {
-            translatePos: {
-              x: 0,
-              y: 0
-            },
-            scale: 1.0,
-            scaleMultiplier: 0.8,
-            startDragOffset: {},
-            mouseDown: false
+      if (mainDepthCanvas) {
+        const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, depthCanvas);
+        initImage({
+          prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height }
+        });
+        storeScaleParams({ name: "depthScaleParams", value: { ratio, centerShift_x, centerShift_y } });
+        addEffect({
+          name: "depthStack",
+          value: {
+            func: drawCanvasImage
           }
-        }
-      });
+        });
+      }
     }
     // If operation is added to the stack, rerun all operations in operation stack
     if (prevProps.operationStack.depthStack !== operationStack.depthStack || prevProps.layerMode !== layerMode) {
-      if (!layerMode) {
-        console.warn(savedDepthCanvas);
-        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
-        runCanvasOperations("depthStack", savedDepthCanvas || mainDepthCanvas, depthContext);
-        runTempDepthOperations(
-          "depthStack",
-          savedDepthCanvas || mainDepthCanvas,
-          depthCanvas.width,
-          depthCanvas.height
-        );
+      if (!layerMode && mainDepthCanvas) {
+        let prevStack = prevProps.operationStack.depthStack;
+        let currentStack = operationStack.depthStack;
+        if (
+          prevStack.length > 1 &&
+          currentStack.length > 1 &&
+          prevStack[prevStack.length - 1].func.toString() === currentStack[currentStack.length - 1].func.toString()
+        ) {
+          runCachedDepthOperations(mainDepthCanvas);
+        } else {
+          runDepthOperations(mainDepthCanvas);
+        }
       }
     }
     if (prevProps.operationStack.layerStack !== operationStack.layerStack || prevProps.layerMode !== layerMode) {
-      if (layerMode) {
-        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
-        runDepthLayerOperations(depthContext);
-        runTempDepthLayerOperations(depthCanvas.width, depthCanvas.height);
+      if (layerMode && displayDepthCanvas) {
+        runDepthLayerOperations(displayDepthCanvas.width, displayDepthCanvas.height);
       }
     }
-    // If operation is added to the move stack, rerun all operations in operation stack
-    if (prevProps.operationStack.moveStack !== operationStack.moveStack) {
-      runCanvasOperations("moveStack", mainDepthCanvas, depthContext);
+    if (
+      prevProps.displayDepthCanvas !== displayDepthCanvas ||
+      prevProps.depthScaleParams !== depthScaleParams ||
+      prevProps.parameters.croppedArea !== parameters.croppedArea
+    ) {
+      if (displayDepthCanvas) {
+        const { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
+        drawScaledCanvasImage(
+          displayDepthCanvas,
+          depthCanvas,
+          ratio,
+          centerShift_x,
+          centerShift_y,
+          scale,
+          translatePos
+        );
+        if (parameters.croppedArea) {
+          drawBox(
+            depthCanvas,
+            downScaleBox(parameters.croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
+          );
+        }
+      }
     }
     // Highlight pixel range from specified range for either cropped image or initial full image
     if (prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange) {
       if (parameters.histogramParams.pixelRange || parameters.croppedArea) {
         const { croppedArea, histogramParams } = parameters;
         let newArea = null;
-        depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
         if (croppedArea) {
           newArea = croppedArea;
         } else {
-          newArea = dimensionToBox(depthCanvasDimension);
+          newArea = getBoundingArea(displayDepthCanvas);
         }
         addOperation({
           name: "depthStack",
@@ -154,9 +151,10 @@ class DepthViewer extends Component {
       if (tools.currentTool) {
         depthCanvas.addEventListener("click", this.drawBoundingBox);
       } else {
+        depthCanvas.style.cursor = "default";
         depthCanvas.removeEventListener("click", this.drawBoundingBox);
-        const bitmapContext = bitmapCanvas.getContext("2d");
-        bitmapContext.clearRect(0, 0, bitmapCanvas.width, bitmapCanvas.height);
+        const bitmapContext = depthBitmapCanvas.getContext("2d");
+        bitmapContext.clearRect(0, 0, depthBitmapCanvas.width, depthBitmapCanvas.height);
         removeOperation({
           name: "depthStack",
           value: drawBox
@@ -181,65 +179,56 @@ class DepthViewer extends Component {
     URL.revokeObjectURL(objectUrl);
   }
   handleResize = () => {
+    const { displayDepthCanvas, depthScaleParams, parameters, initImage, storeScaleParams } = this.props;
+    const { translatePos, scale } = depthScaleParams;
+    const depthCanvas = this.depthImageRef.current;
     this.setState({ ...this.state, windowWidth: window.innerWidth });
-    const { depthImageRef } = this;
-    const { mainDepthCanvas, bitmapCanvas, parameters, operationStack, initImage, addEffect } = this.props;
-    const depthCanvas = depthImageRef.current;
-    if (depthCanvas && mainDepthCanvas) {
+    if (depthCanvas && displayDepthCanvas) {
       depthCanvas.width = (window.innerWidth / 1500) * 521;
       depthCanvas.height = (window.innerHeight / 1200) * 352;
-      bitmapCanvas.width = depthCanvas.width;
-      bitmapCanvas.height = depthCanvas.height;
-      const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, depthCanvas);
+      const { ratio, centerShift_x, centerShift_y } = getRatio(displayDepthCanvas, depthCanvas);
       initImage({
-        parameters: {
-          ...parameters,
-          canvasParams: {
-            translatePos: {
-              x: 0,
-              y: 0
-            },
-            scale: 1.0,
-            scaleMultiplier: 0.8,
-            startDragOffset: {},
-            mouseDown: false
-          }
-        },
-        operationStack: {
-          ...operationStack,
-          depthStack: [],
-          moveStack: []
-        },
-        prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height },
-        depthCanvasDimension: getDimension(mainDepthCanvas, ratio, centerShift_x, centerShift_y)
+        prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height }
       });
-      addEffect({
-        name: "depthStack",
-        value: { func: drawCanvasImage, params: [ratio, centerShift_x, centerShift_y] }
-      });
+      storeScaleParams({ name: "depthScaleParams", value: { ratio, centerShift_x, centerShift_y } });
+      drawScaledCanvasImage(displayDepthCanvas, depthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+      if (parameters.croppedArea) {
+        drawBox(
+          depthCanvas,
+          downScaleBox(parameters.croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
+        );
+      }
     }
   };
   drawBoundingBox = event => {
     let depthCanvas = this.depthImageRef.current;
     let { initBoundingBox } = this.state;
-    let { tempDepthCanvas, depthCanvasDimension, storeParameters, addOperation, removeOperation } = this.props;
-    if (tempDepthCanvas) {
+    let { memoryDepthCanvas, depthScaleParams, storeParameters, addOperation, removeOperation } = this.props;
+    let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
+    if (memoryDepthCanvas) {
       let x = event.layerX;
       let y = event.layerY;
       if (initBoundingBox) {
+        let depthCanvasDimension = getDimension(
+          memoryDepthCanvas,
+          ratio,
+          centerShift_x,
+          centerShift_y,
+          translatePos,
+          scale
+        );
         let [image_x1, image_y1, image_x2, image_y2] = depthCanvasDimension;
         let new_x = Math.max(Math.min(initBoundingBox.x, x), image_x1);
         let new_y = Math.max(Math.min(initBoundingBox.y, y), image_y1);
         let new_w = Math.min(Math.max(initBoundingBox.x, x), image_x2) - new_x;
         let new_h = Math.min(Math.max(initBoundingBox.y, y), image_y2) - new_y;
         if (new_w !== 0 || new_w !== 0) {
-          let croppedArea = [new_x, new_y, new_w, new_h];
+          let croppedArea = upScaleBox([new_x, new_y, new_w, new_h], ratio, centerShift_x, centerShift_y);
           this.setState({ initBoundingBox: null }, () => {
             depthCanvas.style.cursor = "default";
-            storeParameters({ croppedCanvasImage: cropCanvas(tempDepthCanvas, croppedArea), croppedArea: croppedArea });
-            addOperation({
-              name: "depthStack",
-              value: { func: drawBox, params: croppedArea }
+            storeParameters({
+              croppedCanvasImage: cropCanvas(memoryDepthCanvas, croppedArea),
+              croppedArea: croppedArea
             });
           });
         }
@@ -247,6 +236,7 @@ class DepthViewer extends Component {
         this.setState({ initBoundingBox: { x, y } }, () => {
           depthCanvas.style.cursor = "crosshair";
           storeParameters({
+            croppedArea: null,
             histogramParams: {
               pixelRange: [0, 255],
               domain: [0, 255],
@@ -254,81 +244,80 @@ class DepthViewer extends Component {
               update: [0, 255]
             }
           });
-          removeOperation({
-            name: "depthStack",
-            value: drawBox
-          });
         });
       }
     }
   };
   render() {
     const { depthImageRef } = this;
-    const depthCanvas = depthImageRef.current;
-    const { mainDepthCanvas, parameters, tools, storeParameters, addOperation } = this.props;
-    const { scale, translatePos, startDragOffset, mouseDown } = parameters.canvasParams;
+    const {
+      mainDepthCanvas,
+      rgbScaleParams,
+      depthScaleParams,
+      parameters,
+      tools,
+      storeScaleParams,
+      storeParameters,
+      addOperation
+    } = this.props;
     return (
       <DepthViewerStyle>
         <canvas
           width={(window.innerWidth / 1500) * 521}
           height={(window.innerHeight / 1200) * 352}
           ref={depthImageRef}
-          onMouseDown={e =>
-            storeParameters({
-              canvasParams: {
-                ...parameters.canvasParams,
+          onMouseDown={e => {
+            storeScaleParams({
+              name: "rgbScaleParams",
+              value: {
                 startDragOffset: {
-                  x: e.clientX - translatePos.x,
-                  y: e.clientY - translatePos.y
+                  x: e.clientX - rgbScaleParams.translatePos.x,
+                  y: e.clientY - rgbScaleParams.translatePos.y
                 },
                 mouseDown: true
               }
-            })
-          }
-          onMouseUp={e =>
-            mouseDown &&
-            storeParameters({
-              canvasParams: {
-                ...parameters.canvasParams,
-                mouseDown: false
+            });
+            storeScaleParams({
+              name: "depthScaleParams",
+              value: {
+                startDragOffset: {
+                  x: e.clientX - depthScaleParams.translatePos.x,
+                  y: e.clientY - depthScaleParams.translatePos.y
+                },
+                mouseDown: true
               }
-            })
-          }
-          onMouseOver={e =>
-            mouseDown &&
-            storeParameters({
-              canvasParams: {
-                ...parameters.canvasParams,
-                mouseDown: false
-              }
-            })
-          }
-          onMouseOut={e =>
-            mouseDown &&
-            storeParameters({
-              canvasParams: {
-                ...parameters.canvasParams,
-                mouseDown: false
-              }
-            })
-          }
+            });
+          }}
+          onMouseUp={e => {
+            rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+            depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+          }}
+          onMouseOver={e => {
+            rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+            depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+          }}
+          onMouseOut={e => {
+            rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+            depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+          }}
           onMouseMove={e => {
-            if (mouseDown && !tools.currentTool) {
-              const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, depthCanvas);
-              storeParameters({
-                canvasParams: {
-                  ...parameters.canvasParams,
+            if (depthScaleParams.mouseDown && !tools.currentTool) {
+              storeScaleParams({
+                name: "rgbScaleParams",
+                value: {
                   translatePos: {
-                    x: e.clientX - startDragOffset.x,
-                    y: e.clientY - startDragOffset.y
+                    x: e.clientX - rgbScaleParams.startDragOffset.x,
+                    y: e.clientY - rgbScaleParams.startDragOffset.y
                   }
                 }
               });
-              addOperation({
-                name: "moveStack",
+              storeScaleParams({
+                name: "depthScaleParams",
                 value: {
-                  func: drawScaledCanvasImage,
-                  params: [depthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos]
+                  translatePos: {
+                    x: e.clientX - depthScaleParams.startDragOffset.x,
+                    y: e.clientY - depthScaleParams.startDragOffset.y
+                  }
                 }
               });
             }
@@ -342,12 +331,13 @@ class DepthViewer extends Component {
 const mapStateToProps = state => ({
   depthImageUrl: imageSelectors.depthImageUrl(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  savedDepthCanvas: imageSelectors.savedDepthCanvas(state),
+  displayDepthCanvas: imageSelectors.displayDepthCanvas(state),
+  memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   prevDepthSize: imageSelectors.prevDepthSize(state),
-  depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
-  bitmapCanvas: imageSelectors.bitmapCanvas(state),
+  depthBitmapCanvas: imageSelectors.depthBitmapCanvas(state),
   layerMode: imageSelectors.layerMode(state),
+  rgbScaleParams: imageSelectors.rgbScaleParams(state),
+  depthScaleParams: imageSelectors.depthScaleParams(state),
   tools: imageSelectors.tools(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),
@@ -356,6 +346,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   initImage: imageActions.initImage,
+  initDepth: imageActions.initDepth,
+  storeScaleParams: imageActions.storeScaleParams,
   storeParameters: imageActions.storeParameters,
   addOperation: imageActions.addOperation,
   removeOperation: imageActions.removeOperation,

@@ -25,25 +25,12 @@ class MainPane extends Component {
       toolExtOpen,
       rgbImageUrl,
       depthImageUrl,
-      tempRgbCanvas,
-      tempDepthCanvas,
-      rgbCanvasDimension,
-      depthCanvasDimension,
+      displayRgbCanvas,
+      memoryDepthCanvas,
+      operationStack,
       removeItem,
       removeAllItem
     } = this.props;
-    const rgbBoundingBox = rgbCanvasDimension && [
-      rgbCanvasDimension[0],
-      rgbCanvasDimension[1],
-      rgbCanvasDimension[2] - rgbCanvasDimension[0],
-      rgbCanvasDimension[3] - rgbCanvasDimension[1]
-    ];
-    const depthBoundingBox = depthCanvasDimension && [
-      depthCanvasDimension[0],
-      depthCanvasDimension[1],
-      depthCanvasDimension[2] - depthCanvasDimension[0],
-      depthCanvasDimension[3] - depthCanvasDimension[1]
-    ];
     return (
       <MainPaneStyle>
         <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
@@ -59,8 +46,8 @@ class MainPane extends Component {
             <div className="main-column main-column-3d">
               <div className="box threeD-box">
                 <ThreeDViewer
-                  rgbImageCanvas={canvasToImage(cropCanvas(tempRgbCanvas, rgbBoundingBox))}
-                  depthImageCanvas={canvasToImage(cropCanvas(tempDepthCanvas, depthBoundingBox))}
+                  rgbImageCanvas={canvasToImage(displayRgbCanvas)}
+                  depthImageCanvas={canvasToImage(memoryDepthCanvas)}
                 />
               </div>
               <div className="box histogram-box">
@@ -94,10 +81,29 @@ class MainPane extends Component {
                     e.stopPropagation();
                     removeItem({
                       rgbImageUrl: null,
-                      loadedRgbImage: null,
                       mainRgbCanvas: null,
-                      tempRgbCanvas: null,
-                      rgbImageDimension: null
+                      displayRgbCanvas: null,
+                      cacheRgbCanvas: null,
+                      prevRgbSize: { width: null, height: null },
+                      rgbBitmapCanvas: null,
+                      depthBitmapCanvas: null,
+                      rgbScaleParams: {
+                        ratio: 1,
+                        centerShift_x: 0,
+                        centerShift_y: 0,
+                        translatePos: {
+                          x: 0,
+                          y: 0
+                        },
+                        scale: 1.0,
+                        scaleMultiplier: 0.8,
+                        startDragOffset: {},
+                        mouseDown: false
+                      },
+                      operationStack: {
+                        ...operationStack,
+                        rgbStack: []
+                      }
                     });
                   }}
                   className="remove-img"
@@ -130,17 +136,42 @@ class MainPane extends Component {
                     e.stopPropagation();
                     removeItem({
                       depthImageUrl: null,
-                      loadedDepthImage: null,
                       mainDepthCanvas: null,
-                      tempDepthCanvas: null,
-                      depthImageDimension: null,
+                      memoryDepthCanvas: null,
+                      displayDepthCanvas: null,
+                      cacheDepthCanvas: null,
+                      prevDepthSize: { width: null, height: null },
+                      rgbBitmapCanvas: null,
+                      depthBitmapCanvas: null,
+                      layerMode: false,
+                      depthScaleParams: {
+                        ratio: 1,
+                        centerShift_x: 0,
+                        centerShift_y: 0,
+                        translatePos: {
+                          x: 0,
+                          y: 0
+                        },
+                        scale: 1.0,
+                        scaleMultiplier: 0.8,
+                        startDragOffset: {},
+                        mouseDown: false
+                      },
                       tools: {
                         currentTool: null,
-                        depth: false
+                        singleSelection: false,
+                        addSelection: false,
+                        subtractSelection: false,
+                        intersectSelection: false
                       },
                       toolsParameters: {
-                        depthBoxIntensity: 0,
-                        depthRangeIntensity: 0
+                        depthRangeIntensity: 0,
+                        depthScale: 0,
+                        brightness: 0,
+                        contrast: 0,
+                        sharpness: 0,
+                        aConstant: 0,
+                        bConstant: 0
                       },
                       parameters: {
                         croppedCanvasImage: null,
@@ -151,6 +182,11 @@ class MainPane extends Component {
                           values: [0, 255],
                           update: [0, 255]
                         }
+                      },
+                      operationStack: {
+                        ...operationStack,
+                        depthStack: [],
+                        layerStack: []
                       }
                     });
                   }}
@@ -182,10 +218,9 @@ const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
   rgbImageUrl: imageSelectors.rgbImageUrl(state),
   depthImageUrl: imageSelectors.depthImageUrl(state),
-  tempRgbCanvas: imageSelectors.tempRgbCanvas(state),
-  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  rgbCanvasDimension: imageSelectors.rgbCanvasDimension(state),
-  depthCanvasDimension: imageSelectors.depthCanvasDimension(state)
+  displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
+  memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
+  operationStack: imageSelectors.operationStack(state)
 });
 
 const mapDispatchToProps = {

@@ -29,21 +29,18 @@ import {
   getRgbBitmap,
   highlightPixelArea,
   modifyBitmap,
-  scaleBox,
-  scaleSelection
+  upScaleBox,
+  scaleSelection,
+  getBoundingArea
 } from "utils/canvasUtils";
 import PointCurve from "components/PointCurve";
 
 export function SidePane({
   toolExtOpen,
   toolExtActions,
-  mainDepthCanvas,
-  tempRgbCanvas,
-  tempDepthCanvas,
-  savedDepthCanvas,
-  depthCanvasDimension,
-  bitmapCanvas,
-  saveBitmapCanvas,
+  memoryDepthCanvas,
+  displayRgbCanvas,
+  depthBitmapCanvas,
   layerMode,
   tools,
   toolsParameters,
@@ -58,8 +55,7 @@ export function SidePane({
   updateLayer,
   removeLayer,
   removeAllLayers,
-  addEffect,
-  removeOperation
+  addEffect
 }) {
   const [activeTool, setActiveTool] = useState(0);
   const [bitmapImage, setBitmapImage] = useState(null);
@@ -111,42 +107,20 @@ export function SidePane({
     }
   };
   const onModifyBitmap = () => {
-    if (tempDepthCanvas) {
+    if (memoryDepthCanvas) {
       const { croppedCanvasImage, croppedArea, histogramParams } = parameters;
-      const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
       let newArea = null;
       let newCroppedCanvasImage = null;
-      let saveNewArea = null;
-      let saveNewCroppedCanvasImage = null;
       if (croppedArea) {
         newArea = croppedArea;
         newCroppedCanvasImage = croppedCanvasImage;
-        saveNewArea = scaleBox(newArea, ratio, centerShift_x, centerShift_y);
-        saveNewCroppedCanvasImage = cropCanvas(savedDepthCanvas, saveNewArea);
       } else {
-        newArea = dimensionToBox(depthCanvasDimension);
-        newCroppedCanvasImage = cropCanvas(tempDepthCanvas, newArea);
-        saveNewArea = scaleBox(newArea, ratio, centerShift_x, centerShift_y);
-        saveNewCroppedCanvasImage = cropCanvas(savedDepthCanvas, saveNewArea);
+        newArea = getBoundingArea(memoryDepthCanvas);
+        newCroppedCanvasImage = cloneCanvas(memoryDepthCanvas);
       }
-      modifyBitmap(bitmapCanvas, newCroppedCanvasImage, newArea, tools.currentTool, histogramParams.pixelRange);
-      modifyBitmap(
-        saveBitmapCanvas,
-        saveNewCroppedCanvasImage,
-        saveNewArea,
-        tools.currentTool,
-        histogramParams.pixelRange
-      );
-      setBitmapImage(getImageFromCanvas(bitmapCanvas));
-      initImage({ rgbBitmapCanvas: getRgbBitmap(cloneCanvas(bitmapCanvas), cloneCanvas(tempRgbCanvas)) });
-      removeOperation({
-        name: "depthStack",
-        value: drawBox
-      });
-      removeOperation({
-        name: "rgbStack",
-        value: drawBox
-      });
+      modifyBitmap(depthBitmapCanvas, newCroppedCanvasImage, newArea, tools.currentTool, histogramParams.pixelRange);
+      setBitmapImage(getImageFromCanvas(depthBitmapCanvas));
+      initImage({ rgbBitmapCanvas: getRgbBitmap(cloneCanvas(depthBitmapCanvas), cloneCanvas(displayRgbCanvas)) });
       storeParameters({
         croppedCanvasImage: null,
         croppedArea: null,
@@ -160,17 +134,17 @@ export function SidePane({
     }
   };
   useEffect(() => {
-    if (bitmapCanvas) {
-      setBitmapImage(getImageFromCanvas(bitmapCanvas));
+    if (depthBitmapCanvas) {
+      setBitmapImage(getImageFromCanvas(depthBitmapCanvas));
     }
-  }, [bitmapCanvas]);
+  }, [depthBitmapCanvas]);
   useEffect(() => {
     setTempLayerStack([...operationStack.layerStack]);
   }, [operationStack.layerStack]);
   useEffect(() => {
     if (activeTool === 1) {
       let tempLayer = tempLayerStack.map((element, key) => {
-        let image = getImageFromCanvas(element.bitmap);
+        let image = getImageFromCanvas(element.depthBitmap);
         return (
           <div key={key} className="p-2 my-2 tool-ext-layer">
             <img src={image} />
@@ -245,128 +219,79 @@ export function SidePane({
     }
   }, [tempLayerStack, activeTool]);
   useEffect(() => {
-    if (parameters.histogramParams.pixelRange && (parameters.croppedArea || depthCanvasDimension)) {
+    if (parameters.histogramParams.pixelRange && parameters.croppedArea) {
       addEffect({
         name: "depthStack",
         value: {
           func: editHighlightPixelArea,
-          params: [cloneCanvas(bitmapCanvas), toolsParameters.depthRangeIntensity]
-        }
-      });
-      addEffect({
-        name: "saveStack",
-        value: {
-          func: editHighlightPixelArea,
-          params: [cloneCanvas(saveBitmapCanvas), toolsParameters.depthRangeIntensity]
+          params: [cloneCanvas(depthBitmapCanvas), toolsParameters.depthRangeIntensity]
         }
       });
     }
   }, [toolsParameters.depthRangeIntensity]);
   useEffect(() => {
-    if (parameters.histogramParams.pixelRange && (parameters.croppedArea || depthCanvasDimension)) {
+    if (parameters.histogramParams.pixelRange && parameters.croppedArea) {
       addEffect({
         name: "depthStack",
         value: {
           func: scaleSelection,
-          params: [cloneCanvas(bitmapCanvas), toolsParameters.depthScale]
-        }
-      });
-      addEffect({
-        name: "saveStack",
-        value: {
-          func: scaleSelection,
-          params: [cloneCanvas(saveBitmapCanvas), toolsParameters.depthScale]
+          params: [cloneCanvas(depthBitmapCanvas), toolsParameters.depthScale]
         }
       });
     }
   }, [toolsParameters.depthScale]);
   useEffect(() => {
-    if (tempDepthCanvas) {
+    if (memoryDepthCanvas) {
       const { croppedArea } = parameters;
-      const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
-      if (croppedArea || depthCanvasDimension) {
-        let newArea = null;
-        if (croppedArea) {
-          newArea = croppedArea;
-        } else {
-          newArea = dimensionToBox(depthCanvasDimension);
-        }
-        console.warn(scaleBox(newArea, ratio, centerShift_x, centerShift_y));
-        addEffect({
-          name: "depthStack",
-          value: {
-            func: editBrightness,
-            params: [newArea, toolsParameters.brightness]
-          }
-        });
-        addEffect({
-          name: "saveStack",
-          value: {
-            func: editBrightness,
-            params: [scaleBox(newArea, ratio, centerShift_x, centerShift_y), toolsParameters.brightness]
-          }
-        });
+      let newArea = null;
+      if (croppedArea) {
+        newArea = croppedArea;
+      } else {
+        newArea = getBoundingArea(memoryDepthCanvas);
       }
+      addEffect({
+        name: "depthStack",
+        value: {
+          func: editBrightness,
+          params: [newArea, toolsParameters.brightness]
+        }
+      });
     }
   }, [toolsParameters.brightness]);
   useEffect(() => {
-    if (tempDepthCanvas) {
+    if (memoryDepthCanvas) {
       const { croppedArea } = parameters;
-      const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
-      if (croppedArea || depthCanvasDimension) {
-        let newArea = null;
-        if (croppedArea) {
-          newArea = croppedArea;
-        } else {
-          newArea = dimensionToBox(depthCanvasDimension);
-        }
-        addEffect({
-          name: "depthStack",
-          value: {
-            func: editContrast,
-            params: [newArea, toolsParameters.contrast]
-          }
-        });
-        addEffect({
-          name: "saveStack",
-          value: {
-            func: editContrast,
-            params: [scaleBox(newArea, ratio, centerShift_x, centerShift_y), toolsParameters.contrast]
-          }
-        });
+      let newArea = null;
+      if (croppedArea) {
+        newArea = croppedArea;
+      } else {
+        newArea = getBoundingArea(memoryDepthCanvas);
       }
+      addEffect({
+        name: "depthStack",
+        value: {
+          func: editContrast,
+          params: [newArea, toolsParameters.contrast]
+        }
+      });
     }
   }, [toolsParameters.contrast]);
   useEffect(() => {
-    if (tempDepthCanvas) {
+    if (memoryDepthCanvas) {
       const { croppedArea } = parameters;
-      const { ratio, centerShift_x, centerShift_y } = getRatio(mainDepthCanvas, tempDepthCanvas);
-      if (croppedArea || depthCanvasDimension) {
-        let newArea = null;
-        if (croppedArea) {
-          newArea = croppedArea;
-        } else {
-          newArea = dimensionToBox(depthCanvasDimension);
-        }
-        addEffect({
-          name: "depthStack",
-          value: {
-            func: addScaleShift,
-            params: [newArea, toolsParameters.aConstant, toolsParameters.bConstant]
-          }
-        });
-        addEffect({
-          name: "saveStack",
-          value: {
-            func: addScaleShift,
-            params: [
-              scaleBox(newArea, ratio, centerShift_x, centerShift_y),
-              toolsParameters.aConstant,
-              toolsParameters.bConstant
-            ]
-          }
-        });
+      let newArea = null;
+      if (croppedArea) {
+        newArea = croppedArea;
+      } else {
+        newArea = getBoundingArea(memoryDepthCanvas);
       }
+      addEffect({
+        name: "depthStack",
+        value: {
+          func: addScaleShift,
+          params: [newArea, toolsParameters.aConstant, toolsParameters.bConstant]
+        }
+      });
     }
   }, [toolsParameters.aConstant, toolsParameters.bConstant]);
   const adjust = () => {
@@ -380,36 +305,38 @@ export function SidePane({
               <div className="tool-ext-selection-icons">
                 <div
                   onClick={() => {
-                    if (tempDepthCanvas) {
+                    if (memoryDepthCanvas) {
                       selectTool("singleSelection");
                     }
                   }}
                   className={
-                    tools.singleSelection && tempDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
+                    tools.singleSelection && memoryDepthCanvas
+                      ? "selection-tool selection-tool-active"
+                      : "selection-tool"
                   }
                 >
                   <MdCropDin />
                 </div>
                 <div
                   onClick={() => {
-                    if (tempDepthCanvas) {
+                    if (memoryDepthCanvas) {
                       selectTool("addSelection");
                     }
                   }}
                   className={
-                    tools.addSelection && tempDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
+                    tools.addSelection && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
                   }
                 >
                   <RiCheckboxMultipleBlankLine />
                 </div>
                 <div
                   onClick={() => {
-                    if (tempDepthCanvas) {
+                    if (memoryDepthCanvas) {
                       selectTool("subtractSelection");
                     }
                   }}
                   className={
-                    tools.subtractSelection && tempDepthCanvas
+                    tools.subtractSelection && memoryDepthCanvas
                       ? "selection-tool selection-tool-active"
                       : "selection-tool"
                   }
@@ -418,12 +345,12 @@ export function SidePane({
                 </div>
                 <div
                   onClick={() => {
-                    if (tempDepthCanvas) {
+                    if (memoryDepthCanvas) {
                       selectTool("intersectSelection");
                     }
                   }}
                   className={
-                    tools.intersectSelection && tempDepthCanvas
+                    tools.intersectSelection && memoryDepthCanvas
                       ? "selection-tool selection-tool-active"
                       : "selection-tool"
                   }
@@ -467,7 +394,7 @@ export function SidePane({
                     <Label for="depthRangeIntensity">Depth Intensity</Label>
                     <div className="tool-ext-input d-flex justify-content-between w-100">
                       <Input
-                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
                         onChange={onHandleChange}
                         onMouseUp={onHandleUpdate}
                         className="tool-ext-input-slider"
@@ -479,7 +406,7 @@ export function SidePane({
                         value={tempToolsParams.depthRangeIntensity}
                       />
                       <Input
-                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
@@ -495,7 +422,7 @@ export function SidePane({
                     <Label for="depthScale">Depth Detail</Label>
                     <div className="tool-ext-input d-flex justify-content-between w-100">
                       <Input
-                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
                         onChange={onHandleChange}
                         onMouseUp={onHandleUpdate}
                         className="tool-ext-input-slider"
@@ -508,7 +435,7 @@ export function SidePane({
                         value={tempToolsParams.depthScale}
                       />
                       <Input
-                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
@@ -536,7 +463,7 @@ export function SidePane({
                     <Label for="brightness">Brightness</Label>
                     <div className="tool-ext-input d-flex justify-content-between w-100">
                       <Input
-                        disabled={!tempDepthCanvas}
+                        disabled={!memoryDepthCanvas}
                         onChange={onHandleChange}
                         onMouseUp={onHandleUpdate}
                         className="tool-ext-input-slider"
@@ -548,7 +475,7 @@ export function SidePane({
                         value={tempToolsParams.brightness}
                       />
                       <Input
-                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
@@ -564,7 +491,7 @@ export function SidePane({
                     <Label for="contrast">Contrast</Label>
                     <div className="tool-ext-input d-flex justify-content-between w-100">
                       <Input
-                        disabled={!tempDepthCanvas}
+                        disabled={!memoryDepthCanvas}
                         onChange={onHandleChange}
                         onMouseUp={onHandleUpdate}
                         className="tool-ext-input-slider"
@@ -576,7 +503,7 @@ export function SidePane({
                         value={tempToolsParams.contrast}
                       />
                       <Input
-                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
@@ -592,7 +519,7 @@ export function SidePane({
                     <Label for="sharpness">Sharpness</Label>
                     <div className="tool-ext-input d-flex justify-content-between w-100">
                       <Input
-                        disabled={!tempDepthCanvas}
+                        disabled={!memoryDepthCanvas}
                         onChange={onHandleChange}
                         onMouseUp={onHandleUpdate}
                         className="tool-ext-input-slider"
@@ -604,7 +531,7 @@ export function SidePane({
                         value={tempToolsParams.sharpness}
                       />
                       <Input
-                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
@@ -632,7 +559,7 @@ export function SidePane({
                     <Label for="aConstant">A</Label>
                     <div className="tool-ext-input d-flex justify-content-between w-100">
                       <Input
-                        disabled={!tempDepthCanvas}
+                        disabled={!memoryDepthCanvas}
                         onChange={onHandleChange}
                         onMouseUp={onHandleUpdate}
                         className="tool-ext-input-slider"
@@ -645,7 +572,7 @@ export function SidePane({
                         value={tempToolsParams.aConstant}
                       />
                       <Input
-                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
@@ -661,7 +588,7 @@ export function SidePane({
                     <Label for="bConstant">B</Label>
                     <div className="tool-ext-input d-flex justify-content-between w-100">
                       <Input
-                        disabled={!tempDepthCanvas}
+                        disabled={!memoryDepthCanvas}
                         onChange={onHandleChange}
                         onMouseUp={onHandleUpdate}
                         className="tool-ext-input-slider"
@@ -674,7 +601,7 @@ export function SidePane({
                         value={tempToolsParams.bConstant}
                       />
                       <Input
-                        disabled={!tempDepthCanvas || !parameters.histogramParams.pixelRange}
+                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
@@ -729,7 +656,7 @@ export function SidePane({
                         name: "depthStack",
                         value: {
                           func: drawLayerCanvas,
-                          params: [cloneCanvas(tempDepthCanvas)]
+                          params: [cloneCanvas(memoryDepthCanvas)]
                         }
                       });
                     }}
@@ -820,12 +747,10 @@ export function SidePane({
 const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  tempRgbCanvas: imageSelectors.tempRgbCanvas(state),
-  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  savedDepthCanvas: imageSelectors.savedDepthCanvas(state),
-  depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
-  bitmapCanvas: imageSelectors.bitmapCanvas(state),
-  saveBitmapCanvas: imageSelectors.saveBitmapCanvas(state),
+  displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
+  memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
+  rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
+  depthBitmapCanvas: imageSelectors.depthBitmapCanvas(state),
   layerMode: imageSelectors.layerMode(state),
   tools: imageSelectors.tools(state),
   toolsParameters: imageSelectors.toolsParameters(state),
