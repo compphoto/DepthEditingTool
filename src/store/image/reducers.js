@@ -1,29 +1,58 @@
-import { cloneCanvas, getRgbBitmap } from "utils/canvasUtils";
+import { cloneCanvas } from "utils/canvasUtils";
 import { types } from "./constants";
 
 const initialState = {
   rgbImageUrl: null,
   depthImageUrl: null,
-  mainRgbCanvas: null, // use canvas to image to convert to image
-  mainDepthCanvas: null, // use canvas to image to convert to image
-  tempRgbCanvas: null, // global reference to depth canvas
-  tempDepthCanvas: null, // global reference to depth canvas
+  mainRgbCanvas: null,
+  mainDepthCanvas: null,
+  displayRgbCanvas: null,
+  memoryDepthCanvas: null,
+  displayDepthCanvas: null,
+  cacheRgbCanvas: null,
+  cacheDepthCanvas: null,
   prevRgbSize: { width: null, height: null },
   prevDepthSize: { width: null, height: null },
-  rgbCanvasDimension: null,
-  depthCanvasDimension: null,
-  bitmapCanvas: null,
+  rgbBitmapCanvas: null,
+  depthBitmapCanvas: null,
   layerMode: false,
+  rgbScaleParams: {
+    ratio: 1,
+    centerShift_x: 0,
+    centerShift_y: 0,
+    translatePos: {
+      x: 0,
+      y: 0
+    },
+    scale: 1.0,
+    scaleMultiplier: 0.8,
+    startDragOffset: {},
+    mouseDown: false
+  },
+  depthScaleParams: {
+    ratio: 1,
+    centerShift_x: 0,
+    centerShift_y: 0,
+    translatePos: {
+      x: 0,
+      y: 0
+    },
+    scale: 1.0,
+    scaleMultiplier: 0.8,
+    startDragOffset: {},
+    mouseDown: false
+  },
   tools: {
     currentTool: null,
     singleSelection: false,
     addSelection: false,
     subtractSelection: false,
-    intersectSelection: false
+    intersectSelection: false,
+    panTool: false
   },
   toolsParameters: {
     depthRangeIntensity: 0,
-    depthScale: 0,
+    depthScale: 1,
     brightness: 0,
     contrast: 0,
     sharpness: 0,
@@ -38,19 +67,11 @@ const initialState = {
       domain: [0, 255],
       values: [0, 255],
       update: [0, 255]
-    },
-    canvasParams: {
-      translatePos: {},
-      scale: 1.0,
-      scaleMultiplier: 0.8,
-      startDragOffset: {},
-      mouseDown: false
     }
   },
   operationStack: {
     rgbStack: [],
     depthStack: [],
-    moveStack: [],
     layerStack: []
   }
 };
@@ -66,6 +87,89 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         ...payload
+      };
+    case types.INIT_RGB:
+      return {
+        ...state,
+        mainRgbCanvas: payload,
+        displayRgbCanvas: null,
+        cacheRgbCanvas: null,
+        prevRgbSize: { width: null, height: null },
+        rgbBitmapCanvas: null,
+        depthBitmapCanvas: null,
+        rgbScaleParams: {
+          ratio: 1,
+          centerShift_x: 0,
+          centerShift_y: 0,
+          translatePos: {
+            x: 0,
+            y: 0
+          },
+          scale: 1.0,
+          scaleMultiplier: 0.8,
+          startDragOffset: {},
+          mouseDown: false
+        },
+        operationStack: {
+          ...state.operationStack,
+          rgbStack: []
+        }
+      };
+    case types.INIT_DEPTH:
+      return {
+        ...state,
+        mainDepthCanvas: payload,
+        memoryDepthCanvas: null,
+        displayDepthCanvas: null,
+        cacheDepthCanvas: null,
+        prevDepthSize: { width: null, height: null },
+        rgbBitmapCanvas: null,
+        depthBitmapCanvas: null,
+        layerMode: false,
+        depthScaleParams: {
+          ratio: 1,
+          centerShift_x: 0,
+          centerShift_y: 0,
+          translatePos: {
+            x: 0,
+            y: 0
+          },
+          scale: 1.0,
+          scaleMultiplier: 0.8,
+          startDragOffset: {},
+          mouseDown: false
+        },
+        tools: {
+          currentTool: null,
+          singleSelection: false,
+          addSelection: false,
+          subtractSelection: false,
+          intersectSelection: false
+        },
+        toolsParameters: {
+          depthRangeIntensity: 0,
+          depthScale: 0,
+          brightness: 0,
+          contrast: 0,
+          sharpness: 0,
+          aConstant: 0,
+          bConstant: 0
+        },
+        parameters: {
+          croppedCanvasImage: null,
+          croppedArea: null,
+          histogramParams: {
+            pixelRange: [0, 255],
+            domain: [0, 255],
+            values: [0, 255],
+            update: [0, 255]
+          }
+        },
+        operationStack: {
+          ...state.operationStack,
+          depthStack: [],
+          layerStack: []
+        }
       };
     case types.SELECT_TOOL:
       var prevTool = state.tools.currentTool;
@@ -94,6 +198,15 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         tools: newTools
+      };
+    case types.STORE_SCALE_PARAMS:
+      var { name, value } = payload;
+      return {
+        ...state,
+        [name]: {
+          ...state[name],
+          ...value
+        }
       };
     case types.STORE_TOOL_PARAMETERS:
       return {
@@ -126,8 +239,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
             {
               depth: 0,
               detail: 1,
-              bitmap: cloneCanvas(state.bitmapCanvas),
-              rgbBitmap: getRgbBitmap(cloneCanvas(state.bitmapCanvas), cloneCanvas(state.tempRgbCanvas))
+              depthBitmap: cloneCanvas(state.depthBitmapCanvas),
+              rgbBitmap: cloneCanvas(state.rgbBitmapCanvas)
             }
           ]
         }
@@ -165,9 +278,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       var array = state.operationStack[name];
       var newArray = array.filter(x => {
         if (x.func.toString() !== value.func.toString()) {
-          if (x.func.toString().includes("scale, translatePos")) {
-            return;
-          }
           return x;
         }
       });
@@ -197,10 +307,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       var { name, value } = payload;
       if (
         state.operationStack[name].length !== 0 &&
-        (state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString() ||
-          state.operationStack[name][state.operationStack[name].length - 1].func
-            .toString()
-            .includes("scale, translatePos"))
+        state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString()
       ) {
         state.operationStack[name].pop();
       }
@@ -209,6 +316,30 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         operationStack: {
           ...state.operationStack,
           [name]: [...state.operationStack[name], { ...value, type: "effect" }]
+        }
+      };
+    case types.ZOOM_IN:
+      return {
+        ...state,
+        rgbScaleParams: {
+          ...state.rgbScaleParams,
+          scale: state.rgbScaleParams.scale / state.rgbScaleParams.scaleMultiplier
+        },
+        depthScaleParams: {
+          ...state.depthScaleParams,
+          scale: state.depthScaleParams.scale / state.depthScaleParams.scaleMultiplier
+        }
+      };
+    case types.ZOOM_OUT:
+      return {
+        ...state,
+        rgbScaleParams: {
+          ...state.rgbScaleParams,
+          scale: state.rgbScaleParams.scale * state.rgbScaleParams.scaleMultiplier
+        },
+        depthScaleParams: {
+          ...state.depthScaleParams,
+          scale: state.depthScaleParams.scale * state.depthScaleParams.scaleMultiplier
         }
       };
     case types.UNDO:
@@ -249,17 +380,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
             domain: [0, 255],
             values: [0, 255],
             update: [0, 255]
-          },
-          canvasParams: {
-            ...state.parameters.canvasParams,
-            translatePos: {
-              x: 0,
-              y: 0
-            },
-            scale: 1.0,
-            scaleMultiplier: 0.8,
-            startDragOffset: {},
-            mouseDown: false
           }
         },
         operationStack: {
@@ -273,6 +393,32 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       var depthStack = [state.operationStack.depthStack[0]];
       return {
         ...state,
+        rgbScaleParams: {
+          ratio: 1,
+          centerShift_x: 0,
+          centerShift_y: 0,
+          translatePos: {
+            x: 0,
+            y: 0
+          },
+          scale: 1.0,
+          scaleMultiplier: 0.8,
+          startDragOffset: {},
+          mouseDown: false
+        },
+        depthScaleParams: {
+          ratio: 1,
+          centerShift_x: 0,
+          centerShift_y: 0,
+          translatePos: {
+            x: 0,
+            y: 0
+          },
+          scale: 1.0,
+          scaleMultiplier: 0.8,
+          startDragOffset: {},
+          mouseDown: false
+        },
         parameters: {
           ...state.parameters,
           croppedCanvasImage: null,
@@ -282,17 +428,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
             domain: [0, 255],
             values: [0, 255],
             update: [0, 255]
-          },
-          canvasParams: {
-            ...state.parameters.canvasParams,
-            translatePos: {
-              x: 0,
-              y: 0
-            },
-            scale: 1.0,
-            scaleMultiplier: 0.8,
-            startDragOffset: {},
-            mouseDown: false
           }
         },
         operationStack: {
@@ -307,62 +442,9 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         ...payload
       };
     case types.REMOVE_ALL_ITEM:
-      var newState = {
-        rgbImageUrl: null,
-        depthImageUrl: null,
-        mainRgbCanvas: null, // use canvas to image to convert to image
-        mainDepthCanvas: null, // use canvas to image to convert to image
-        tempRgbCanvas: null, // global reference to depth canvas
-        tempDepthCanvas: null, // global reference to depth canvas
-        prevRgbSize: { width: null, height: null },
-        prevDepthSize: { width: null, height: null },
-        rgbCanvasDimension: null,
-        depthCanvasDimension: null,
-        bitmapCanvas: null,
-        layerMode: false,
-        tools: {
-          currentTool: null,
-          singleSelection: false,
-          addSelection: false,
-          subtractSelection: false,
-          intersectSelection: false
-        },
-        toolsParameters: {
-          depthRangeIntensity: 0,
-          depthScale: 0,
-          brightness: 0,
-          contrast: 0,
-          sharpness: 0,
-          aConstant: 0,
-          bConstant: 0
-        },
-        parameters: {
-          croppedCanvasImage: null,
-          croppedArea: null,
-          histogramParams: {
-            pixelRange: [0, 255],
-            domain: [0, 255],
-            values: [0, 255],
-            update: [0, 255]
-          },
-          canvasParams: {
-            translatePos: {},
-            scale: 1.0,
-            scaleMultiplier: 0.8,
-            startDragOffset: {},
-            mouseDown: false
-          }
-        },
-        operationStack: {
-          rgbStack: [],
-          depthStack: [],
-          moveStack: [],
-          layerStack: []
-        }
-      };
       return {
         ...state,
-        ...newState
+        ...initialState
       };
     default: {
       return state;

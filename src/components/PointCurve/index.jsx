@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import PointCurveStyle from "./style";
-import { dimensionToBox, adjustTone } from "utils/canvasUtils";
+import { dimensionToBox, adjustTone, getBoundingArea } from "utils/canvasUtils";
 
 let objectUrl = null;
 let circle1 = new Path2D();
@@ -133,7 +133,7 @@ class PointCurve extends Component {
   render() {
     const { pointCurveRef } = this;
     const { cpS, cp1, cp2, cpE, selectedControl } = this.state;
-    const { depthCanvasDimension, parameters, addEffect } = this.props;
+    const { memoryDepthCanvas, parameters, addEffect } = this.props;
     return (
       <PointCurveStyle>
         <canvas
@@ -145,23 +145,21 @@ class PointCurve extends Component {
           onMouseUp={e => {
             if (selectedControl) {
               const { croppedArea } = parameters;
-              if (croppedArea || depthCanvasDimension) {
-                let newArea = null;
-                if (croppedArea) {
-                  newArea = croppedArea;
-                } else {
-                  newArea = dimensionToBox(depthCanvasDimension);
-                }
-                addEffect({
-                  name: "depthStack",
-                  value: {
-                    func: adjustTone,
-                    params: [newArea, cpS, cp1, cp2, cpE]
-                  }
-                });
+              let newArea = null;
+              if (croppedArea) {
+                newArea = croppedArea;
+              } else {
+                newArea = getBoundingArea(memoryDepthCanvas);
               }
-              this.setState({ selectedControl: null });
+              addEffect({
+                name: "depthStack",
+                value: {
+                  func: adjustTone,
+                  params: [newArea, cpS, cp1, cp2, cpE]
+                }
+              });
             }
+            this.setState({ selectedControl: null });
           }}
         ></canvas>
       </PointCurveStyle>
@@ -170,7 +168,7 @@ class PointCurve extends Component {
 }
 
 const mapStateToProps = state => ({
-  depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
+  memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   parameters: imageSelectors.parameters(state)
 });
 

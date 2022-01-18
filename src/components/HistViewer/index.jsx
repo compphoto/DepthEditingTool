@@ -1,11 +1,10 @@
-import React, { Component, createRef } from "react";
+import React, { Component } from "react";
 import { connect } from "react-redux";
-import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import RangeSlider from "./rangeslider";
 import HistViewerStyle from "./style";
-import { getCanvasImageData, getImageData } from "utils/drawHistogram";
-import { cropCanvas, getDimension, getRatio } from "utils/canvasUtils";
+import { getImageData } from "utils/drawHistogram";
+import { cropCanvas, dimensionToBox } from "utils/canvasUtils";
 
 class HistViewer extends Component {
   constructor() {
@@ -16,24 +15,18 @@ class HistViewer extends Component {
     windowHeight: window.innerHeight,
     data: []
   };
-  componentDidUpdate(prevProps, prevState) {
-    let { tempDepthCanvas, depthCanvasDimension, parameters } = this.props;
+  componentDidUpdate(prevProps) {
+    let { memoryDepthCanvas, parameters } = this.props;
     if (
       prevProps.parameters.croppedCanvasImage !== parameters.croppedCanvasImage ||
-      prevProps.tempDepthCanvas !== tempDepthCanvas
+      prevProps.memoryDepthCanvas !== memoryDepthCanvas
     ) {
       if (parameters.croppedCanvasImage) {
         let histDepthData = getImageData(parameters.croppedCanvasImage);
         this.setState({ data: histDepthData });
       } else {
-        if (tempDepthCanvas) {
-          const boundingBox = [
-            depthCanvasDimension[0],
-            depthCanvasDimension[1],
-            depthCanvasDimension[2] - depthCanvasDimension[0],
-            depthCanvasDimension[3] - depthCanvasDimension[1]
-          ];
-          let histDepthData = getImageData(cropCanvas(tempDepthCanvas, boundingBox));
+        if (memoryDepthCanvas) {
+          let histDepthData = getImageData(memoryDepthCanvas);
           this.setState({ data: histDepthData });
         }
       }
@@ -50,9 +43,7 @@ class HistViewer extends Component {
 }
 
 const mapStateToProps = state => ({
-  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  tempDepthCanvas: imageSelectors.tempDepthCanvas(state),
-  depthCanvasDimension: imageSelectors.depthCanvasDimension(state),
+  memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   parameters: imageSelectors.parameters(state)
 });
 

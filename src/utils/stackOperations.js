@@ -1,85 +1,91 @@
 import store from "store/store";
 import { imageActions } from "store/image";
-import { canvasToImage, cloneCanvas, editHighlightPixelArea, scaleSelection } from "./canvasUtils";
+import { cloneCanvas } from "./canvasUtils";
 
-export const runCanvasOperations = (name, image, context) => {
-  let canvasStack = store.getState().image.operationStack[name];
-  canvasStack.forEach(element => {
-    element.params ? element.func(image, context, ...element.params) : element.func(image, context);
-  });
-};
-
-export const runTempRgbOperations = (name, image, width, height) => {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext("2d");
-  let stack = store.getState().image.operationStack[name];
+export const runRgbOperations = image => {
+  const displayRgbCanvas = document.createElement("canvas");
+  displayRgbCanvas.width = image.width;
+  displayRgbCanvas.height = image.height;
+  const cachedRgbContext = displayRgbCanvas.getContext("2d");
+  let stack = store.getState().image.operationStack["rgbStack"];
   stack.forEach(element => {
-    element.params ? element.func(image, context, ...element.params) : element.func(image, context);
+    element.params ? element.func(image, cachedRgbContext, ...element.params) : element.func(image, cachedRgbContext);
   });
   const storeAction = require("store/store");
-  storeAction.default.dispatch(imageActions.initImage({ tempRgbCanvas: cloneCanvas(canvas) }));
-};
-
-export const runTempDepthOperations = (name, image, width, height) => {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext("2d");
-  let stack = store.getState().image.operationStack[name];
-  stack.forEach(element => {
-    if (element.type === "effect") {
-      element.params ? element.func(image, context, ...element.params) : element.func(image, context);
-    }
-  });
-  const storeAction = require("store/store");
-  let bitmapCanvas = store.getState().image.bitmapCanvas;
+  const rgbBitmapCanvas = store.getState().image.rgbBitmapCanvas;
   let data = {
-    tempDepthCanvas: cloneCanvas(canvas),
-    bitmapCanvas: bitmapCanvas === null ? cloneCanvas(canvas) : bitmapCanvas
+    displayRgbCanvas: cloneCanvas(displayRgbCanvas),
+    cacheRgbCanvas: cloneCanvas(displayRgbCanvas),
+    rgbBitmapCanvas: rgbBitmapCanvas === null ? cloneCanvas(displayRgbCanvas) : rgbBitmapCanvas
   };
   storeAction.default.dispatch(imageActions.initImage(data));
 };
 
-export const runDepthLayerOperations = context => {
-  let layerStack = store.getState().image.operationStack["layerStack"];
-  [...layerStack].reverse().forEach(element => {
-    let newBitmap = editHighlightPixelArea(null, context, cloneCanvas(element.bitmap), element.depth);
-    scaleSelection(null, context, newBitmap, element.detail);
-  });
+export const runCachedRgbOperations = image => {
+  const displayRgbCanvas = cloneCanvas(store.getState().image.cacheRgbCanvas);
+  const displayRgbContext = displayRgbCanvas.getContext("2d");
+  let stack = store.getState().image.operationStack["rgbStack"];
+  const lastOperation = stack[stack.length - 1];
+  lastOperation.params
+    ? lastOperation.func(image, displayRgbContext, ...lastOperation.params)
+    : lastOperation.func(image, displayRgbContext);
+  const storeAction = require("store/store");
+  let data = {
+    displayRgbCanvas: displayRgbCanvas
+  };
+  storeAction.default.dispatch(imageActions.initImage(data));
 };
 
-export const runTempDepthLayerOperations = (width, height) => {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext("2d");
-  let layerStack = store.getState().image.operationStack["layerStack"];
-  [...layerStack].reverse().forEach(element => {
-    let newBitmap = editHighlightPixelArea(null, context, cloneCanvas(element.bitmap), element.depth);
-    scaleSelection(null, context, newBitmap, element.detail);
+export const runDepthOperations = image => {
+  const memoryDepthCanvas = document.createElement("canvas");
+  const displayDepthCanvas = document.createElement("canvas");
+  memoryDepthCanvas.width = image.width;
+  memoryDepthCanvas.height = image.height;
+  displayDepthCanvas.width = image.width;
+  displayDepthCanvas.height = image.height;
+  const memoryDepthContext = memoryDepthCanvas.getContext("2d");
+  const displayDepthContext = displayDepthCanvas.getContext("2d");
+  let stack = store.getState().image.operationStack["depthStack"];
+  stack.forEach(element => {
+    element.params
+      ? element.func(image, displayDepthContext, ...element.params)
+      : element.func(image, displayDepthContext);
+    if (element.type === "effect") {
+      element.params
+        ? element.func(image, memoryDepthContext, ...element.params)
+        : element.func(image, memoryDepthContext);
+    }
   });
   const storeAction = require("store/store");
-  storeAction.default.dispatch(imageActions.initImage({ tempDepthCanvas: cloneCanvas(canvas) }));
+  const depthBitmapCanvas = store.getState().image.depthBitmapCanvas;
+  let data = {
+    memoryDepthCanvas: cloneCanvas(memoryDepthCanvas),
+    displayDepthCanvas: cloneCanvas(displayDepthCanvas),
+    cacheDepthCanvas: cloneCanvas(memoryDepthCanvas),
+    depthBitmapCanvas: depthBitmapCanvas === null ? cloneCanvas(memoryDepthCanvas) : depthBitmapCanvas
+  };
+  storeAction.default.dispatch(imageActions.initImage(data));
 };
 
-export const runRgbLayerOperations = context => {
-  let layerStack = store.getState().image.operationStack["layerStack"];
-  [...layerStack].reverse().forEach(element => {
-    context.drawImage(element.rgbBitmap, 0, 0);
-  });
-};
-
-export const runTempRgbLayerOperations = (width, height) => {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext("2d");
-  let layerStack = store.getState().image.operationStack["layerStack"];
-  [...layerStack].reverse().forEach(element => {
-    context.drawImage(element.rgbBitmap, 0, 0);
-  });
+export const runCachedDepthOperations = image => {
+  const memoryDepthCanvas = cloneCanvas(store.getState().image.cacheDepthCanvas);
+  const displayDepthCanvas = cloneCanvas(store.getState().image.cacheDepthCanvas);
+  const memoryDepthContext = memoryDepthCanvas.getContext("2d");
+  const displayDepthContext = displayDepthCanvas.getContext("2d");
+  let stack = store.getState().image.operationStack["depthStack"];
+  const lastOperation = stack[stack.length - 1];
+  lastOperation.params
+    ? lastOperation.func(image, displayDepthContext, ...lastOperation.params)
+    : lastOperation.func(image, displayDepthContext);
+  if (lastOperation.type === "effect") {
+    lastOperation.params
+      ? lastOperation.func(image, memoryDepthContext, ...lastOperation.params)
+      : lastOperation.func(image, memoryDepthCanvas);
+  }
   const storeAction = require("store/store");
-  storeAction.default.dispatch(imageActions.initImage({ tempRgbCanvas: cloneCanvas(canvas) }));
+  let data = {
+    memoryDepthCanvas: memoryDepthCanvas,
+    displayDepthCanvas: displayDepthCanvas
+  };
+  storeAction.default.dispatch(imageActions.initImage(data));
 };
