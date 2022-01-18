@@ -49,39 +49,35 @@ export const getRatio = (image, canvas) => {
   };
 };
 
-export const upScaleBox = (box, ratio, centerShift_x, centerShift_y) => {
-  let x = (box[0] - centerShift_x) / ratio;
-  let y = (box[1] - centerShift_y) / ratio;
-  let w = box[2] / ratio;
-  let h = box[3] / ratio;
+export const upScaleBox = (box, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
+  let x = (box[0] - centerShift_x - translatePos.x) / ratio / scale;
+  let y = (box[1] - centerShift_y - translatePos.y) / ratio / scale;
+  let w = box[2] / ratio / scale;
+  let h = box[3] / ratio / scale;
   return [x, y, w, h];
 };
 
-export const upScaleDimension = (dimension, ratio, centerShift_x, centerShift_y) => {
-  let x1 = (dimension[0] - centerShift_x) / ratio;
-  let y1 = (dimension[1] - centerShift_y) / ratio;
-  let x2 = x1 + (dimension[2] - centerShift_x) / ratio;
-  let y2 = y1 + (dimension[3] - centerShift_y) / ratio;
+export const upScaleDimension = (dimension, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
+  let x1 = (dimension[0] - centerShift_x - translatePos.x) / ratio / scale;
+  let y1 = (dimension[1] - centerShift_y - translatePos.y) / ratio / scale;
+  let x2 = x1 + (dimension[2] - centerShift_x) / ratio / scale;
+  let y2 = y1 + (dimension[3] - centerShift_y) / ratio / scale;
   return [x1, y1, x2, y2];
 };
 
 export const downScaleBox = (box, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
-  let x = box[0] * ratio + centerShift_x;
-  let y = box[1] * ratio + centerShift_y;
-  let w = box[2] * ratio;
-  let h = box[3] * ratio;
+  let x = box[0] * ratio * scale + centerShift_x + translatePos.x;
+  let y = box[1] * ratio * scale + centerShift_y + translatePos.y;
+  let w = box[2] * ratio * scale;
+  let h = box[3] * ratio * scale;
   return [x, y, w, h];
 };
 
 export const getDimension = (image, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
-  let x1 = centerShift_x;
-  let y1 = centerShift_y;
-  let x2 = centerShift_x + image.width * ratio;
-  let y2 = centerShift_y + image.height * ratio;
-  // let x1 = centerShift_x + translatePos.x;
-  // let y1 = centerShift_y + translatePos.y;
-  // let x2 = centerShift_x + translatePos.x + image.width * ratio;
-  // let y2 = centerShift_y + translatePos.y + image.height * ratio;
+  let x1 = centerShift_x + translatePos.x;
+  let y1 = centerShift_y + translatePos.y;
+  let x2 = x1 + image.width * ratio * scale;
+  let y2 = y1 + image.height * ratio * scale;
   return [x1, y1, x2, y2];
 };
 
@@ -101,7 +97,7 @@ export const drawScaledCanvasImage = (image, canvas, ratio, centerShift_x, cente
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.save();
   context.translate(translatePos.x, translatePos.y);
-  context.scale(scale, scale);
+  // context.scale(scale, scale);
   context.drawImage(
     image,
     0,
@@ -110,8 +106,8 @@ export const drawScaledCanvasImage = (image, canvas, ratio, centerShift_x, cente
     image.height,
     centerShift_x,
     centerShift_y,
-    image.width * ratio,
-    image.height * ratio
+    image.width * ratio * scale,
+    image.height * ratio * scale
   );
   context.restore();
 };

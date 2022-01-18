@@ -4,7 +4,6 @@ import { selectors as imageSelectors } from "store/image";
 import RangeSlider from "./rangeslider";
 import HistViewerStyle from "./style";
 import { getImageData } from "utils/drawHistogram";
-import { cropCanvas, dimensionToBox } from "utils/canvasUtils";
 
 class HistViewer extends Component {
   constructor() {

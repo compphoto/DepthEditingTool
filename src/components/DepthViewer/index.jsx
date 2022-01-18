@@ -54,7 +54,6 @@ class DepthViewer extends Component {
       storeScaleParams,
       storeParameters,
       addOperation,
-      removeOperation,
       addEffect
     } = this.props;
     let depthCanvas = depthImageRef.current;
@@ -204,7 +203,7 @@ class DepthViewer extends Component {
   drawBoundingBox = event => {
     let depthCanvas = this.depthImageRef.current;
     let { initBoundingBox } = this.state;
-    let { memoryDepthCanvas, depthScaleParams, storeParameters, addOperation, removeOperation } = this.props;
+    let { memoryDepthCanvas, depthScaleParams, storeParameters } = this.props;
     let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
     if (memoryDepthCanvas) {
       let x = event.layerX;
@@ -223,15 +222,33 @@ class DepthViewer extends Component {
         let new_y = Math.max(Math.min(initBoundingBox.y, y), image_y1);
         let new_w = Math.min(Math.max(initBoundingBox.x, x), image_x2) - new_x;
         let new_h = Math.min(Math.max(initBoundingBox.y, y), image_y2) - new_y;
-        if (new_w !== 0 || new_w !== 0) {
-          let croppedArea = upScaleBox([new_x, new_y, new_w, new_h], ratio, centerShift_x, centerShift_y);
-          this.setState({ initBoundingBox: null }, () => {
-            depthCanvas.style.cursor = "default";
-            storeParameters({
-              croppedCanvasImage: cropCanvas(memoryDepthCanvas, croppedArea),
-              croppedArea: croppedArea
+        if (
+          new_x >= image_x1 &&
+          new_x <= image_x2 &&
+          new_y >= image_y1 &&
+          new_y <= image_y2 &&
+          new_x + new_w <= image_x2 &&
+          new_x + new_w >= image_x1 &&
+          new_y + new_h <= image_y2 &&
+          new_y + new_h >= image_y1
+        ) {
+          if (new_w !== 0 || new_w !== 0) {
+            let croppedArea = upScaleBox(
+              [new_x, new_y, new_w, new_h],
+              ratio,
+              centerShift_x,
+              centerShift_y,
+              translatePos,
+              scale
+            );
+            this.setState({ initBoundingBox: null }, () => {
+              depthCanvas.style.cursor = "default";
+              storeParameters({
+                croppedCanvasImage: cropCanvas(memoryDepthCanvas, croppedArea),
+                croppedArea: croppedArea
+              });
             });
-          });
+          }
         }
       } else {
         this.setState({ initBoundingBox: { x, y } }, () => {
@@ -351,7 +368,6 @@ const mapDispatchToProps = {
   storeScaleParams: imageActions.storeScaleParams,
   storeParameters: imageActions.storeParameters,
   addOperation: imageActions.addOperation,
-  removeOperation: imageActions.removeOperation,
   addEffect: imageActions.addEffect
 };
 
