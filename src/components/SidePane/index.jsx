@@ -221,7 +221,7 @@ export function SidePane({
     }
   }, [tempLayerStack, activeTool]);
   useEffect(() => {
-    if (parameters.histogramParams.pixelRange && parameters.croppedArea) {
+    if (parameters.histogramParams.pixelRange && depthBitmapCanvas) {
       addEffect({
         name: "depthStack",
         value: {
@@ -232,7 +232,7 @@ export function SidePane({
     }
   }, [toolsParameters.depthRangeIntensity]);
   useEffect(() => {
-    if (parameters.histogramParams.pixelRange && parameters.croppedArea) {
+    if (parameters.histogramParams.pixelRange && depthBitmapCanvas) {
       addEffect({
         name: "depthStack",
         value: {
