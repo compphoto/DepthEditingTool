@@ -62,7 +62,7 @@ export function SidePane({
   const [layers, setLayers] = useState(null);
   const [tempToolsParams, setTempToolsParams] = useState({
     depthRangeIntensity: 0,
-    depthScale: 0,
+    depthScale: 1,
     brightness: 0,
     contrast: 0,
     sharpness: 0,
