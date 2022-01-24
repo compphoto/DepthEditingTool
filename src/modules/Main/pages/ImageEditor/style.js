@@ -34,15 +34,28 @@ const ImageEditorStyle = styled.div`
     }
   }
   section {
-    height: calc(100vh - 110px);
+    height: calc(100vh - 90px);
     display: flex;
   }
   footer {
-    height: 54px;
+    height: 34px;
     background-color: #333334;
     color: #fff;
-    padding: 15px 15px;
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .btn-default {
+      width: 200px;
+      color: #7e838e;
+      font-size: 0.8rem;
+      margin: 0;
+      svg {
+        height: 1rem;
+        width: 1rem;
+      }
+      &:hover {
+      }
+    }
   }
 `;
 

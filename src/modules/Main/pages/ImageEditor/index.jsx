@@ -4,13 +4,13 @@ import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import { Helmet } from "react-helmet";
 import { Container, Button } from "reactstrap";
-import { RiDownloadLine } from "react-icons/ri";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
-import { MdOutlinePanTool } from "react-icons/md";
+import { MdOutlinePanTool, MdDoubleArrow } from "react-icons/md";
 import { ImUndo2 } from "react-icons/im";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
+import UploadPane from "components/UploadPane";
 import { canvasToImage } from "utils/canvasUtils";
 import {} from "utils/stackOperations";
 
@@ -85,7 +85,7 @@ export function ImageEditor({ memoryDepthCanvas, zoomIn, zoomOut, undo, clear, r
                 size="sm"
                 color="primary"
               >
-                <RiDownloadLine className="mb-1" /> Download
+                Download
               </Button>
             </div>
           </div>
@@ -94,8 +94,14 @@ export function ImageEditor({ memoryDepthCanvas, zoomIn, zoomOut, undo, clear, r
       <section>
         <SidePane />
         <MainPane />
+        <UploadPane />
       </section>
-      <footer>Computational Photography Labs SFU</footer>
+      <footer>
+        <div>Computational Photography Labs SFU</div>
+        <div className="btn btn-default">
+          <MdDoubleArrow className="mb-1" /> Import
+        </div>
+      </footer>
     </ImageEditorStyle>
   );
 }
