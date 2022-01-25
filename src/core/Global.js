@@ -8,6 +8,7 @@ const GlobalStyles = createGlobalStyle`
     }
     *, *:before, *:after {
         box-sizing: border-box;
+        font-size: 0.9rem;
     }
     ::-webkit-scrollbar {
         width: 8px;

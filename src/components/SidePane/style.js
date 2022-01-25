@@ -112,47 +112,6 @@ const SidePaneStyle = styled.div`
               }
             }
           }
-          .tool-ext-layers {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            .tool-ext-layer {
-              position: relative;
-              border: 2px solid #ddd;
-              border-radius: 4px;
-              width: 100%;
-              overflow: hidden;
-              img {
-                width: 100%;
-              }
-              .remove-layer {
-                display: none;
-                color: #7e838e;
-                position: absolute;
-                top: 0%;
-                left: 85%;
-                svg {
-                  height: 1rem;
-                  width: 1rem;
-                }
-                &:hover {
-                  color: #fff;
-                }
-              }
-              &:hover .remove-layer {
-                display: block;
-              }
-            }
-            .tool-ext-layer:hover {
-              border: 1px solid rgba(0, 140, 186, 0.5);
-              box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
-            }
-            .tool-ext-layer-active {
-              border: 1px solid rgba(0, 140, 186, 0.5);
-              box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
-            }
-          }
         }
       }
 

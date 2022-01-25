@@ -7,29 +7,19 @@ import { selectors as imageSelectors } from "store/image";
 import { Button, UncontrolledCollapse, CardBody, Card, FormGroup, Label, Input } from "reactstrap";
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
-import { MdCropDin, MdKeyboardArrowLeft, MdKeyboardArrowRight, MdCancel } from "react-icons/md";
+import { MdCropDin, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { RiCheckboxMultipleBlankLine } from "react-icons/ri";
 import { BiIntersect } from "react-icons/bi";
 import { BsSubtract } from "react-icons/bs";
-import { IoIosArrowDown } from "react-icons/io";
 import {
   addScaleShift,
-  canvasToImage,
   cloneCanvas,
-  cropCanvas,
-  dimensionToBox,
-  drawBox,
-  drawCanvasImage,
-  drawLayerCanvas,
   editBrightness,
   editContrast,
   editHighlightPixelArea,
   getImageFromCanvas,
-  getRatio,
   getRgbBitmap,
-  highlightPixelArea,
   modifyBitmap,
-  upScaleBox,
   scaleSelection,
   getBoundingArea
 } from "utils/canvasUtils";
@@ -41,25 +31,18 @@ export function SidePane({
   memoryDepthCanvas,
   displayRgbCanvas,
   depthBitmapCanvas,
-  layerMode,
   tools,
   toolsParameters,
   parameters,
-  operationStack,
   selectTool,
   initImage,
   storeToolParameters,
   storeParameters,
-  toggleLayerMode,
-  addLayer,
-  updateLayer,
-  removeLayer,
-  removeAllLayers,
   addEffect
 }) {
   const [activeTool, setActiveTool] = useState(0);
   const [bitmapImage, setBitmapImage] = useState(null);
-  const [layers, setLayers] = useState(null);
+
   const [tempToolsParams, setTempToolsParams] = useState({
     depthRangeIntensity: 0,
     depthScale: 1,
@@ -69,7 +52,7 @@ export function SidePane({
     aConstant: 0,
     bConstant: 0
   });
-  const [tempLayerStack, setTempLayerStack] = useState([]);
+
   const toggleTool = index => {
     setActiveTool(index);
   };
@@ -87,25 +70,7 @@ export function SidePane({
       storeToolParameters({ [name]: tempToolsParams[name] });
     }
   };
-  const onHandleLayerChange = e => {
-    let { name, value } = e.target;
-    let [key, index] = name.split("-");
-    let items = [...tempLayerStack];
-    let item = {
-      ...tempLayerStack[+index],
-      [key]: +value
-    };
-    items[+index] = item;
-    setTempLayerStack(items);
-  };
-  const onHandleLayerUpdate = e => {
-    updateLayer(tempLayerStack);
-  };
-  const onHandleLayerEnter = e => {
-    if (e.key === "Enter") {
-      updateLayer(tempLayerStack);
-    }
-  };
+
   const onModifyBitmap = () => {
     if (memoryDepthCanvas) {
       const { croppedCanvasImage, croppedArea, histogramParams } = parameters;
@@ -140,86 +105,7 @@ export function SidePane({
       setBitmapImage(null);
     }
   }, [depthBitmapCanvas]);
-  useEffect(() => {
-    setTempLayerStack([...operationStack.layerStack]);
-  }, [operationStack.layerStack]);
-  useEffect(() => {
-    if (activeTool === 1) {
-      let tempLayer = tempLayerStack.map((element, key) => {
-        let image = getImageFromCanvas(element.depthBitmap);
-        return (
-          <div key={key} className="p-2 my-2 tool-ext-layer">
-            <img src={image} />
-            <div
-              onClick={e => {
-                e.stopPropagation();
-                removeLayer(key);
-              }}
-              className="remove-layer"
-            >
-              <MdCancel />
-            </div>
-            <FormGroup className="w-100">
-              <Label for={`depth-${key}`}>Depth</Label>
-              <div className="tool-ext-input d-flex justify-content-between w-100">
-                <Input
-                  onChange={onHandleLayerChange}
-                  onMouseUp={onHandleLayerUpdate}
-                  className="tool-ext-input-slider"
-                  id={`depth-${key}`}
-                  name={`depth-${key}`}
-                  min="-100"
-                  max="100"
-                  type="range"
-                  value={tempLayerStack[key]["depth"]}
-                />
-                <Input
-                  onChange={onHandleLayerChange}
-                  onMouseLeave={onHandleLayerUpdate}
-                  onKeyDown={onHandleLayerEnter}
-                  size="sm"
-                  className="tool-ext-input-number"
-                  id={`depth-${key}`}
-                  name={`depth-${key}`}
-                  type="number"
-                  value={tempLayerStack[key]["depth"]}
-                />
-              </div>
-            </FormGroup>
-            <FormGroup className="w-100">
-              <Label for={`detail-${key}`}>Detail</Label>
-              <div className="mt-2 tool-ext-input d-flex justify-content-between w-100">
-                <Input
-                  onChange={onHandleLayerChange}
-                  onMouseUp={onHandleLayerUpdate}
-                  className="tool-ext-input-slider"
-                  id={`detail-${key}`}
-                  name={`detail-${key}`}
-                  min="0"
-                  max="1"
-                  step={0.01}
-                  type="range"
-                  value={tempLayerStack[key]["detail"]}
-                />
-                <Input
-                  onChange={onHandleLayerChange}
-                  onMouseLeave={onHandleLayerUpdate}
-                  onKeyDown={onHandleLayerEnter}
-                  size="sm"
-                  className="tool-ext-input-number"
-                  id={`detail-${key}`}
-                  name={`detail-${key}`}
-                  type="number"
-                  value={tempLayerStack[key]["detail"]}
-                />
-              </div>
-            </FormGroup>
-          </div>
-        );
-      });
-      setLayers(tempLayer);
-    }
-  }, [tempLayerStack, activeTool]);
+
   useEffect(() => {
     if (parameters.histogramParams.pixelRange && depthBitmapCanvas) {
       addEffect({
@@ -625,48 +511,7 @@ export function SidePane({
     return (
       <>
         <div className="tool-ext mt-4 w-100">
-          <div className="w-100 mt-3 tool-ext-section">
-            <Button className="mb-2 dropdown-button" color="secondary" id="depth-adjust-toggler">
-              Layers <IoIosArrowDown />
-            </Button>
-            <UncontrolledCollapse style={{ width: "100%" }} toggler="#depth-adjust-toggler">
-              <Card className="tool-ext-card">
-                <CardBody className="tool-ext-card-body">
-                  <Button className="mb-4" size="sm" color="secondary" onClick={toggleLayerMode}>
-                    Layer Mode ({layerMode ? "ON" : "OFF"})
-                  </Button>
-                  <div className="d-flex">
-                    <Button className="mx-2" size="sm" color="secondary" onClick={addLayer}>
-                      Add
-                    </Button>
-                    <Button className="mx-2" size="sm" color="secondary" onClick={removeAllLayers}>
-                      Remove all
-                    </Button>
-                  </div>
-                  <div id="tool-ext-layers" className="my-3 tool-ext-layers">
-                    {layers || null}
-                  </div>
-                  <Button
-                    className="mx-2"
-                    size="sm"
-                    color="secondary"
-                    disabled={tempLayerStack === undefined || tempLayerStack.length == 0}
-                    onClick={() => {
-                      addEffect({
-                        name: "depthStack",
-                        value: {
-                          func: drawLayerCanvas,
-                          params: [cloneCanvas(memoryDepthCanvas)]
-                        }
-                      });
-                    }}
-                  >
-                    Apply
-                  </Button>
-                </CardBody>
-              </Card>
-            </UncontrolledCollapse>
-          </div>
+          <div className="w-100 mt-3 tool-ext-section"></div>
         </div>
       </>
     );
