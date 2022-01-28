@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 const MainPaneStyle = styled.div`
   height: 100%;
-  width: calc(100% - 272px);
+  width: calc(100% - 260px);
   .main {
     background: #f0f1f2;
     overflow: hidden;
@@ -63,7 +63,7 @@ const MainPaneStyle = styled.div`
     -webkit-transition: all 0.5s;
   }
   .main-shrink {
-    margin-left: 300px;
+    margin-left: 250px;
     transition: all 0.5s;
     -webkit-transition: all 0.5s;
   }

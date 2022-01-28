@@ -182,95 +182,108 @@ export function SidePane({
       });
     }
   }, [toolsParameters.aConstant, toolsParameters.bConstant]);
+  const toolBox = () => {
+    return (
+      <>
+        <div className="tool-ext mt-4 w-100">
+          <div className="tool-ext-selection">
+            <img src={bitmapImage} />
+            <div className="tool-ext-selection-icons">
+              <div
+                onClick={() => {
+                  if (memoryDepthCanvas) {
+                    selectTool("singleSelection");
+                  }
+                }}
+                className={
+                  tools.singleSelection && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
+                }
+              >
+                <MdCropDin />
+              </div>
+              <div
+                onClick={() => {
+                  if (memoryDepthCanvas) {
+                    selectTool("addSelection");
+                  }
+                }}
+                className={
+                  tools.addSelection && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
+                }
+              >
+                <RiCheckboxMultipleBlankLine />
+              </div>
+              <div
+                onClick={() => {
+                  if (memoryDepthCanvas) {
+                    selectTool("subtractSelection");
+                  }
+                }}
+                className={
+                  tools.subtractSelection && memoryDepthCanvas
+                    ? "selection-tool selection-tool-active"
+                    : "selection-tool"
+                }
+              >
+                <BsSubtract />
+              </div>
+              <div
+                onClick={() => {
+                  if (memoryDepthCanvas) {
+                    selectTool("intersectSelection");
+                  }
+                }}
+                className={
+                  tools.intersectSelection && memoryDepthCanvas
+                    ? "selection-tool selection-tool-active"
+                    : "selection-tool"
+                }
+              >
+                <BiIntersect />
+              </div>
+            </div>
+            <div className="d-flex">
+              <Button
+                disabled={!tools.currentTool}
+                size="sm"
+                className="mx-2"
+                color="secondary"
+                onClick={onModifyBitmap}
+              >
+                {tools.singleSelection || tools.addSelection
+                  ? "Add"
+                  : tools.subtractSelection
+                  ? "Subtract"
+                  : tools.intersectSelection
+                  ? "Intersect"
+                  : "Select"}
+              </Button>
+              <Button
+                disabled={!tools.currentTool}
+                size="sm"
+                className="mx-2"
+                color="secondary"
+                onClick={() => {
+                  const bitmapContext = depthBitmapCanvas.getContext("2d");
+                  bitmapContext.clearRect(0, 0, depthBitmapCanvas.width, depthBitmapCanvas.height);
+                  setBitmapImage(getImageFromCanvas(depthBitmapCanvas));
+                }}
+              >
+                Clear
+              </Button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  };
   const adjust = () => {
     return (
       <>
         <div className="tool-ext w-100">
           <div className="w-100 mt-3 tool-ext-section">
-            <p className="mb-3 text-white">Depth Selection</p>
-            <div className="tool-ext-selection">
-              <img src={bitmapImage} />
-              <div className="tool-ext-selection-icons">
-                <div
-                  onClick={() => {
-                    if (memoryDepthCanvas) {
-                      selectTool("singleSelection");
-                    }
-                  }}
-                  className={
-                    tools.singleSelection && memoryDepthCanvas
-                      ? "selection-tool selection-tool-active"
-                      : "selection-tool"
-                  }
-                >
-                  <MdCropDin />
-                </div>
-                <div
-                  onClick={() => {
-                    if (memoryDepthCanvas) {
-                      selectTool("addSelection");
-                    }
-                  }}
-                  className={
-                    tools.addSelection && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
-                  }
-                >
-                  <RiCheckboxMultipleBlankLine />
-                </div>
-                <div
-                  onClick={() => {
-                    if (memoryDepthCanvas) {
-                      selectTool("subtractSelection");
-                    }
-                  }}
-                  className={
-                    tools.subtractSelection && memoryDepthCanvas
-                      ? "selection-tool selection-tool-active"
-                      : "selection-tool"
-                  }
-                >
-                  <BsSubtract />
-                </div>
-                <div
-                  onClick={() => {
-                    if (memoryDepthCanvas) {
-                      selectTool("intersectSelection");
-                    }
-                  }}
-                  className={
-                    tools.intersectSelection && memoryDepthCanvas
-                      ? "selection-tool selection-tool-active"
-                      : "selection-tool"
-                  }
-                >
-                  <BiIntersect />
-                </div>
-              </div>
-              <div className="d-flex">
-                <Button disabled={!tools.currentTool} className="mx-2" color="secondary" onClick={onModifyBitmap}>
-                  {tools.singleSelection || tools.addSelection
-                    ? "Add"
-                    : tools.subtractSelection
-                    ? "Subtract"
-                    : tools.intersectSelection
-                    ? "Intersect"
-                    : "Select"}
-                </Button>
-                <Button
-                  disabled={!tools.currentTool}
-                  className="mx-2"
-                  color="secondary"
-                  onClick={() => {
-                    const bitmapContext = depthBitmapCanvas.getContext("2d");
-                    bitmapContext.clearRect(0, 0, depthBitmapCanvas.width, depthBitmapCanvas.height);
-                    setBitmapImage(getImageFromCanvas(depthBitmapCanvas));
-                  }}
-                >
-                  Clear
-                </Button>
-              </div>
-            </div>
-            <Button className="mt-4 mb-2 dropdown-button" color="secondary" id="depth-adjust-toggler">
+            <p className="mb-1 text-white">Depth Selection</p>
+            <Button className="mt-4 mb-2 dropdown-button" size="sm" color="secondary" id="depth-adjust-toggler">
               Adjust Selection
             </Button>
             <UncontrolledCollapse style={{ width: "100%" }} toggler="#depth-adjust-toggler">
@@ -296,6 +309,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
+                        size="sm"
                         className="tool-ext-input-number"
                         id="depthRangeIntensity"
                         name="depthRangeIntensity"
@@ -325,6 +339,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
+                        size="sm"
                         className="tool-ext-input-number"
                         id="depthScale"
                         name="depthScale"
@@ -339,7 +354,7 @@ export function SidePane({
           </div>
           <div className="w-100 mt-3 tool-ext-section">
             <p className="mb-1 text-white">Brightness &#38; Color</p>
-            <Button className="mt-4 mb-2 dropdown-button" color="secondary" id="basic-adjust-toggler">
+            <Button className="mt-4 mb-2 dropdown-button" size="sm" color="secondary" id="basic-adjust-toggler">
               Basic Adjust
             </Button>
             <UncontrolledCollapse style={{ width: "100%" }} toggler="#basic-adjust-toggler">
@@ -365,6 +380,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
+                        size="sm"
                         className="tool-ext-input-number"
                         id="brightness"
                         name="brightness"
@@ -393,6 +409,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
+                        size="sm"
                         className="tool-ext-input-number"
                         id="contrast"
                         name="contrast"
@@ -421,6 +438,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
+                        size="sm"
                         className="tool-ext-input-number"
                         id="sharpness"
                         name="sharpness"
@@ -434,7 +452,8 @@ export function SidePane({
             </UncontrolledCollapse>
           </div>
           <div className="w-100 mt-3 tool-ext-section">
-            <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="depth-rotate-toggler">
+            <p className="mb-1 text-white">Non-linearity</p>
+            <Button className="mt-3 mb-3 dropdown-button" size="sm" color="secondary" id="depth-rotate-toggler">
               Point Curve
             </Button>
             <UncontrolledCollapse toggler="#depth-rotate-toggler">
@@ -462,6 +481,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
+                        size="sm"
                         className="tool-ext-input-number"
                         id="aConstant"
                         name="aConstant"
@@ -491,6 +511,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
+                        size="sm"
                         className="tool-ext-input-number"
                         id="bConstant"
                         name="bConstant"
@@ -516,51 +537,6 @@ export function SidePane({
       </>
     );
   };
-  const text = () => {
-    return (
-      <>
-        <div className="tool-ext mt-4 w-100">
-          <p className="mb-3 text-white">Size</p>
-          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-crop-toggler">
-            Crop
-          </Button>
-          <UncontrolledCollapse toggler="#adjust-crop-toggler">
-            <Card className="tool-ext-card">
-              <CardBody className="tool-ext-card-body">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
-                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
-                Minus, alias.
-              </CardBody>
-            </Card>
-          </UncontrolledCollapse>
-          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-rotate-toggler">
-            Rotate
-          </Button>
-          <UncontrolledCollapse toggler="#adjust-rotate-toggler">
-            <Card className="tool-ext-card">
-              <CardBody className="tool-ext-card-body">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
-                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
-                Minus, alias.
-              </CardBody>
-            </Card>
-          </UncontrolledCollapse>
-          <Button className="mt-3 mb-3 dropdown-button" color="secondary" id="adjust-resize-toggler">
-            Resize
-          </Button>
-          <UncontrolledCollapse toggler="#adjust-resize-toggler">
-            <Card className="tool-ext-card">
-              <CardBody className="tool-ext-card-body">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt magni, voluptas debitis similique
-                porro a molestias consequuntur earum odio officiis natus, amet hic, iste sed dignissimos esse fuga!
-                Minus, alias.
-              </CardBody>
-            </Card>
-          </UncontrolledCollapse>
-        </div>
-      </>
-    );
-  };
   return (
     <SidePaneStyle>
       <div className="tools">
@@ -579,7 +555,7 @@ export function SidePane({
       </div>
       <div className={toolExtOpen ? "tools-ext tool-ext-active" : "tools-ext tool-ext-inactive"}>
         <div className="tools-ext-elements">
-          {activeTool === 0 ? adjust() : activeTool === 1 ? effect() : activeTool === 2 ? text() : null}
+          {activeTool === 0 ? toolBox() : activeTool === 1 ? adjust() : activeTool === 2 ? effect() : null}
           <Button onClick={toolExtActions} className="toggle-button">
             {toolExtOpen ? <MdKeyboardArrowLeft /> : <MdKeyboardArrowRight />}
           </Button>

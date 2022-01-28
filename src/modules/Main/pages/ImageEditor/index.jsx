@@ -12,7 +12,7 @@ import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
 import UploadPane from "components/UploadPane";
-import { canvasToImage, cloneCanvas, getImageFromCanvas } from "utils/canvasUtils";
+import { canvasToImage, cloneCanvas, drawLayerCanvas, getImageFromCanvas } from "utils/canvasUtils";
 import {} from "utils/stackOperations";
 
 export function ImageEditor({
@@ -25,6 +25,7 @@ export function ImageEditor({
   layerMode,
   operationStack,
   toggleLayerMode,
+  addEffect,
   addLayer,
   updateLayer,
   removeLayer,
@@ -285,6 +286,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
+  addEffect: imageActions.addEffect,
   zoomIn: imageActions.zoomIn,
   zoomOut: imageActions.zoomOut,
   undo: imageActions.undo,

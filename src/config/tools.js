@@ -1,9 +1,13 @@
 import React from "react";
 import { HiOutlineAdjustments } from "react-icons/hi";
 import { IoMdColorFill } from "react-icons/io";
-import { BiText } from "react-icons/bi";
+import { AiFillTool } from "react-icons/ai";
 
 const Tools = [
+  {
+    name: "Tools",
+    icon: <AiFillTool />
+  },
   {
     name: "Adjust",
     icon: <HiOutlineAdjustments />
@@ -11,10 +15,6 @@ const Tools = [
   {
     name: "Effects",
     icon: <IoMdColorFill />
-  },
-  {
-    name: "Text",
-    icon: <BiText />
   }
 ];
 

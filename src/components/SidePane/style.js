@@ -4,7 +4,7 @@ import styled from "styled-components";
 const SidePaneStyle = styled.div`
   display: flex;
   position: relative;
-  width: 72px;
+  width: 60px;
   .tools {
     height: 100%;
     background: #1e1f22;
@@ -13,10 +13,9 @@ const SidePaneStyle = styled.div`
     z-index: 10;
     .tool {
       flex-shrink: 0;
-      width: 72px;
-      height: 72px;
+      width: 60px;
+      height: 60px;
       color: #7e838e;
-      font-size: 12px;
       line-height: 1rem;
       display: flex;
       flex-direction: column;
@@ -26,8 +25,11 @@ const SidePaneStyle = styled.div`
       padding: 2px;
       svg {
         margin-bottom: 0.25rem;
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 1.2rem;
+        height: 1.2rem;
+      }
+      span {
+        font-size: 0.7rem;
       }
       &:hover {
         color: #fff;
@@ -41,7 +43,7 @@ const SidePaneStyle = styled.div`
   .tools-ext {
     position: absolute;
     height: 100%;
-    width: 300px;
+    width: 250px;
     background: #2b2c2f;
     color: #7e838e;
     .tools-ext-elements {
@@ -56,43 +58,6 @@ const SidePaneStyle = styled.div`
           align-items: center;
           .dropdown-button {
             width: 100%;
-          }
-          .tool-ext-selection {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            .tool-ext-selection-icons {
-              width: 100%;
-              display: flex;
-              flex-wrap: wrap;
-              .selection-tool {
-                flex-shrink: 0;
-                width: 50px;
-                height: 50px;
-                color: #7e838e;
-                font-size: 12px;
-                line-height: 1rem;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                cursor: pointer;
-                padding: 2px;
-                svg {
-                  margin-bottom: 0.25rem;
-                  width: 1.5rem;
-                  height: 1.5rem;
-                }
-                &:hover {
-                  color: #fff;
-                }
-              }
-              .selection-tool-active {
-                background: #2b2c2f;
-                color: #fff;
-              }
-            }
           }
           .tool-ext-card {
             background: transparent;
@@ -110,6 +75,43 @@ const SidePaneStyle = styled.div`
                 width: 25%;
                 padding: 0.2em;
               }
+            }
+          }
+        }
+        .tool-ext-selection {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          .tool-ext-selection-icons {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            .selection-tool {
+              flex-shrink: 0;
+              width: 50px;
+              height: 50px;
+              color: #7e838e;
+              font-size: 12px;
+              line-height: 1rem;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              cursor: pointer;
+              padding: 2px;
+              svg {
+                margin-bottom: 0.25rem;
+                width: 1.5rem;
+                height: 1.5rem;
+              }
+              &:hover {
+                color: #fff;
+              }
+            }
+            .selection-tool-active {
+              background: #2b2c2f;
+              color: #fff;
             }
           }
         }
