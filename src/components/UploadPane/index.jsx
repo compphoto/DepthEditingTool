@@ -51,7 +51,7 @@ class UploadPane extends Component {
                   </div>
                 </label>
               </div>
-              <div style={rgbImageUrl ? { display: "block" } : { display: "none" }} className="main-side-bar-img">
+              <div style={rgbImageUrl ? { display: "flex" } : { display: "none" }} className="main-side-bar-img">
                 <img className="side-bar-img" src={getImageUrl(rgbImageUrl)} />
                 <div
                   onClick={e => {
@@ -105,7 +105,7 @@ class UploadPane extends Component {
                   </div>
                 </label>
               </div>
-              <div style={depthImageUrl ? { display: "block" } : { display: "none" }} className="main-side-bar-img">
+              <div style={depthImageUrl ? { display: "flex" } : { display: "none" }} className="main-side-bar-img">
                 <img className="side-bar-img" src={getImageUrl(depthImageUrl)} />
                 <div
                   onClick={e => {

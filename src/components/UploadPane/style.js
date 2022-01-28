@@ -23,6 +23,8 @@ const UploadPaneStyle = styled.div`
       }
       .main-side-bar-container {
         height: 50%;
+        display: flex;
+        flex-direction: column;
         .main-side-bar-container-text {
           text-align: center;
           font-size: 0.9rem;
@@ -61,9 +63,12 @@ const UploadPaneStyle = styled.div`
           width: 100%;
           margin-bottom: 0.5rem;
           overflow: hidden;
-          max-height: 200px;
+          flex-grow: 100;
+          justify-content: center;
+          align-items: center;
           .side-bar-img {
-            width: 100%;
+            max-width: 100%;
+            max-height: 100%;
           }
           .remove-img {
             display: none;

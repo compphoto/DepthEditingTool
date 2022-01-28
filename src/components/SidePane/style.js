@@ -83,6 +83,23 @@ const SidePaneStyle = styled.div`
           flex-direction: column;
           justify-content: center;
           align-items: center;
+          .tool-ext-selection-image-card {
+            background: #1e1f22;
+            width: 100%;
+            .tool-ext-selection-image {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              overflow: hidden;
+              width: 100%;
+              height: 100px;
+              padding: 0;
+              img {
+                max-width: 100%;
+                max-height: 100%;
+              }
+            }
+          }
           .tool-ext-selection-icons {
             width: 100%;
             display: flex;

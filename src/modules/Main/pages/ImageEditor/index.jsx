@@ -12,7 +12,7 @@ import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
 import UploadPane from "components/UploadPane";
-import { canvasToImage, cloneCanvas, drawLayerCanvas, getImageFromCanvas } from "utils/canvasUtils";
+import { canvasToImage, cloneCanvas, drawLayerCanvas } from "utils/canvasUtils";
 import {} from "utils/stackOperations";
 
 export function ImageEditor({
@@ -58,10 +58,12 @@ export function ImageEditor({
   }, [operationStack.layerStack]);
   useEffect(() => {
     let tempLayer = tempLayerStack.map((element, key) => {
-      let image = getImageFromCanvas(element.depthBitmap);
+      let image = canvasToImage(element.depthBitmap);
       return (
         <div key={key} className="p-2 my-2 layer-mode-body-content">
-          <img src={image} />
+          <div className="layer-mode-body-content-img">
+            <img src={image} />
+          </div>
           <div
             onClick={e => {
               e.stopPropagation();

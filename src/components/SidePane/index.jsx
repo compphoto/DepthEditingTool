@@ -17,11 +17,11 @@ import {
   editBrightness,
   editContrast,
   editHighlightPixelArea,
-  getImageFromCanvas,
   getRgbBitmap,
   modifyBitmap,
   scaleSelection,
-  getBoundingArea
+  getBoundingArea,
+  canvasToImage
 } from "utils/canvasUtils";
 import PointCurve from "components/PointCurve";
 
@@ -84,7 +84,7 @@ export function SidePane({
         newCroppedCanvasImage = cloneCanvas(memoryDepthCanvas);
       }
       modifyBitmap(depthBitmapCanvas, newCroppedCanvasImage, newArea, tools.currentTool, histogramParams.pixelRange);
-      setBitmapImage(getImageFromCanvas(depthBitmapCanvas));
+      setBitmapImage(canvasToImage(depthBitmapCanvas));
       initImage({ rgbBitmapCanvas: getRgbBitmap(cloneCanvas(depthBitmapCanvas), cloneCanvas(displayRgbCanvas)) });
       storeParameters({
         croppedCanvasImage: null,
@@ -100,7 +100,7 @@ export function SidePane({
   };
   useEffect(() => {
     if (depthBitmapCanvas) {
-      setBitmapImage(getImageFromCanvas(depthBitmapCanvas));
+      setBitmapImage(canvasToImage(depthBitmapCanvas));
     } else {
       setBitmapImage(null);
     }
@@ -185,9 +185,13 @@ export function SidePane({
   const toolBox = () => {
     return (
       <>
-        <div className="tool-ext mt-4 w-100">
+        <div className="tool-ext w-100">
           <div className="tool-ext-selection">
-            <img src={bitmapImage} />
+            <Card className="tool-ext-selection-image-card">
+              <CardBody className="tool-ext-selection-image">
+                <img src={bitmapImage || "https://via.placeholder.com/200x100.png?text=no+bitmap"} />
+              </CardBody>
+            </Card>
             <div className="tool-ext-selection-icons">
               <div
                 onClick={() => {
@@ -241,6 +245,63 @@ export function SidePane({
               >
                 <BiIntersect />
               </div>
+
+              <div
+                onClick={() => {
+                  if (memoryDepthCanvas) {
+                    selectTool("intersectSelection");
+                  }
+                }}
+                className={
+                  tools.intersectSelection && memoryDepthCanvas
+                    ? "selection-tool selection-tool-active"
+                    : "selection-tool"
+                }
+              >
+                <BiIntersect />
+              </div>
+              <div
+                onClick={() => {
+                  if (memoryDepthCanvas) {
+                    selectTool("intersectSelection");
+                  }
+                }}
+                className={
+                  tools.intersectSelection && memoryDepthCanvas
+                    ? "selection-tool selection-tool-active"
+                    : "selection-tool"
+                }
+              >
+                <BiIntersect />
+              </div>
+              <div
+                onClick={() => {
+                  if (memoryDepthCanvas) {
+                    selectTool("intersectSelection");
+                  }
+                }}
+                className={
+                  tools.intersectSelection && memoryDepthCanvas
+                    ? "selection-tool selection-tool-active"
+                    : "selection-tool"
+                }
+              >
+                <BiIntersect />
+              </div>
+              <div
+                onClick={() => {
+                  if (memoryDepthCanvas) {
+                    selectTool("intersectSelection");
+                  }
+                }}
+                className={
+                  tools.intersectSelection && memoryDepthCanvas
+                    ? "selection-tool selection-tool-active"
+                    : "selection-tool"
+                }
+              >
+                <BiIntersect />
+              </div>
             </div>
             <div className="d-flex">
               <Button
@@ -266,7 +327,7 @@ export function SidePane({
                 onClick={() => {
                   const bitmapContext = depthBitmapCanvas.getContext("2d");
                   bitmapContext.clearRect(0, 0, depthBitmapCanvas.width, depthBitmapCanvas.height);
-                  setBitmapImage(getImageFromCanvas(depthBitmapCanvas));
+                  setBitmapImage(canvasToImage(depthBitmapCanvas));
                 }}
               >
                 Clear

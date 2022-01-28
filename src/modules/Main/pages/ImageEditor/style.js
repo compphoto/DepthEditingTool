@@ -106,8 +106,17 @@ const ImageEditorStyle = styled.div`
           border: 2px solid #ddd;
           border-radius: 4px;
           width: 100%;
-          img {
+          .layer-mode-body-content-img {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
             width: 100%;
+            height: 100px;
+            img {
+              max-width: 100%;
+              max-height: 100%;
+            }
           }
           .remove-layer {
             display: none;
