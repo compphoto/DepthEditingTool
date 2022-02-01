@@ -104,6 +104,7 @@ const SidePaneStyle = styled.div`
             width: 100%;
             display: flex;
             flex-wrap: wrap;
+            margin: 2rem;
             .selection-tool {
               flex-shrink: 0;
               width: 50px;
