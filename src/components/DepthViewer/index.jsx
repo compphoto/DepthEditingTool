@@ -15,10 +15,15 @@ import {
   drawScaledCanvasImage,
   getBoundingArea,
   upScaleBox,
-  downScaleBox
+  downScaleBox,
+  drawScribble,
+  upScalePoint,
+  downScalePoint,
+  getScribbleRange
 } from "utils/canvasUtils";
 import { runDepthOperations, runCachedDepthOperations } from "utils/stackOperations";
 import { runDepthLayerOperations } from "utils/layerOperations";
+import ToolBox from "config/toolBox";
 
 let objectUrl = null;
 
@@ -45,6 +50,7 @@ class DepthViewer extends Component {
       prevDepthSize,
       depthBitmapCanvas,
       layerMode,
+      scribbleParams,
       depthScaleParams,
       tools,
       parameters,
@@ -127,6 +133,15 @@ class DepthViewer extends Component {
             downScaleBox(parameters.croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
           );
         }
+        if (Array.isArray(scribbleParams.path) || scribbleParams.path.length) {
+          for (let i = 0; i < scribbleParams.path.length; i++) {
+            drawScribble(
+              depthCanvas.getContext("2d"),
+              downScalePoint(scribbleParams.path[i].start, ratio, centerShift_x, centerShift_y, translatePos, scale),
+              downScalePoint(scribbleParams.path[i].end, ratio, centerShift_x, centerShift_y, translatePos, scale)
+            );
+          }
+        }
       } else {
         let depthContext = depthCanvas.getContext("2d");
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
@@ -149,8 +164,8 @@ class DepthViewer extends Component {
       }
     }
     // Listens for mouse movements around the depth canvas and draw bounding box
-    if (prevProps.tools.currentTool !== tools.currentTool) {
-      if (tools.currentTool) {
+    if (prevProps.tools.currentTool !== tools.currentTool && tools.currentTool) {
+      if (ToolBox[tools.currentTool].type === "boundingBox") {
         depthCanvas.addEventListener("click", this.drawBoundingBox);
       } else {
         depthCanvas.style.cursor = "default";
@@ -179,7 +194,8 @@ class DepthViewer extends Component {
     URL.revokeObjectURL(objectUrl);
   }
   handleResize = () => {
-    const { displayDepthCanvas, depthScaleParams, parameters, initImage, storeScaleParams } = this.props;
+    const { displayDepthCanvas, scribbleParams, depthScaleParams, parameters, initImage, storeScaleParams } =
+      this.props;
     const { translatePos, scale } = depthScaleParams;
     const depthCanvas = this.depthImageRef.current;
     this.setState({ ...this.state, windowWidth: window.innerWidth });
@@ -197,6 +213,15 @@ class DepthViewer extends Component {
           depthCanvas,
           downScaleBox(parameters.croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
         );
+      }
+      if (Array.isArray(scribbleParams.path) || scribbleParams.path.length) {
+        for (let i = 0; i < scribbleParams.path.length; i++) {
+          drawScribble(
+            depthCanvas.getContext("2d"),
+            downScalePoint(scribbleParams.path[i].start, ratio, centerShift_x, centerShift_y, translatePos, scale),
+            downScalePoint(scribbleParams.path[i].end, ratio, centerShift_x, centerShift_y, translatePos, scale)
+          );
+        }
       }
     }
   };
@@ -270,14 +295,19 @@ class DepthViewer extends Component {
     const { depthImageRef } = this;
     const {
       mainDepthCanvas,
+      memoryDepthCanvas,
       rgbScaleParams,
       depthScaleParams,
       parameters,
       tools,
+      scribbleParams,
+      storeScribbleParams,
       storeScaleParams,
       storeParameters,
       addOperation
     } = this.props;
+    const { pixelRange, domain, values, update } = parameters.histogramParams;
+    const depthCanvas = depthImageRef.current;
     return (
       <DepthViewerStyle>
         <canvas
@@ -285,59 +315,125 @@ class DepthViewer extends Component {
           height={(window.innerHeight / 1200) * 352}
           ref={depthImageRef}
           onMouseDown={e => {
-            storeScaleParams({
-              name: "rgbScaleParams",
-              value: {
-                startDragOffset: {
-                  x: e.clientX - rgbScaleParams.translatePos.x,
-                  y: e.clientY - rgbScaleParams.translatePos.y
-                },
-                mouseDown: true
+            if (tools.currentTool) {
+              if (ToolBox[tools.currentTool].type === "scribble") {
+                storeScribbleParams({
+                  pos: { x: e.clientX - depthCanvas.offsetLeft, y: e.clientY - depthCanvas.offsetTop }
+                });
+              } else if (ToolBox[tools.currentTool].type === "pan") {
+                storeScaleParams({
+                  name: "rgbScaleParams",
+                  value: {
+                    startDragOffset: {
+                      x: e.clientX - rgbScaleParams.translatePos.x,
+                      y: e.clientY - rgbScaleParams.translatePos.y
+                    },
+                    mouseDown: true
+                  }
+                });
+                storeScaleParams({
+                  name: "depthScaleParams",
+                  value: {
+                    startDragOffset: {
+                      x: e.clientX - depthScaleParams.translatePos.x,
+                      y: e.clientY - depthScaleParams.translatePos.y
+                    },
+                    mouseDown: true
+                  }
+                });
               }
-            });
-            storeScaleParams({
-              name: "depthScaleParams",
-              value: {
-                startDragOffset: {
-                  x: e.clientX - depthScaleParams.translatePos.x,
-                  y: e.clientY - depthScaleParams.translatePos.y
-                },
-                mouseDown: true
-              }
-            });
+            }
           }}
           onMouseUp={e => {
-            rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-            depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+            if (tools.currentTool) {
+              if (ToolBox[tools.currentTool].type === "scribble") {
+                if (Array.isArray(scribbleParams.path) || scribbleParams.path.length) {
+                  let range = getScribbleRange(memoryDepthCanvas, scribbleParams.path);
+                  storeParameters({
+                    histogramParams: {
+                      ...parameters.histogramParams,
+                      pixelRange: range
+                    }
+                  });
+                }
+              } else if (ToolBox[tools.currentTool].type === "pan") {
+                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+                depthScaleParams.mouseDown &&
+                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+              }
+            }
           }}
           onMouseOver={e => {
-            rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-            depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+            if (tools.currentTool) {
+              if (ToolBox[tools.currentTool].type === "scribble") {
+              } else if (ToolBox[tools.currentTool].type === "pan") {
+                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+                depthScaleParams.mouseDown &&
+                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+              }
+            }
           }}
           onMouseOut={e => {
-            rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-            depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+            if (tools.currentTool) {
+              if (ToolBox[tools.currentTool].type === "scribble") {
+              } else if (ToolBox[tools.currentTool].type === "pan") {
+                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+                depthScaleParams.mouseDown &&
+                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+              }
+            }
+          }}
+          onMouseEnter={e => {
+            if (tools.currentTool) {
+              if (ToolBox[tools.currentTool].type === "scribble") {
+                storeScribbleParams({
+                  pos: { x: e.clientX - depthCanvas.offsetLeft, y: e.clientY - depthCanvas.offsetTop }
+                });
+              } else if (ToolBox[tools.currentTool].type === "pan") {
+              }
+            }
           }}
           onMouseMove={e => {
-            if (depthScaleParams.mouseDown && !tools.currentTool) {
-              storeScaleParams({
-                name: "rgbScaleParams",
-                value: {
-                  translatePos: {
-                    x: e.clientX - rgbScaleParams.startDragOffset.x,
-                    y: e.clientY - rgbScaleParams.startDragOffset.y
-                  }
+            if (tools.currentTool) {
+              if (ToolBox[tools.currentTool].type === "scribble") {
+                if (e.buttons !== 1) return;
+                let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
+                const depthContext = depthCanvas.getContext("2d");
+                let start = { x: scribbleParams.pos.x, y: scribbleParams.pos.y };
+                let end = { x: e.clientX - depthCanvas.offsetLeft, y: e.clientY - depthCanvas.offsetTop };
+                drawScribble(depthContext, start, end);
+                storeScribbleParams({
+                  pos: { x: e.clientX - depthCanvas.offsetLeft, y: e.clientY - depthCanvas.offsetTop },
+                  path: [
+                    ...scribbleParams.path,
+                    {
+                      start: upScalePoint(start, ratio, centerShift_x, centerShift_y, translatePos, scale),
+                      end: upScalePoint(end, ratio, centerShift_x, centerShift_y, translatePos, scale)
+                    }
+                  ]
+                });
+              } else if (ToolBox[tools.currentTool].type === "pan") {
+                if (depthScaleParams.mouseDown) {
+                  storeScaleParams({
+                    name: "rgbScaleParams",
+                    value: {
+                      translatePos: {
+                        x: e.clientX - rgbScaleParams.startDragOffset.x,
+                        y: e.clientY - rgbScaleParams.startDragOffset.y
+                      }
+                    }
+                  });
+                  storeScaleParams({
+                    name: "depthScaleParams",
+                    value: {
+                      translatePos: {
+                        x: e.clientX - depthScaleParams.startDragOffset.x,
+                        y: e.clientY - depthScaleParams.startDragOffset.y
+                      }
+                    }
+                  });
                 }
-              });
-              storeScaleParams({
-                name: "depthScaleParams",
-                value: {
-                  translatePos: {
-                    x: e.clientX - depthScaleParams.startDragOffset.x,
-                    y: e.clientY - depthScaleParams.startDragOffset.y
-                  }
-                }
-              });
+              }
             }
           }}
         ></canvas>
@@ -353,6 +449,7 @@ const mapStateToProps = state => ({
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   prevDepthSize: imageSelectors.prevDepthSize(state),
   depthBitmapCanvas: imageSelectors.depthBitmapCanvas(state),
+  scribbleParams: imageSelectors.scribbleParams(state),
   layerMode: imageSelectors.layerMode(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
   depthScaleParams: imageSelectors.depthScaleParams(state),
@@ -365,6 +462,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   initImage: imageActions.initImage,
   initDepth: imageActions.initDepth,
+  storeScribbleParams: imageActions.storeScribbleParams,
   storeScaleParams: imageActions.storeScaleParams,
   storeParameters: imageActions.storeParameters,
   addOperation: imageActions.addOperation,

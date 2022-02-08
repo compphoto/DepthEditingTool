@@ -7,10 +7,8 @@ import { selectors as imageSelectors } from "store/image";
 import { Button, UncontrolledCollapse, CardBody, Card, FormGroup, Label, Input } from "reactstrap";
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
-import { MdCropDin, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
-import { RiCheckboxMultipleBlankLine } from "react-icons/ri";
-import { BiIntersect } from "react-icons/bi";
-import { BsSubtract } from "react-icons/bs";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+
 import {
   addScaleShift,
   cloneCanvas,
@@ -18,12 +16,12 @@ import {
   editContrast,
   editHighlightPixelArea,
   getRgbBitmap,
-  modifyBitmap,
   scaleSelection,
   getBoundingArea,
   canvasToImage
 } from "utils/canvasUtils";
 import PointCurve from "components/PointCurve";
+import ToolBox from "config/toolBox";
 
 export function SidePane({
   toolExtOpen,
@@ -73,29 +71,31 @@ export function SidePane({
 
   const onModifyBitmap = () => {
     if (memoryDepthCanvas) {
-      const { croppedCanvasImage, croppedArea, histogramParams } = parameters;
-      let newArea = null;
-      let newCroppedCanvasImage = null;
-      if (croppedArea) {
-        newArea = croppedArea;
-        newCroppedCanvasImage = croppedCanvasImage;
-      } else {
-        newArea = getBoundingArea(memoryDepthCanvas);
-        newCroppedCanvasImage = cloneCanvas(memoryDepthCanvas);
-      }
-      modifyBitmap(depthBitmapCanvas, newCroppedCanvasImage, newArea, tools.currentTool, histogramParams.pixelRange);
-      setBitmapImage(canvasToImage(depthBitmapCanvas));
-      initImage({ rgbBitmapCanvas: getRgbBitmap(cloneCanvas(depthBitmapCanvas), cloneCanvas(displayRgbCanvas)) });
-      storeParameters({
-        croppedCanvasImage: null,
-        croppedArea: null,
-        histogramParams: {
-          pixelRange: [0, 255],
-          domain: [0, 255],
-          values: [0, 255],
-          update: [0, 255]
+      if (ToolBox[tools.currentTool].type === "boundingBox") {
+        const { croppedCanvasImage, croppedArea, histogramParams } = parameters;
+        let newArea = null;
+        let newCroppedCanvasImage = null;
+        if (croppedArea) {
+          newArea = croppedArea;
+          newCroppedCanvasImage = croppedCanvasImage;
+        } else {
+          newArea = getBoundingArea(memoryDepthCanvas);
+          newCroppedCanvasImage = cloneCanvas(memoryDepthCanvas);
         }
-      });
+        ToolBox[tools.currentTool].func(depthBitmapCanvas, newCroppedCanvasImage, newArea, histogramParams.pixelRange);
+        setBitmapImage(canvasToImage(depthBitmapCanvas));
+        initImage({ rgbBitmapCanvas: getRgbBitmap(cloneCanvas(depthBitmapCanvas), cloneCanvas(displayRgbCanvas)) });
+        storeParameters({
+          croppedCanvasImage: null,
+          croppedArea: null,
+          histogramParams: {
+            pixelRange: [0, 255],
+            domain: [0, 255],
+            values: [0, 255],
+            update: [0, 255]
+          }
+        });
+      }
     }
   };
   useEffect(() => {
@@ -193,119 +193,25 @@ export function SidePane({
               </CardBody>
             </Card>
             <div className="tool-ext-selection-icons">
-              <div
-                onClick={() => {
-                  if (memoryDepthCanvas) {
-                    selectTool("singleSelection");
+              {Object.keys(ToolBox).map((key, index) => (
+                <div
+                  key={index}
+                  onClick={() => {
+                    if (memoryDepthCanvas) {
+                      selectTool(key);
+                    }
+                  }}
+                  className={
+                    tools[key] && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
                   }
-                }}
-                className={
-                  tools.singleSelection && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
-                }
-              >
-                <MdCropDin />
-              </div>
-              <div
-                onClick={() => {
-                  if (memoryDepthCanvas) {
-                    selectTool("addSelection");
-                  }
-                }}
-                className={
-                  tools.addSelection && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
-                }
-              >
-                <RiCheckboxMultipleBlankLine />
-              </div>
-              <div
-                onClick={() => {
-                  if (memoryDepthCanvas) {
-                    selectTool("subtractSelection");
-                  }
-                }}
-                className={
-                  tools.subtractSelection && memoryDepthCanvas
-                    ? "selection-tool selection-tool-active"
-                    : "selection-tool"
-                }
-              >
-                <BsSubtract />
-              </div>
-              <div
-                onClick={() => {
-                  if (memoryDepthCanvas) {
-                    selectTool("intersectSelection");
-                  }
-                }}
-                className={
-                  tools.intersectSelection && memoryDepthCanvas
-                    ? "selection-tool selection-tool-active"
-                    : "selection-tool"
-                }
-              >
-                <BiIntersect />
-              </div>
-
-              <div
-                onClick={() => {
-                  if (memoryDepthCanvas) {
-                    selectTool("intersectSelection");
-                  }
-                }}
-                className={
-                  tools.intersectSelection && memoryDepthCanvas
-                    ? "selection-tool selection-tool-active"
-                    : "selection-tool"
-                }
-              >
-                <BiIntersect />
-              </div>
-              <div
-                onClick={() => {
-                  if (memoryDepthCanvas) {
-                    selectTool("intersectSelection");
-                  }
-                }}
-                className={
-                  tools.intersectSelection && memoryDepthCanvas
-                    ? "selection-tool selection-tool-active"
-                    : "selection-tool"
-                }
-              >
-                <BiIntersect />
-              </div>
-              <div
-                onClick={() => {
-                  if (memoryDepthCanvas) {
-                    selectTool("intersectSelection");
-                  }
-                }}
-                className={
-                  tools.intersectSelection && memoryDepthCanvas
-                    ? "selection-tool selection-tool-active"
-                    : "selection-tool"
-                }
-              >
-                <BiIntersect />
-              </div>
-              <div
-                onClick={() => {
-                  if (memoryDepthCanvas) {
-                    selectTool("intersectSelection");
-                  }
-                }}
-                className={
-                  tools.intersectSelection && memoryDepthCanvas
-                    ? "selection-tool selection-tool-active"
-                    : "selection-tool"
-                }
-              >
-                <BiIntersect />
-              </div>
+                >
+                  {ToolBox[key].icon}
+                </div>
+              ))}
             </div>
             <div className="d-flex">
               <Button
-                disabled={!tools.currentTool}
+                disabled={!tools.currentTool || ToolBox[tools.currentTool].type !== "boundingBox"}
                 size="sm"
                 className="mx-2"
                 color="secondary"
@@ -320,7 +226,7 @@ export function SidePane({
                   : "Select"}
               </Button>
               <Button
-                disabled={!tools.currentTool}
+                disabled={!tools.currentTool || ToolBox[tools.currentTool].type !== "boundingBox"}
                 size="sm"
                 className="mx-2"
                 color="secondary"

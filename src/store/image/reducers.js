@@ -16,6 +16,11 @@ const initialState = {
   rgbBitmapCanvas: null,
   depthBitmapCanvas: null,
   layerMode: false,
+  scribbleParams: {
+    pos: { x: 0, y: 0 },
+    offset: {},
+    path: []
+  },
   rgbScaleParams: {
     ratio: 1,
     centerShift_x: 0,
@@ -48,7 +53,8 @@ const initialState = {
     addSelection: false,
     subtractSelection: false,
     intersectSelection: false,
-    panTool: false
+    panTool: false,
+    scribbleTool: false
   },
   toolsParameters: {
     depthRangeIntensity: 0,
@@ -143,13 +149,20 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         rgbBitmapCanvas: null,
         depthBitmapCanvas: null,
         layerMode: false,
+        scribbleParams: {
+          pos: { x: 0, y: 0 },
+          offset: {},
+          path: []
+        },
         depthScaleParams: depthScaleParams,
         tools: {
           currentTool: null,
           singleSelection: false,
           addSelection: false,
           subtractSelection: false,
-          intersectSelection: false
+          intersectSelection: false,
+          panTool: false,
+          scribbleTool: false
         },
         toolsParameters: {
           depthRangeIntensity: 0,
@@ -203,6 +216,14 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         tools: newTools
+      };
+    case types.STORE_SCRIBBLE_PARAMS:
+      return {
+        ...state,
+        scribbleParams: {
+          ...state.scribbleParams,
+          ...payload
+        }
       };
     case types.STORE_SCALE_PARAMS:
       var { name, value } = payload;
@@ -376,6 +397,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       });
       return {
         ...state,
+        scribbleParams: {
+          pos: { x: 0, y: 0 },
+          offset: {},
+          path: []
+        },
         parameters: {
           ...state.parameters,
           croppedCanvasImage: null,
@@ -399,6 +425,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       var layerStack = [];
       return {
         ...state,
+        scribbleParams: {
+          pos: { x: 0, y: 0 },
+          offset: {},
+          path: []
+        },
         rgbScaleParams: {
           ...state.rgbScaleParams,
           translatePos: {

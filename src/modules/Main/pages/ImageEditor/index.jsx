@@ -6,7 +6,7 @@ import { Helmet } from "react-helmet";
 import Switch from "react-switch";
 import { Container, Button, FormGroup, Label, Input } from "reactstrap";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
-import { MdOutlinePanTool, MdDoubleArrow, MdCancel } from "react-icons/md";
+import { MdDoubleArrow, MdCancel } from "react-icons/md";
 import { ImUndo2 } from "react-icons/im";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
@@ -145,9 +145,6 @@ export function ImageEditor({
               <h4>Image Editor</h4>
             </div>
             <div className="nav-button">
-              <Button onClick={() => {}} size="sm" color="outline">
-                <MdOutlinePanTool />
-              </Button>
               <Button
                 onClick={() => {
                   zoomOut();

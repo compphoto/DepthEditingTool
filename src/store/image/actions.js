@@ -6,6 +6,7 @@ export const imageActions = {
   initRgb: payload => ({ type: types.INIT_RGB, payload: payload }),
   initDepth: payload => ({ type: types.INIT_DEPTH, payload: payload }),
   selectTool: payload => ({ type: types.SELECT_TOOL, payload: payload }),
+  storeScribbleParams: payload => ({ type: types.STORE_SCRIBBLE_PARAMS, payload: payload }),
   storeScaleParams: payload => ({ type: types.STORE_SCALE_PARAMS, payload: payload }),
   storeToolParameters: payload => ({ type: types.STORE_TOOL_PARAMETERS, payload: payload }),
   storeParameters: payload => ({ type: types.STORE_PARAMETERS, payload: payload }),

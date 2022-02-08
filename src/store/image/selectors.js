@@ -12,6 +12,7 @@ export const selectors = {
   prevDepthSize: state => state.image.prevDepthSize,
   rgbBitmapCanvas: state => state.image.rgbBitmapCanvas,
   depthBitmapCanvas: state => state.image.depthBitmapCanvas,
+  scribbleParams: state => state.image.scribbleParams,
   layerMode: state => state.image.layerMode,
   rgbScaleParams: state => state.image.rgbScaleParams,
   depthScaleParams: state => state.image.depthScaleParams,

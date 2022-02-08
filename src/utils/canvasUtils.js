@@ -73,6 +73,20 @@ export const downScaleBox = (box, ratio, centerShift_x, centerShift_y, translate
   return [x, y, w, h];
 };
 
+export const upScalePoint = (point, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
+  let { x, y } = point;
+  let new_x = (x - centerShift_x - translatePos.x) / ratio / scale;
+  let new_y = (y - centerShift_y - translatePos.y) / ratio / scale;
+  return { x: new_x, y: new_y };
+};
+
+export const downScalePoint = (point, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
+  let { x, y } = point;
+  let new_x = x * ratio * scale + centerShift_x + translatePos.x;
+  let new_y = y * ratio * scale + centerShift_y + translatePos.y;
+  return { x: new_x, y: new_y };
+};
+
 export const getDimension = (image, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
   let x1 = centerShift_x + translatePos.x;
   let y1 = centerShift_y + translatePos.y;
@@ -362,4 +376,45 @@ export const addScaleShift = (image, context, boundingBox, a, b) => {
     }
     context.putImageData(imageData, boundingBox[0], boundingBox[1]);
   }
+};
+
+export const drawScribble = (context, start, end) => {
+  context.beginPath();
+  context.lineWidth = 3;
+  context.lineCap = "round";
+  context.strokeStyle = "#c0392b";
+  context.moveTo(start.x, start.y);
+  context.lineTo(end.x, end.y);
+  context.stroke();
+};
+
+export const getScribbleRange = (depthCanvas, path) => {
+  const bitmapCanvas = document.createElement("canvas");
+  const bitmapContext = bitmapCanvas.getContext("2d");
+  bitmapCanvas.width = depthCanvas.width;
+  bitmapCanvas.height = depthCanvas.height;
+
+  for (let i = 0; i < path.length; i++) {
+    drawScribble(bitmapContext, path[i].start, path[i].end);
+  }
+
+  bitmapContext.globalCompositeOperation = "source-in";
+  bitmapContext.drawImage(depthCanvas, 0, 0);
+
+  let maxi = -Infinity;
+  let mini = Infinity;
+  const imageData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
+  const src = imageData.data;
+  for (let i = 0; i < src.length; i += 4) {
+    if (src[i + 3] !== 0) {
+      if (src[i] > maxi) {
+        maxi = src[i];
+      }
+      if (src[i] < mini) {
+        mini = src[i];
+      }
+    }
+  }
+
+  return [mini, maxi];
 };
