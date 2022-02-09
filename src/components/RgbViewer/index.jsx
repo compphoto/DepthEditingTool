@@ -95,14 +95,6 @@ class RgbViewer extends Component {
       }
     }
     if (
-      prevProps.operationStack.layerStack.length !== operationStack.layerStack.length ||
-      prevProps.layerMode !== layerMode
-    ) {
-      if (layerMode && displayRgbCanvas) {
-        runRgbLayerOperations(displayRgbCanvas.width, displayRgbCanvas.height);
-      }
-    }
-    if (
       prevProps.displayRgbCanvas !== displayRgbCanvas ||
       prevProps.rgbScaleParams !== rgbScaleParams ||
       prevProps.parameters.croppedArea !== parameters.croppedArea

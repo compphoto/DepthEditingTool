@@ -32,18 +32,18 @@ export function SidePane({
   tools,
   toolsParameters,
   parameters,
+  operationStack,
   selectTool,
   initImage,
   storeToolParameters,
   storeParameters,
-  addEffect
+  addEffect,
+  updateLayer
 }) {
   const [activeTool, setActiveTool] = useState(0);
-  const [bitmapImage, setBitmapImage] = useState(null);
-
   const [tempToolsParams, setTempToolsParams] = useState({
-    depthRangeIntensity: 0,
-    depthScale: 1,
+    disparity: 0,
+    scale: 1,
     brightness: 0,
     contrast: 0,
     sharpness: 0,
@@ -73,61 +73,65 @@ export function SidePane({
     if (memoryDepthCanvas) {
       if (ToolBox[tools.currentTool].type === "boundingBox") {
         const { croppedCanvasImage, croppedArea, histogramParams } = parameters;
-        let newArea = null;
-        let newCroppedCanvasImage = null;
-        if (croppedArea) {
-          newArea = croppedArea;
-          newCroppedCanvasImage = croppedCanvasImage;
-        } else {
-          newArea = getBoundingArea(memoryDepthCanvas);
-          newCroppedCanvasImage = cloneCanvas(memoryDepthCanvas);
-        }
-        ToolBox[tools.currentTool].func(depthBitmapCanvas, newCroppedCanvasImage, newArea, histogramParams.pixelRange);
-        setBitmapImage(canvasToImage(depthBitmapCanvas));
-        initImage({ rgbBitmapCanvas: getRgbBitmap(cloneCanvas(depthBitmapCanvas), cloneCanvas(displayRgbCanvas)) });
-        storeParameters({
-          croppedCanvasImage: null,
-          croppedArea: null,
-          histogramParams: {
-            pixelRange: [0, 255],
-            domain: [0, 255],
-            values: [0, 255],
-            update: [0, 255]
+        const { activeIndex, layerStack } = operationStack;
+        if (activeIndex > 0) {
+          let newArea = null;
+          let newCroppedCanvasImage = null;
+          if (croppedArea) {
+            newArea = croppedArea;
+            newCroppedCanvasImage = croppedCanvasImage;
+          } else {
+            newArea = getBoundingArea(memoryDepthCanvas);
+            newCroppedCanvasImage = cloneCanvas(memoryDepthCanvas);
           }
-        });
+          const newBitmapCanvas = ToolBox[tools.currentTool].func(
+            cloneCanvas(layerStack[activeIndex].bitmap),
+            newCroppedCanvasImage,
+            newArea,
+            histogramParams.pixelRange
+          );
+          updateLayer({ index: activeIndex, value: { bitmap: newBitmapCanvas, toolsParameters: null } });
+          initImage({
+            rgbBitmapCanvas: getRgbBitmap(cloneCanvas(layerStack[activeIndex].bitmap), cloneCanvas(displayRgbCanvas))
+          });
+          storeParameters({
+            croppedCanvasImage: null,
+            croppedArea: null,
+            histogramParams: {
+              pixelRange: [0, 255],
+              domain: [0, 255],
+              values: [0, 255],
+              update: [0, 255]
+            }
+          });
+        }
       }
     }
   };
   useEffect(() => {
-    if (depthBitmapCanvas) {
-      setBitmapImage(canvasToImage(depthBitmapCanvas));
-    } else {
-      setBitmapImage(null);
-    }
-  }, [depthBitmapCanvas]);
-
-  useEffect(() => {
-    if (parameters.histogramParams.pixelRange && depthBitmapCanvas) {
+    const { activeIndex, layerStack } = operationStack;
+    if (parameters.histogramParams.pixelRange && activeIndex > -1) {
       addEffect({
         name: "depthStack",
         value: {
           func: editHighlightPixelArea,
-          params: [cloneCanvas(depthBitmapCanvas), toolsParameters.depthRangeIntensity]
+          params: [cloneCanvas(layerStack[activeIndex].bitmap), toolsParameters.disparity]
         }
       });
     }
-  }, [toolsParameters.depthRangeIntensity]);
+  }, [toolsParameters.disparity]);
   useEffect(() => {
-    if (parameters.histogramParams.pixelRange && depthBitmapCanvas) {
+    const { activeIndex, layerStack } = operationStack;
+    if (parameters.histogramParams.pixelRange && activeIndex > -1) {
       addEffect({
         name: "depthStack",
         value: {
           func: scaleSelection,
-          params: [cloneCanvas(depthBitmapCanvas), toolsParameters.depthScale]
+          params: [cloneCanvas(layerStack[activeIndex].bitmap), toolsParameters.scale]
         }
       });
     }
-  }, [toolsParameters.depthScale]);
+  }, [toolsParameters.scale]);
   useEffect(() => {
     if (memoryDepthCanvas) {
       const { croppedArea } = parameters;
@@ -187,11 +191,6 @@ export function SidePane({
       <>
         <div className="tool-ext w-100">
           <div className="tool-ext-selection">
-            <Card className="tool-ext-selection-image-card">
-              <CardBody className="tool-ext-selection-image">
-                <img src={bitmapImage || "https://via.placeholder.com/200x100.png?text=no+bitmap"} />
-              </CardBody>
-            </Card>
             <div className="tool-ext-selection-icons">
               {Object.keys(ToolBox).map((key, index) => (
                 <div
@@ -257,19 +256,19 @@ export function SidePane({
               <Card className="tool-ext-card">
                 <CardBody className="tool-ext-card-body">
                   <FormGroup className="w-100">
-                    <Label for="depthRangeIntensity">Depth Intensity</Label>
+                    <Label for="disparity">Depth Intensity</Label>
                     <div className="tool-ext-input d-flex justify-content-between w-100">
                       <Input
                         disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
                         onChange={onHandleChange}
                         onMouseUp={onHandleUpdate}
                         className="tool-ext-input-slider"
-                        id="depthRangeIntensity"
-                        name="depthRangeIntensity"
+                        id="disparity"
+                        name="disparity"
                         min="-100"
                         max="100"
                         type="range"
-                        value={tempToolsParams.depthRangeIntensity}
+                        value={tempToolsParams.disparity}
                       />
                       <Input
                         disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
@@ -278,28 +277,28 @@ export function SidePane({
                         onKeyDown={onHandleEnter}
                         size="sm"
                         className="tool-ext-input-number"
-                        id="depthRangeIntensity"
-                        name="depthRangeIntensity"
+                        id="disparity"
+                        name="disparity"
                         type="number"
-                        value={tempToolsParams.depthRangeIntensity}
+                        value={tempToolsParams.disparity}
                       />
                     </div>
                   </FormGroup>
                   <FormGroup className="w-100">
-                    <Label for="depthScale">Depth Detail</Label>
+                    <Label for="scale">Depth Detail</Label>
                     <div className="tool-ext-input d-flex justify-content-between w-100">
                       <Input
                         disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
                         onChange={onHandleChange}
                         onMouseUp={onHandleUpdate}
                         className="tool-ext-input-slider"
-                        id="depthScale"
-                        name="depthScale"
+                        id="scale"
+                        name="scale"
                         min="0"
                         max="1"
                         step={0.01}
                         type="range"
-                        value={tempToolsParams.depthScale}
+                        value={tempToolsParams.scale}
                       />
                       <Input
                         disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
@@ -308,10 +307,10 @@ export function SidePane({
                         onKeyDown={onHandleEnter}
                         size="sm"
                         className="tool-ext-input-number"
-                        id="depthScale"
-                        name="depthScale"
+                        id="scale"
+                        name="scale"
                         type="number"
-                        value={tempToolsParams.depthScale}
+                        value={tempToolsParams.scale}
                       />
                     </div>
                   </FormGroup>

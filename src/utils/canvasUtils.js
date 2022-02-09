@@ -17,6 +17,17 @@ export const cloneCanvas = oldCanvas => {
   return null;
 };
 
+export const canvasLike = canvas => {
+  if (canvas) {
+    const newCanvas = document.createElement("canvas");
+    const context = newCanvas.getContext("2d");
+    newCanvas.width = canvas.width;
+    newCanvas.height = canvas.height;
+    return newCanvas;
+  }
+  return null;
+};
+
 export const dimensionToBox = dimension => {
   let x = dimension[0];
   let y = dimension[1];
@@ -230,6 +241,7 @@ export const modifyBitmap = (bitmapCanvas, croppedCanvas, box, currentTool, pixe
     bitmapContext.globalCompositeOperation = "source-in";
   }
   bitmapContext.drawImage(croppedCanvas, box[0], box[1]);
+  return bitmapCanvas;
 };
 
 export const editHighlightPixelArea = (image, context, canvas, depth) => {

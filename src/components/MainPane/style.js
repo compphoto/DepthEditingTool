@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 const MainPaneStyle = styled.div`
   height: 100%;
-  width: calc(100% - 260px);
+  width: calc(100% - 310px);
   .main {
     background: #f0f1f2;
     overflow: hidden;

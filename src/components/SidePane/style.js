@@ -94,7 +94,7 @@ const SidePaneStyle = styled.div`
               width: 100%;
               height: 100px;
               padding: 0;
-              img {
+              img {s
                 max-width: 100%;
                 max-height: 100%;
               }

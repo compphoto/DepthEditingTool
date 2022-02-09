@@ -57,6 +57,7 @@ class DepthViewer extends Component {
       operationStack,
       initImage,
       initDepth,
+      initLayer,
       storeScaleParams,
       storeParameters,
       addOperation,
@@ -88,6 +89,7 @@ class DepthViewer extends Component {
             func: drawCanvasImage
           }
         });
+        initLayer();
       }
     }
     // If operation is added to the stack, rerun all operations in operation stack
@@ -104,11 +106,6 @@ class DepthViewer extends Component {
         } else {
           runDepthOperations(mainDepthCanvas);
         }
-      }
-    }
-    if (prevProps.operationStack.layerStack !== operationStack.layerStack || prevProps.layerMode !== layerMode) {
-      if (layerMode && displayDepthCanvas) {
-        runDepthLayerOperations(displayDepthCanvas.width, displayDepthCanvas.height);
       }
     }
     if (
@@ -462,6 +459,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   initImage: imageActions.initImage,
   initDepth: imageActions.initDepth,
+  initLayer: imageActions.initLayer,
   storeScribbleParams: imageActions.storeScribbleParams,
   storeScaleParams: imageActions.storeScaleParams,
   storeParameters: imageActions.storeParameters,

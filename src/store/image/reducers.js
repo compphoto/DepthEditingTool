@@ -1,4 +1,4 @@
-import { cloneCanvas } from "utils/canvasUtils";
+import { canvasLike, cloneCanvas } from "utils/canvasUtils";
 import { types } from "./constants";
 
 const initialState = {
@@ -57,8 +57,8 @@ const initialState = {
     scribbleTool: false
   },
   toolsParameters: {
-    depthRangeIntensity: 0,
-    depthScale: 1,
+    disparity: 0,
+    scale: 1,
     brightness: 0,
     contrast: 0,
     sharpness: 0,
@@ -78,7 +78,8 @@ const initialState = {
   operationStack: {
     rgbStack: [],
     depthStack: [],
-    layerStack: []
+    layerStack: [],
+    activeIndex: -1
   }
 };
 
@@ -165,8 +166,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           scribbleTool: false
         },
         toolsParameters: {
-          depthRangeIntensity: 0,
-          depthScale: 0,
+          disparity: 0,
+          scale: 0,
           brightness: 0,
           contrast: 0,
           sharpness: 0,
@@ -255,28 +256,74 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         ...state,
         layerMode: !state.layerMode
       };
-    case types.ADD_LAYER:
+    case types.INIT_LAYER:
       return {
         ...state,
         operationStack: {
           ...state.operationStack,
           layerStack: [
-            ...state.operationStack.layerStack,
             {
-              depth: 0,
-              detail: 1,
-              depthBitmap: cloneCanvas(state.depthBitmapCanvas),
-              rgbBitmap: cloneCanvas(state.rgbBitmapCanvas)
+              bitmap: cloneCanvas(state.mainDepthCanvas),
+              toolsParameters: {
+                disparity: 0,
+                scale: 1,
+                brightness: 0,
+                contrast: 0,
+                sharpness: 0,
+                aConstant: 0,
+                bConstant: 0
+              }
             }
-          ]
+          ],
+          activeIndex: 0
         }
       };
-    case types.UPDATE_LAYER:
+    case types.ADD_LAYER:
+      var newLayerStack = [
+        ...state.operationStack.layerStack,
+        {
+          bitmap: canvasLike(state.mainDepthCanvas),
+          toolsParameters: {
+            disparity: 0,
+            scale: 1,
+            brightness: 0,
+            contrast: 0,
+            sharpness: 0,
+            aConstant: 0,
+            bConstant: 0
+          }
+        }
+      ];
       return {
         ...state,
         operationStack: {
           ...state.operationStack,
-          layerStack: [...payload]
+          layerStack: newLayerStack,
+          activeIndex: newLayerStack.length - 1
+        }
+      };
+    case types.UPDATE_LAYER_INDEX:
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          layerStack: [...state.operationStack.layerStack],
+          activeIndex: payload
+        }
+      };
+    case types.UPDATE_LAYER:
+      var { index, value } = payload;
+      var layerStack = [...state.operationStack.layerStack];
+      var layer = {
+        ...layerStack[index],
+        ...value
+      };
+      layerStack[index] = layer;
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          layerStack: layerStack
         }
       };
     case types.REMOVE_LAYER:
@@ -284,19 +331,25 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       if (payload !== -1) {
         newLayerStack.splice(payload, 1);
       }
+      if (newLayerStack.length < 1) {
+        return state;
+      }
       return {
         ...state,
         operationStack: {
           ...state.operationStack,
-          layerStack: newLayerStack
+          layerStack: newLayerStack,
+          activeIndex: newLayerStack.length - 1
         }
       };
     case types.REMOVE_ALL_LAYER:
+      var newLayerStack = [state.operationStack.layerStack[0]];
       return {
         ...state,
         operationStack: {
           ...state.operationStack,
-          layerStack: []
+          layerStack: newLayerStack,
+          activeIndex: 0
         }
       };
     case types.ADD_OPERATION:
