@@ -171,6 +171,10 @@ const ImageEditorStyle = styled.div`
             background: #1b1b1d;
           }
         }
+        .layer-mode-body-add[disabled] {
+          pointer-events: none;
+          opacity: 0.7;
+        }
       }
       .layer-mode-footer {
         background-color: #26272b;

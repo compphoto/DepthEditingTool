@@ -15,6 +15,7 @@ import { canvasToImage, cloneCanvas, drawLayerCanvas } from "utils/canvasUtils";
 import {} from "utils/stackOperations";
 
 export function ImageEditor({
+  mainDepthCanvas,
   memoryDepthCanvas,
   depthBitmapCanvas,
   zoomIn,
@@ -182,7 +183,7 @@ export function ImageEditor({
           <div className="layer-mode-body">
             {layers || null}
             {/* if later stack is empty, disable this */}
-            <div className="my-2 layer-mode-body-add">
+            <div disabled={mainDepthCanvas === null} className="my-2 layer-mode-body-add">
               <Card className="layer-mode-body-add-card" onClick={addLayer}>
                 <AiOutlinePlus />
               </Card>
@@ -225,6 +226,7 @@ export function ImageEditor({
 }
 
 const mapStateToProps = state => ({
+  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   depthBitmapCanvas: imageSelectors.depthBitmapCanvas(state),
   layerMode: imageSelectors.layerMode(state),
