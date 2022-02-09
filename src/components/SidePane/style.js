@@ -35,6 +35,10 @@ const SidePaneStyle = styled.div`
         color: #fff;
       }
     }
+    .tool[disabled] {
+      pointer-events: none;
+      opacity: 0.7;
+    }
     .active {
       background: #2b2c2f;
       color: #fff;

@@ -110,6 +110,12 @@ export function SidePane({
   };
   useEffect(() => {
     const { activeIndex, layerStack } = operationStack;
+    if (activeIndex === 0) {
+      toggleTool(1);
+    }
+  }, [operationStack.activeIndex]);
+  useEffect(() => {
+    const { activeIndex, layerStack } = operationStack;
     if (parameters.histogramParams.pixelRange && activeIndex > -1) {
       addEffect({
         name: "depthStack",
@@ -512,6 +518,7 @@ export function SidePane({
             onClick={() => {
               toggleTool(key);
             }}
+            disabled={key === 0 && operationStack.activeIndex === 0}
             className={key === activeTool ? "active tool" : "tool"}
           >
             {tool.icon}
@@ -521,7 +528,13 @@ export function SidePane({
       </div>
       <div className={toolExtOpen ? "tools-ext tool-ext-active" : "tools-ext tool-ext-inactive"}>
         <div className="tools-ext-elements">
-          {activeTool === 0 ? toolBox() : activeTool === 1 ? adjust() : activeTool === 2 ? effect() : null}
+          {activeTool === 0 && operationStack.activeIndex !== 0
+            ? toolBox()
+            : activeTool === 1
+            ? adjust()
+            : activeTool === 2
+            ? effect()
+            : null}
           <Button onClick={toolExtActions} className="toggle-button">
             {toolExtOpen ? <MdKeyboardArrowLeft /> : <MdKeyboardArrowRight />}
           </Button>
