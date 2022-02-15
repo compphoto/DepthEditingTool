@@ -3,7 +3,16 @@ import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import { Helmet } from "react-helmet";
-import { Container, Button, CardBody, Card } from "reactstrap";
+import {
+  Container,
+  Button,
+  CardBody,
+  Card,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem
+} from "reactstrap";
 import { AiOutlineClose, AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { MdDoubleArrow, MdCancel } from "react-icons/md";
 import { ImUndo2 } from "react-icons/im";
@@ -25,6 +34,7 @@ export function ImageEditor({
   reset,
   layerMode,
   operationStack,
+  handleChange,
   toggleLayerMode,
   addEffect,
   addLayer,
@@ -35,6 +45,14 @@ export function ImageEditor({
 }) {
   const [layerToggle, setLayerToggle] = useState(false);
   const [layers, setLayers] = useState(null);
+  const onHandleChange = e => {
+    console.warn("got here");
+    handleChange(e);
+    e.target.value = null;
+  };
+  const openAttachment = id => {
+    document.getElementById(id).click();
+  };
   useEffect(() => {
     let tempLayer = operationStack.layerStack.map((element, key) => {
       let image = canvasToImage(element.bitmap);
@@ -79,10 +97,60 @@ export function ImageEditor({
         <title>Image Editor</title>
       </Helmet>
       <header>
+        <input
+          id="upload-rgb-image"
+          type="file"
+          name="rgbImageUrl"
+          onChange={onHandleChange}
+          accept="image/png, image/gif, image/jpeg, image/jpg"
+        />
+        <input
+          id="upload-depth-image"
+          type="file"
+          name="depthImageUrl"
+          onChange={onHandleChange}
+          accept="image/png, image/gif, image/jpeg, image/jpg"
+        />
         <Container fluid>
           <div className="nav-bar">
             <div className="nav-intro">
               <h4>Image Editor</h4>
+              <div className="nav-intro-tabs">
+                <UncontrolledDropdown>
+                  <DropdownToggle>Files</DropdownToggle>
+                  <DropdownMenu>
+                    {/* <DropdownItem header>Header</DropdownItem> */}
+                    <DropdownItem
+                      onClick={() => {
+                        openAttachment("upload-rgb-image");
+                      }}
+                    >
+                      <label htmlFor="upload-rgb-image">Open RGB Image</label>
+                    </DropdownItem>
+                    <DropdownItem
+                      onClick={() => {
+                        openAttachment("upload-depth-image");
+                      }}
+                    >
+                      <label htmlFor="upload-depth-image">Open Depth Image</label>
+                    </DropdownItem>
+                    <DropdownItem divider />
+                    <DropdownItem>
+                      <p>Test</p>
+                    </DropdownItem>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+                <UncontrolledDropdown>
+                  <DropdownToggle>Edit</DropdownToggle>
+                  <DropdownMenu>
+                    <DropdownItem header>Header</DropdownItem>
+                    <DropdownItem>Action</DropdownItem>
+                    <DropdownItem>Another Action</DropdownItem>
+                    <DropdownItem divider />
+                    <DropdownItem>Another Action</DropdownItem>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+              </div>
             </div>
             <div className="nav-button">
               <Button
@@ -149,7 +217,6 @@ export function ImageEditor({
       <section>
         <SidePane />
         <MainPane />
-        <UploadPane />
       </section>
       <footer>
         <div>Computational Photography Labs SFU</div>
@@ -234,6 +301,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
+  handleChange: imageActions.handleChange,
   addEffect: imageActions.addEffect,
   zoomIn: imageActions.zoomIn,
   zoomOut: imageActions.zoomOut,

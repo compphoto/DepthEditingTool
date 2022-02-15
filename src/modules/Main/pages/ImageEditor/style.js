@@ -13,6 +13,9 @@ const ImageEditorStyle = styled.div`
     padding: 10px 15px;
     display: flex;
     align-items: center;
+    input {
+      display: none;
+    }
     .nav-bar {
       display: flex;
       justify-content: space-between;
@@ -21,6 +24,33 @@ const ImageEditorStyle = styled.div`
         display: flex;
         h4 {
           margin: 0;
+        }
+        .nav-intro-tabs {
+          margin: 0 2rem;
+          display: flex;
+          align-items: end;
+          .dropdown {
+            .btn-secondary {
+              color: #7e838e;
+              background: none;
+              border: none;
+              box-shadow: none;
+              &:hover {
+                color: #fff;
+              }
+              &:focus {
+                color: #fff;
+              }
+            }
+            .dropdown-menu {
+              .dropdown-item {
+                padding: 0.75rem 1rem;
+                p {
+                  margin: 0;
+                }
+              }
+            }
+          }
         }
       }
       .nav-button {
