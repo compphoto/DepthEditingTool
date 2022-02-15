@@ -4,7 +4,7 @@ import styled from "styled-components";
 const UploadPaneStyle = styled.div`
   .main-side-bar {
     height: 100%;
-    width: 200px;
+    width: 250px;
     background: #fff;
     -webkit-box-shadow: -1px 0 0 0 rgb(4 0 0 / 5%);
     box-shadow: -1px 0 0 0 rgb(4 0 0 / 5%);

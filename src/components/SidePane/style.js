@@ -35,6 +35,10 @@ const SidePaneStyle = styled.div`
         color: #fff;
       }
     }
+    .tool[disabled] {
+      pointer-events: none;
+      opacity: 0.7;
+    }
     .active {
       background: #2b2c2f;
       color: #fff;
@@ -94,7 +98,7 @@ const SidePaneStyle = styled.div`
               width: 100%;
               height: 100px;
               padding: 0;
-              img {
+              img {s
                 max-width: 100%;
                 max-height: 100%;
               }

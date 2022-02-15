@@ -47,7 +47,7 @@ const ImageEditorStyle = styled.div`
     .layer-mode-toggle {
       z-index: 10;
       height: 100%;
-      width: 200px;
+      width: 250px;
       color: #7e838e;
       background-color: #333334;
       font-size: 0.8rem;
@@ -69,7 +69,7 @@ const ImageEditorStyle = styled.div`
     }
     .layer-mode-pane {
       padding-bottom: 34px;
-      width: 200px;
+      width: 250px;
       bottom: 0;
       right: 0;
       position: fixed;
@@ -79,22 +79,27 @@ const ImageEditorStyle = styled.div`
       flex-direction: column;
       overflow: hidden;
       .layer-mode-header {
-        height: 100px;
+        height: 50px;
         background-color: #26272b;
         padding: 0.5rem 0.75rem;
         font-size: 0.9rem;
         .layer-mode-header-title {
           display: flex;
+          align-items: center;
           justify-content: space-between;
+          p {
+            margin: 0;
+          }
+          button {
+            color: #7e838e;
+          }
         }
         .layer-mode-header-content {
-          display: flex;
-          justify-content: space-around;
         }
       }
       .layer-mode-body {
         padding: 0.5rem 0.75rem;
-        height: calc(100% - 140px);
+        height: calc(100% - 110px);
         overflow-x: hidden;
         overflow-y: auto;
         display: flex;
@@ -103,19 +108,22 @@ const ImageEditorStyle = styled.div`
         font-size: 0.9rem;
         .layer-mode-body-content {
           position: relative;
-          border: 2px solid #ddd;
-          border-radius: 4px;
           width: 100%;
-          .layer-mode-body-content-img {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+          .layer-mode-body-content-image-card {
+            background: #1e1f22;
             width: 100%;
-            height: 100px;
-            img {
-              max-width: 100%;
-              max-height: 100%;
+            .layer-mode-body-content-image {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              overflow: hidden;
+              width: 100%;
+              height: 120px;
+              padding: 0;
+              img {
+                max-width: 100%;
+                max-height: 100%;
+              }
             }
           }
           .remove-layer {
@@ -123,7 +131,7 @@ const ImageEditorStyle = styled.div`
             color: #7e838e;
             position: absolute;
             top: 0%;
-            left: 85%;
+            left: 90%;
             svg {
               height: 1rem;
               width: 1rem;
@@ -135,30 +143,51 @@ const ImageEditorStyle = styled.div`
           &:hover .remove-layer {
             display: block;
           }
-          .layer-mode-input {
-            .layer-mode-input-slider {
-              width: 65%;
-            }
-            .layer-mode-input-number {
-              width: 30%;
-              padding: 0.2em;
-            }
-          }
         }
         .layer-mode-body-content:hover {
-          border: 1px solid rgba(0, 140, 186, 0.5);
-          box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
+          border: 2px solid rgb(126, 131, 142);
         }
         .layer-mode-body-content-active {
-          border: 1px solid rgba(0, 140, 186, 0.5);
-          box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
+          border: 2px solid rgb(126, 131, 142);
+        }
+        .layer-mode-body-add {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          .layer-mode-body-add-card {
+            cursor: pointer;
+            background: #232426;
+            width: 70%;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            svg {
+              width: 1.2rem;
+              height: 1.2rem;
+            }
+          }
+          .layer-mode-body-add-card:hover {
+            background: #1b1b1d;
+          }
+        }
+        .layer-mode-body-add[disabled] {
+          pointer-events: none;
+          opacity: 0.7;
         }
       }
       .layer-mode-footer {
-        height: 40px;
+        background-color: #26272b;
+        height: 60px;
         padding: 0.1rem 0;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
         .layer-mode-apply-button {
-          width: 80%;
+          width: 40%;
+          button {
+            width: 100%;
+          }
         }
       }
     }
