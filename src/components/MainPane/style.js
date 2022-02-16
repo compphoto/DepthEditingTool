@@ -2,10 +2,9 @@ import styled from "styled-components";
 
 const MainPaneStyle = styled.div`
   height: 100%;
-  width: calc(100% - 60px);
+  width: calc(100% - 250px);
   .main {
     background: #f0f1f2;
-    overflow: hidden;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -15,6 +14,7 @@ const MainPaneStyle = styled.div`
     .main-row {
       height: 100%;
       width: 100%;
+      overflow: hidden;
       display: flex;
       justify-content: space-between;
       .main-column {
@@ -29,8 +29,7 @@ const MainPaneStyle = styled.div`
           display: flex;
           justify-content: center;
           align-items: center;
-          overflow-y: hidden;
-          overflow-x: hidden;
+          overflow: hidden;
         }
         .rgb-box {
           height: 50%;

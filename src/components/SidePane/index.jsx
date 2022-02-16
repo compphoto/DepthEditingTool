@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import { connect } from "react-redux";
 import { toolExtActions } from "store/toolext";
 import { imageActions } from "store/image";
@@ -7,7 +7,8 @@ import { selectors as imageSelectors } from "store/image";
 import { Button, UncontrolledCollapse, CardBody, Card, FormGroup, Label, Input } from "reactstrap";
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdCancel } from "react-icons/md";
+import { AiOutlineClose, AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 
 import {
   addScaleShift,
@@ -26,6 +27,7 @@ import ToolBox from "config/toolBox";
 export function SidePane({
   toolExtOpen,
   toolExtActions,
+  mainDepthCanvas,
   memoryDepthCanvas,
   displayRgbCanvas,
   depthBitmapCanvas,
@@ -38,9 +40,14 @@ export function SidePane({
   storeToolParameters,
   storeParameters,
   addEffect,
-  updateLayer
+  addLayer,
+  updateLayerIndex,
+  updateLayer,
+  removeLayer,
+  removeAllLayers
 }) {
   const [activeTool, setActiveTool] = useState(0);
+  const [layers, setLayers] = useState(null);
   const [tempToolsParams, setTempToolsParams] = useState({
     disparity: 0,
     scale: 1,
@@ -114,6 +121,44 @@ export function SidePane({
       toggleTool(1);
     }
   }, [operationStack.activeIndex]);
+  useEffect(() => {
+    let tempLayer = operationStack.layerStack.map((element, key) => {
+      let image = canvasToImage(element.bitmap);
+      return (
+        <Fragment key={key}>
+          <div
+            onClick={() => {
+              updateLayerIndex(key);
+            }}
+            className={
+              operationStack.activeIndex === key
+                ? "my-2 layer-mode-body-content layer-mode-body-content-active"
+                : "my-2 layer-mode-body-content"
+            }
+          >
+            <Card className="layer-mode-body-content-image-card">
+              <CardBody className="layer-mode-body-content-image">
+                <img src={image} />
+              </CardBody>
+            </Card>
+            {key !== 0 ? (
+              <div
+                onClick={e => {
+                  e.stopPropagation();
+                  removeLayer(key);
+                }}
+                className="remove-layer"
+              >
+                <MdCancel />
+              </div>
+            ) : null}
+          </div>
+          {key === 0 ? <hr style={{ borderTop: "1px solid #7e838e", width: "100%", marginBottom: "20px" }} /> : null}
+        </Fragment>
+      );
+    });
+    setLayers(tempLayer);
+  }, [operationStack.layerStack]);
   useEffect(() => {
     const { activeIndex, layerStack } = operationStack;
     if (parameters.histogramParams.pixelRange && activeIndex > -1) {
@@ -254,7 +299,7 @@ export function SidePane({
       <>
         <div className="tool-ext w-100">
           <div className="w-100 mt-3 tool-ext-section">
-            <p className="mb-1 text-white">Depth Selection</p>
+            <p className="mb-1">Depth Selection</p>
             <Button className="mt-4 mb-2 dropdown-button" size="sm" color="secondary" id="depth-adjust-toggler">
               Adjust Selection
             </Button>
@@ -325,7 +370,7 @@ export function SidePane({
             </UncontrolledCollapse>
           </div>
           <div className="w-100 mt-3 tool-ext-section">
-            <p className="mb-1 text-white">Brightness &#38; Color</p>
+            <p className="mb-1">Brightness &#38; Color</p>
             <Button className="mt-4 mb-2 dropdown-button" size="sm" color="secondary" id="basic-adjust-toggler">
               Basic Adjust
             </Button>
@@ -424,7 +469,7 @@ export function SidePane({
             </UncontrolledCollapse>
           </div>
           <div className="w-100 mt-3 tool-ext-section">
-            <p className="mb-1 text-white">Non-linearity</p>
+            <p className="mb-1">Non-linearity</p>
             <Button className="mt-3 mb-3 dropdown-button" size="sm" color="secondary" id="depth-rotate-toggler">
               Point Curve
             </Button>
@@ -511,33 +556,64 @@ export function SidePane({
   };
   return (
     <SidePaneStyle>
-      <div className="tools">
-        {Tools.map((tool, key) => (
-          <div
-            key={key}
-            onClick={() => {
-              toggleTool(key);
-            }}
-            disabled={key === 0 && operationStack.activeIndex === 0}
-            className={key === activeTool ? "active tool" : "tool"}
-          >
-            {tool.icon}
-            <span>{tool.name}</span>
+      <div className="layer-mode-pane">
+        <div className="layer-mode-header">
+          <div className="layer-mode-header-title">
+            <p>Selection Pane</p>
           </div>
-        ))}
+        </div>
+        <div className="layer-mode-body">
+          {layers || null}
+          {/* if later stack is empty, disable this */}
+          <div disabled={mainDepthCanvas === null} className="my-2 layer-mode-body-add">
+            <Card className="layer-mode-body-add-card" onClick={addLayer}>
+              <AiOutlinePlus />
+            </Card>
+          </div>
+        </div>
+        <div className="layer-mode-footer text-center">
+          <div className="layer-mode-apply-button mx-2">
+            <Button size="sm" color="secondary" onClick={addLayer}>
+              Add
+            </Button>
+          </div>
+          <div className="layer-mode-apply-button mx-2">
+            <Button size="sm" color="secondary" onClick={removeAllLayers}>
+              Remove all
+            </Button>
+          </div>
+        </div>
       </div>
+
       <div className={toolExtOpen ? "tools-ext tool-ext-active" : "tools-ext tool-ext-inactive"}>
-        <div className="tools-ext-elements">
-          {activeTool === 0 && operationStack.activeIndex !== 0
-            ? toolBox()
-            : activeTool === 1
-            ? adjust()
-            : activeTool === 2
-            ? effect()
-            : null}
-          <Button onClick={toolExtActions} className="toggle-button">
-            {toolExtOpen ? <MdKeyboardArrowLeft /> : <MdKeyboardArrowRight />}
-          </Button>
+        <div className="tools-ext-header">
+          {Tools.map((tool, key) => (
+            <div
+              key={key}
+              onClick={() => {
+                toggleTool(key);
+              }}
+              disabled={key === 0 && operationStack.activeIndex === 0}
+              className={key === activeTool ? "active tool" : "tool"}
+            >
+              {tool.icon}
+              <span>{tool.name}</span>
+            </div>
+          ))}
+        </div>
+        <div className="tools-ext-body">
+          <div className="tools-ext-elements">
+            {activeTool === 0 && operationStack.activeIndex !== 0
+              ? toolBox()
+              : activeTool === 1
+              ? adjust()
+              : activeTool === 2
+              ? effect()
+              : null}
+            <Button onClick={toolExtActions} className="toggle-button">
+              {toolExtOpen ? <MdKeyboardArrowLeft /> : <MdKeyboardArrowRight />}
+            </Button>
+          </div>
         </div>
       </div>
     </SidePaneStyle>
@@ -546,6 +622,7 @@ export function SidePane({
 
 const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
+  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
@@ -566,6 +643,7 @@ const mapDispatchToProps = {
   storeParameters: imageActions.storeParameters,
   toggleLayerMode: imageActions.toggleLayerMode,
   addLayer: imageActions.addLayer,
+  updateLayerIndex: imageActions.updateLayerIndex,
   updateLayer: imageActions.updateLayer,
   removeLayer: imageActions.removeLayer,
   removeAllLayers: imageActions.removeAllLayers,
