@@ -475,7 +475,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
     case types.RESET:
       var rgbStack = [state.operationStack.rgbStack[0]];
       var depthStack = [state.operationStack.depthStack[0]];
-      var layerStack = [];
+      var layerStack = [state.operationStack.layerStack[0]];
       return {
         ...state,
         scribbleParams: {
@@ -520,7 +520,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           ...state.operationStack,
           rgbStack: [...rgbStack],
           depthStack: [...depthStack],
-          layerStack: layerStack
+          layerStack: [...layerStack]
         }
       };
     case types.REMOVE_ITEM:
