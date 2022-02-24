@@ -174,6 +174,7 @@ const SidePaneStyle = styled.div`
       }
     }
     .tools-ext-body {
+      height: calc(100% - 50px);
       .tools-ext-elements {
         height: 100%;
         padding: 16px 24px;
@@ -261,6 +262,10 @@ const SidePaneStyle = styled.div`
                 background: #2e2f34;
                 color: #fff;
               }
+            }
+            .tool-ext-selection-icons[disabled] {
+              pointer-events: none;
+              opacity: 0.7;
             }
           }
         }
