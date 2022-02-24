@@ -59,3 +59,21 @@ export function solveCubic(a, b, c, d) {
 
   return roots;
 }
+
+export const getScribbleValues = (x, y, depthCanvasDimension) => {
+  let new_x = x;
+  let new_y = y;
+  if (x < depthCanvasDimension[0]) {
+    new_x = depthCanvasDimension[0];
+  }
+  if (x > depthCanvasDimension[2]) {
+    new_x = depthCanvasDimension[2];
+  }
+  if (y < depthCanvasDimension[1]) {
+    new_y = depthCanvasDimension[1];
+  }
+  if (y > depthCanvasDimension[3]) {
+    new_y = depthCanvasDimension[3];
+  }
+  return [new_x, new_y];
+};

@@ -22,8 +22,8 @@ import {
   getScribbleRange
 } from "utils/canvasUtils";
 import { runDepthOperations, runCachedDepthOperations } from "utils/stackOperations";
-import { runDepthLayerOperations } from "utils/layerOperations";
 import ToolBox from "config/toolBox";
+import { getScribbleValues } from "utils/calculation";
 
 let objectUrl = null;
 
@@ -314,8 +314,22 @@ class DepthViewer extends Component {
           onMouseDown={e => {
             if (tools.currentTool) {
               if (ToolBox[tools.currentTool].type === "scribble") {
+                let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
+                let depthCanvasDimension = getDimension(
+                  memoryDepthCanvas,
+                  ratio,
+                  centerShift_x,
+                  centerShift_y,
+                  translatePos,
+                  scale
+                );
+                let [x, y] = getScribbleValues(
+                  e.clientX - depthCanvas.offsetLeft,
+                  e.clientY - depthCanvas.offsetTop,
+                  depthCanvasDimension
+                );
                 storeScribbleParams({
-                  pos: { x: e.clientX - depthCanvas.offsetLeft, y: e.clientY - depthCanvas.offsetTop }
+                  pos: { x, y }
                 });
               } else if (ToolBox[tools.currentTool].type === "pan") {
                 storeScaleParams({
@@ -383,8 +397,22 @@ class DepthViewer extends Component {
           onMouseEnter={e => {
             if (tools.currentTool) {
               if (ToolBox[tools.currentTool].type === "scribble") {
+                let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
+                let depthCanvasDimension = getDimension(
+                  memoryDepthCanvas,
+                  ratio,
+                  centerShift_x,
+                  centerShift_y,
+                  translatePos,
+                  scale
+                );
+                let [x, y] = getScribbleValues(
+                  e.clientX - depthCanvas.offsetLeft,
+                  e.clientY - depthCanvas.offsetTop,
+                  depthCanvasDimension
+                );
                 storeScribbleParams({
-                  pos: { x: e.clientX - depthCanvas.offsetLeft, y: e.clientY - depthCanvas.offsetTop }
+                  pos: { x, y }
                 });
               } else if (ToolBox[tools.currentTool].type === "pan") {
               }
@@ -395,12 +423,25 @@ class DepthViewer extends Component {
               if (ToolBox[tools.currentTool].type === "scribble") {
                 if (e.buttons !== 1) return;
                 let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
+                let depthCanvasDimension = getDimension(
+                  memoryDepthCanvas,
+                  ratio,
+                  centerShift_x,
+                  centerShift_y,
+                  translatePos,
+                  scale
+                );
+                let [x, y] = getScribbleValues(
+                  e.clientX - depthCanvas.offsetLeft,
+                  e.clientY - depthCanvas.offsetTop,
+                  depthCanvasDimension
+                );
                 const depthContext = depthCanvas.getContext("2d");
                 let start = { x: scribbleParams.pos.x, y: scribbleParams.pos.y };
-                let end = { x: e.clientX - depthCanvas.offsetLeft, y: e.clientY - depthCanvas.offsetTop };
+                let end = { x, y };
                 drawScribble(depthContext, start, end);
                 storeScribbleParams({
-                  pos: { x: e.clientX - depthCanvas.offsetLeft, y: e.clientY - depthCanvas.offsetTop },
+                  pos: { x, y },
                   path: [
                     ...scribbleParams.path,
                     {
