@@ -13,27 +13,18 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   const [imageDimension, setImageDimension] = useState(1.0);
   const [colorMap, setColorMap] = useState(false);
   const [displacementMap, setDisplacementMap] = useState(false);
+  const [focalLength, setFocalLength] = useState(75);
   const [angle, setAngle] = useState({
     xAngle: 0,
     vAngle: 0
   });
-  // const { middleGrey, maxLuminance } = useControls({
-  //   middleGrey: {
-  //     min: 0,
-  //     max: 1,
-  //     value: 0.6,
-  //     step: 0.1
-  //   },
-  //   maxLuminance: {
-  //     min: 0,
-  //     max: 64,
-  //     value: 16,
-  //     step: 1
-  //   }
-  // });
   const onHandleChange = e => {
     let { name, value } = e.target;
-    setAngle({ ...angle, [name]: (value / 180) * Math.PI });
+    if (name === "focalLength") {
+      setFocalLength(+value);
+    } else {
+      setAngle({ ...angle, [name]: (value / 180) * Math.PI });
+    }
   };
   useEffect(() => {
     let colorMap = new TextureLoader().setCrossOrigin("").load(rgbImageCanvas, colorMap => {
@@ -54,12 +45,13 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
         <Input onChange={onHandleChange} id="vAngle" name="vAngle" orient="vertical" min="-45" max="45" type="range" />
       </div>
       <div className="x-div">
-        <Canvas camera={{ fov: 75, near: 0.1, far: 100, position: [0, 0, 2] }}>
+        <div className="x-slider">
+          <Input onChange={onHandleChange} id="focalLength" name="focalLength" min="12" max="300" type="range" />
+        </div>
+        <Canvas camera={{ fov: focalLength, near: 0.1, far: 100, position: [0, 0, 2] }}>
           <Suspense fallback={null}>
             <ambientLight intensity={-1} />
             <pointLight position={[0, 4, 4]} />
-            {/* <spotLight color={0xffa95c} intensity={4} position={[-50, 50, 50]} />
-          <hemisphereLight color={0xffeeb1} groundColor={0x080820} intensity={4} /> */}
             <mesh scale={[1.0, imageDimension, 1.0]} rotation={[angle.vAngle, angle.xAngle, 0]}>
               <planeBufferGeometry args={[2, 2, 2000, 2000]} />
               <meshStandardMaterial
@@ -70,17 +62,11 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
               />
             </mesh>
             <OrbitControls
-              // autoRotate
-              // enableZoom={false}
-              // enablePan={false}
               maxAzimuthAngle={Math.PI / 4}
               maxPolarAngle={Math.PI}
               minAzimuthAngle={-Math.PI / 4}
               minPolarAngle={0}
             />
-            {/* <EffectComposer>
-            <ToneMapping middleGrey={middleGrey} maxLuminance={maxLuminance} />
-          </EffectComposer> */}
           </Suspense>
         </Canvas>
         <div className="x-slider">
