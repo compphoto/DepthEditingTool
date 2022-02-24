@@ -15,7 +15,6 @@ import {
   highlightPixelAreaRgb
 } from "utils/canvasUtils";
 import { runCachedRgbOperations, runRgbOperations } from "utils/stackOperations";
-import { runRgbLayerOperations } from "utils/layerOperations";
 
 let objectUrl = null;
 
