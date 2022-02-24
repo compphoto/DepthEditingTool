@@ -259,11 +259,7 @@ export const editHighlightPixelArea = (image, context, canvas, depth) => {
       }
     }
     bitmapContext.putImageData(imageData, 0, 0);
-    // window.location.href = canvasToImage(bitmapCanvas);
-    morphImage(bitmapCanvas, "dilate", 5, 10);
-    // window.location.href = canvasToImage(bitmapCanvas);
     filterImage(bitmapCanvas, "blur");
-    // window.location.href = canvasToImage(bitmapCanvas);
     context.globalCompositeOperation = "source-over";
     context.drawImage(bitmapCanvas, 0, 0);
     return bitmapCanvas;
