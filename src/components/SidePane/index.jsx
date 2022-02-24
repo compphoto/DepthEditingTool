@@ -242,7 +242,7 @@ export function SidePane({
       <>
         <div className="tool-ext w-100">
           <div className="tool-ext-selection">
-            <div className="tool-ext-selection-icons">
+            <div disabled={operationStack.activeIndex <= 0} className="tool-ext-selection-icons">
               {Object.keys(ToolBox).map((key, index) => (
                 <div
                   key={index}
