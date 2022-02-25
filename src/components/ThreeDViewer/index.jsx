@@ -7,18 +7,24 @@ import { Input } from "reactstrap";
 import ThreeDViewerStyle from "./style";
 
 function Camera(props) {
+  let { focalLength, ...prop } = props;
   const ref = useRef();
   const set = useThree(state => state.set);
-  useEffect(() => void set({ camera: ref.current }), []);
+  useEffect(() => {
+    ref.current.setFocalLength(focalLength);
+  }, [focalLength]);
+  useEffect(() => {
+    void set({ camera: ref.current });
+  }, []);
   useFrame(() => ref.current.updateMatrixWorld());
-  return <perspectiveCamera ref={ref} {...props} />;
+  return <perspectiveCamera ref={ref} {...prop} />;
 }
 
 export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   const [imageDimension, setImageDimension] = useState(1.0);
   const [colorMap, setColorMap] = useState(false);
   const [displacementMap, setDisplacementMap] = useState(false);
-  const [focalLength, setFocalLength] = useState(2);
+  const [focalLength, setFocalLength] = useState(35);
   const [angle, setAngle] = useState({
     hAngle: 0,
     vAngle: 0
@@ -52,7 +58,7 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
           <Input onChange={onHandleChange} id="focalLength" name="focalLength" min="1" max="20" type="range" />
         </div>
         <Canvas>
-          <Camera fov={75} near={0.1} far={100} position={[0, 0, focalLength]} />
+          <Camera fov={75} near={0.1} far={100} position={[0, 0, 2]} focalLength={focalLength} />
           <Suspense fallback={null}>
             <ambientLight intensity={-1} />
             <group rotation={[angle.vAngle, angle.hAngle, 0]}>
