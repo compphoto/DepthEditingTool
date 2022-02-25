@@ -19,7 +19,8 @@ import {
   drawScribble,
   upScalePoint,
   downScalePoint,
-  getScribbleRange
+  getScribbleRange,
+  boxToDimension
 } from "utils/canvasUtils";
 import { runDepthOperations, runCachedDepthOperations } from "utils/stackOperations";
 import ToolBox from "config/toolBox";
@@ -314,19 +315,18 @@ class DepthViewer extends Component {
           onMouseDown={e => {
             if (tools.currentTool) {
               if (ToolBox[tools.currentTool].type === "scribble") {
+                const { croppedArea } = parameters;
                 let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
-                let depthCanvasDimension = getDimension(
-                  memoryDepthCanvas,
-                  ratio,
-                  centerShift_x,
-                  centerShift_y,
-                  translatePos,
-                  scale
-                );
+                let dimension = null;
+                if (croppedArea) {
+                  dimension = boxToDimension(croppedArea);
+                } else {
+                  dimension = getDimension(memoryDepthCanvas, ratio, centerShift_x, centerShift_y, translatePos, scale);
+                }
                 let [x, y] = getScribbleValues(
                   e.clientX - depthCanvas.offsetLeft,
                   e.clientY - depthCanvas.offsetTop,
-                  depthCanvasDimension
+                  dimension
                 );
                 storeScribbleParams({
                   pos: { x, y }
@@ -397,19 +397,18 @@ class DepthViewer extends Component {
           onMouseEnter={e => {
             if (tools.currentTool) {
               if (ToolBox[tools.currentTool].type === "scribble") {
+                const { croppedArea } = parameters;
                 let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
-                let depthCanvasDimension = getDimension(
-                  memoryDepthCanvas,
-                  ratio,
-                  centerShift_x,
-                  centerShift_y,
-                  translatePos,
-                  scale
-                );
+                let dimension = null;
+                if (croppedArea) {
+                  dimension = boxToDimension(croppedArea);
+                } else {
+                  dimension = getDimension(memoryDepthCanvas, ratio, centerShift_x, centerShift_y, translatePos, scale);
+                }
                 let [x, y] = getScribbleValues(
                   e.clientX - depthCanvas.offsetLeft,
                   e.clientY - depthCanvas.offsetTop,
-                  depthCanvasDimension
+                  dimension
                 );
                 storeScribbleParams({
                   pos: { x, y }
@@ -422,19 +421,18 @@ class DepthViewer extends Component {
             if (tools.currentTool) {
               if (ToolBox[tools.currentTool].type === "scribble") {
                 if (e.buttons !== 1) return;
+                const { croppedArea } = parameters;
                 let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
-                let depthCanvasDimension = getDimension(
-                  memoryDepthCanvas,
-                  ratio,
-                  centerShift_x,
-                  centerShift_y,
-                  translatePos,
-                  scale
-                );
+                let dimension = null;
+                if (croppedArea) {
+                  dimension = boxToDimension(croppedArea);
+                } else {
+                  dimension = getDimension(memoryDepthCanvas, ratio, centerShift_x, centerShift_y, translatePos, scale);
+                }
                 let [x, y] = getScribbleValues(
                   e.clientX - depthCanvas.offsetLeft,
                   e.clientY - depthCanvas.offsetTop,
-                  depthCanvasDimension
+                  dimension
                 );
                 const depthContext = depthCanvas.getContext("2d");
                 let start = { x: scribbleParams.pos.x, y: scribbleParams.pos.y };
