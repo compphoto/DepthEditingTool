@@ -1,13 +1,18 @@
 import React, { Suspense, useEffect, useState, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { ToneMapping, EffectComposer } from "@react-three/postprocessing";
-import { useControls } from "leva";
 import { TextureLoader } from "three/src/loaders/TextureLoader";
 import { DoubleSide } from "three";
 import { Input } from "reactstrap";
 import ThreeDViewerStyle from "./style";
-import { getImageUrl } from "utils/getImageFromFile";
+
+function Camera(props) {
+  const ref = useRef();
+  const set = useThree(state => state.set);
+  useEffect(() => void set({ camera: ref.current }), []);
+  useFrame(() => ref.current.updateMatrixWorld());
+  return <perspectiveCamera ref={ref} {...props} />;
+}
 
 export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   const [imageDimension, setImageDimension] = useState(1.0);
@@ -33,12 +38,10 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
     });
     setColorMap(colorMap);
   }, [rgbImageCanvas]);
-
   useEffect(() => {
     let displacementMap = new TextureLoader().setCrossOrigin("").load(depthImageCanvas);
     setDisplacementMap(displacementMap);
   }, [depthImageCanvas]);
-
   return (
     <ThreeDViewerStyle>
       <div className="v-slider">
@@ -48,7 +51,8 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
         <div className="x-slider">
           <Input onChange={onHandleChange} id="focalLength" name="focalLength" min="12" max="300" type="range" />
         </div>
-        <Canvas camera={{ fov: focalLength, near: 0.1, far: 100, position: [0, 0, 2] }}>
+        <Canvas>
+          <Camera fov={75} near={0.1} far={100} position={[0, 0, 2]} />
           <Suspense fallback={null}>
             <ambientLight intensity={-1} />
             <group rotation={[angle.vAngle, angle.hAngle, 0]}>
