@@ -18,7 +18,7 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   const [imageDimension, setImageDimension] = useState(1.0);
   const [colorMap, setColorMap] = useState(false);
   const [displacementMap, setDisplacementMap] = useState(false);
-  const [focalLength, setFocalLength] = useState(75);
+  const [focalLength, setFocalLength] = useState(2);
   const [angle, setAngle] = useState({
     hAngle: 0,
     vAngle: 0
@@ -49,10 +49,10 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
       </div>
       <div className="x-div">
         <div className="x-slider">
-          <Input onChange={onHandleChange} id="focalLength" name="focalLength" min="12" max="300" type="range" />
+          <Input onChange={onHandleChange} id="focalLength" name="focalLength" min="1" max="20" type="range" />
         </div>
         <Canvas>
-          <Camera fov={75} near={0.1} far={100} position={[0, 0, 2]} />
+          <Camera fov={75} near={0.1} far={100} position={[0, 0, focalLength]} />
           <Suspense fallback={null}>
             <ambientLight intensity={-1} />
             <group rotation={[angle.vAngle, angle.hAngle, 0]}>
