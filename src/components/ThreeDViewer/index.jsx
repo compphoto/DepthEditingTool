@@ -1,5 +1,5 @@
-import React, { Suspense, useEffect, useState } from "react";
-import { Canvas } from "@react-three/fiber";
+import React, { Suspense, useEffect, useState, useRef } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { ToneMapping, EffectComposer } from "@react-three/postprocessing";
 import { useControls } from "leva";
@@ -15,7 +15,7 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   const [displacementMap, setDisplacementMap] = useState(false);
   const [focalLength, setFocalLength] = useState(75);
   const [angle, setAngle] = useState({
-    xAngle: 0,
+    hAngle: 0,
     vAngle: 0
   });
   const onHandleChange = e => {
@@ -51,26 +51,28 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
         <Canvas camera={{ fov: focalLength, near: 0.1, far: 100, position: [0, 0, 2] }}>
           <Suspense fallback={null}>
             <ambientLight intensity={-1} />
-            <pointLight position={[0, 4, 4]} />
-            <mesh scale={[1.0, imageDimension, 1.0]} rotation={[angle.vAngle, angle.xAngle, 0]}>
-              <planeBufferGeometry args={[2, 2, 2000, 2000]} />
-              <meshStandardMaterial
-                side={DoubleSide}
-                map={colorMap}
-                displacementMap={displacementMap}
-                displacementScale={0.7}
+            <group rotation={[angle.vAngle, angle.hAngle, 0]}>
+              <pointLight position={[0, 4, 4]} />
+              <mesh scale={[1.0, imageDimension, 1.0]}>
+                <planeBufferGeometry args={[2, 2, 2000, 2000]} />
+                <meshStandardMaterial
+                  side={DoubleSide}
+                  map={colorMap}
+                  displacementMap={displacementMap}
+                  displacementScale={0.7}
+                />
+              </mesh>
+              <OrbitControls
+                maxAzimuthAngle={Math.PI / 4}
+                maxPolarAngle={Math.PI}
+                minAzimuthAngle={-Math.PI / 4}
+                minPolarAngle={0}
               />
-            </mesh>
-            <OrbitControls
-              maxAzimuthAngle={Math.PI / 4}
-              maxPolarAngle={Math.PI}
-              minAzimuthAngle={-Math.PI / 4}
-              minPolarAngle={0}
-            />
+            </group>
           </Suspense>
         </Canvas>
         <div className="x-slider">
-          <Input onChange={onHandleChange} id="xAngle" name="xAngle" min="-45" max="45" type="range" />
+          <Input onChange={onHandleChange} id="hAngle" name="hAngle" min="-45" max="45" type="range" />
         </div>
       </div>
     </ThreeDViewerStyle>
