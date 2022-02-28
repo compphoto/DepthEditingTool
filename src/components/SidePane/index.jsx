@@ -97,7 +97,7 @@ export function SidePane({
             newArea,
             histogramParams.pixelRange
           );
-          updateLayer({ index: activeIndex, value: { bitmap: newBitmapCanvas, toolsParameters: null } });
+          updateLayer({ bitmap: newBitmapCanvas, toolsParameters: null });
           initImage({
             rgbBitmapCanvas: getRgbBitmap(cloneCanvas(layerStack[activeIndex].bitmap), cloneCanvas(displayRgbCanvas))
           });

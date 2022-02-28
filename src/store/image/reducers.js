@@ -4,6 +4,7 @@ import { types } from "./constants";
 const initialState = {
   rgbImageUrl: null,
   depthImageUrl: null,
+  selectionImageUrl: null,
   mainRgbCanvas: null,
   mainDepthCanvas: null,
   displayRgbCanvas: null,
@@ -312,11 +313,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         }
       };
     case types.UPDATE_LAYER:
-      var { index, value } = payload;
       var layerStack = [...state.operationStack.layerStack];
+      var index = state.operationStack.activeIndex;
       var layer = {
         ...layerStack[index],
-        ...value
+        ...payload
       };
       layerStack[index] = layer;
       return {

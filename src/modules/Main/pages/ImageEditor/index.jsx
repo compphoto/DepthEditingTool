@@ -3,35 +3,31 @@ import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import { Helmet } from "react-helmet";
-import {
-  Container,
-  Button,
-  CardBody,
-  Card,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem
-} from "reactstrap";
-import { AiOutlineClose, AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
-import { MdDoubleArrow, MdCancel } from "react-icons/md";
+import { Container, Button, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
+import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { ImUndo2 } from "react-icons/im";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
-import { canvasToImage, cloneCanvas, drawLayerCanvas } from "utils/canvasUtils";
+import { canvasToImage, cloneCanvas } from "utils/canvasUtils";
 import {} from "utils/stackOperations";
+import { getImageUrl } from "utils/getImageFromFile";
+
+let objectUrl = null;
 
 export function ImageEditor({
+  selectionImageUrl,
   mainDepthCanvas,
   memoryDepthCanvas,
   depthBitmapCanvas,
+  operationStack,
   zoomIn,
   zoomOut,
   undo,
   clear,
   reset,
-  handleChange
+  handleChange,
+  updateLayer
 }) {
   const onHandleChange = e => {
     handleChange(e);
@@ -40,6 +36,16 @@ export function ImageEditor({
   const openAttachment = id => {
     document.getElementById(id).click();
   };
+  useEffect(() => {
+    if (selectionImageUrl) {
+      let selectionImage = new Image();
+      objectUrl = getImageUrl(selectionImageUrl);
+      selectionImage.src = objectUrl;
+      selectionImage.onload = () => {
+        updateLayer({ bitmap: cloneCanvas(selectionImage), toolsParameters: null });
+      };
+    }
+  }, [selectionImageUrl]);
   return (
     <ImageEditorStyle>
       <Helmet>
@@ -59,6 +65,13 @@ export function ImageEditor({
           name="depthImageUrl"
           onChange={onHandleChange}
           accept="image/png, image/gif, image/jpeg, image/jpg"
+        />
+        <input
+          id="upload-selection-image"
+          type="file"
+          name="selectionImageUrl"
+          onChange={onHandleChange}
+          accept="image/png"
         />
         <Container fluid>
           <div className="nav-bar">
@@ -84,8 +97,13 @@ export function ImageEditor({
                       <label htmlFor="upload-depth-image">Open Depth Image</label>
                     </DropdownItem>
                     <DropdownItem divider />
-                    <DropdownItem>
-                      <p>Test</p>
+                    <DropdownItem
+                      disabled={operationStack.activeIndex < 1}
+                      onClick={() => {
+                        openAttachment("upload-selection-image");
+                      }}
+                    >
+                      <label htmlFor="upload-selection-image">Open Selection Image</label>
                     </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>
@@ -175,6 +193,7 @@ export function ImageEditor({
 }
 
 const mapStateToProps = state => ({
+  selectionImageUrl: imageSelectors.selectionImageUrl(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   depthBitmapCanvas: imageSelectors.depthBitmapCanvas(state),
@@ -184,6 +203,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   handleChange: imageActions.handleChange,
+  updateLayer: imageActions.updateLayer,
   addEffect: imageActions.addEffect,
   zoomIn: imageActions.zoomIn,
   zoomOut: imageActions.zoomOut,
