@@ -6,70 +6,72 @@ const SidePaneStyle = styled.div`
   position: relative;
   width: 250px;
   .layer-mode-pane {
-      width: 100%;
-      background: #1e1f22;
-      color: #7e838e;
+    width: 100%;
+    background: #1e1f22;
+    color: #7e838e;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10;
+    .layer-mode-header {
       display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      z-index: 10;
-      .layer-mode-header {
+      align-items: center;
+      justify-content: center;
+      height: 50px;
+      background-color: #2e2f34;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.9rem;
+      .layer-mode-header-title {
         display: flex;
         align-items: center;
-        justify-content: center;
-        height: 50px;
-        background-color: #2e2f34;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.9rem;
-        .layer-mode-header-title {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          p {
-            margin: 0;
-          }
-          button {
-            color: #7e838e;
-          }
+        justify-content: space-between;
+        p {
+          margin: 0;
         }
-        .layer-mode-header-content {
+        button {
+          color: #7e838e;
         }
       }
-      .layer-mode-body {
-        padding: 0.5rem 0.75rem;
-        height: calc(100% - 110px);
-        overflow-x: hidden;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        font-size: 0.9rem;
-        .layer-mode-body-content {
-          position: relative;
+      .layer-mode-header-content {
+      }
+    }
+    .layer-mode-body {
+      padding: 0.5rem 0.75rem;
+      height: calc(100% - 110px);
+      overflow-x: hidden;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.9rem;
+      .layer-mode-body-content {
+        position: relative;
+        width: 100%;
+        .layer-mode-body-content-image-card {
+          background: #2e2f34;
           width: 100%;
-          .layer-mode-body-content-image-card {
-            background: #2e2f34;
+          .layer-mode-body-content-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
             width: 100%;
-            .layer-mode-body-content-image {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              overflow: hidden;
-              width: 100%;
-              height: 120px;
-              padding: 0;
-              img {
-                max-width: 100%;
-                max-height: 100%;
-              }
+            height: 120px;
+            padding: 0;
+            img {
+              max-width: 100%;
+              max-height: 100%;
             }
           }
-          .remove-layer {
-            display: none;
+        }
+        .top-right-options {
+          position: absolute;
+          top: 0%;
+          left: 80%;
+          display: none;
+          .top-right-option {
+            margin-left: 0.5rem;
             color: #7e838e;
-            position: absolute;
-            top: 0%;
-            left: 90%;
             svg {
               height: 1rem;
               width: 1rem;
@@ -78,57 +80,58 @@ const SidePaneStyle = styled.div`
               color: #fff;
             }
           }
-          &:hover .remove-layer {
-            display: block;
-          }
         }
-        .layer-mode-body-content:hover {
-          border: 2px solid rgb(126, 131, 142);
-        }
-        .layer-mode-body-content-active {
-          border: 2px solid rgb(126, 131, 142);
-        }
-        .layer-mode-body-add {
-          width: 100%;
+        &:hover .top-right-options {
           display: flex;
-          justify-content: center;
-          .layer-mode-body-add-card {
-            cursor: pointer;
-            background: #2e2f34;
-            width: 70%;
-            height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            svg {
-              width: 1.2rem;
-              height: 1.2rem;
-            }
-          }
-          .layer-mode-body-add-card:hover {
-            background: #26272b;
-          }
-        }
-        .layer-mode-body-add[disabled] {
-          pointer-events: none;
-          opacity: 0.7;
         }
       }
-      .layer-mode-footer {
-        background-color: #2e2f34;
-        height: 60px;
-        padding: 0.1rem 0;
+      .layer-mode-body-content:hover {
+        border: 2px solid rgb(126, 131, 142);
+      }
+      .layer-mode-body-content-active {
+        border: 2px solid rgb(126, 131, 142);
+      }
+      .layer-mode-body-add {
+        width: 100%;
         display: flex;
-        justify-content: space-around;
-        align-items: center;
-        .layer-mode-apply-button {
-          width: 40%;
-          button {
-            width: 100%;
+        justify-content: center;
+        .layer-mode-body-add-card {
+          cursor: pointer;
+          background: #2e2f34;
+          width: 70%;
+          height: 50px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          svg {
+            width: 1.2rem;
+            height: 1.2rem;
           }
+        }
+        .layer-mode-body-add-card:hover {
+          background: #26272b;
+        }
+      }
+      .layer-mode-body-add[disabled] {
+        pointer-events: none;
+        opacity: 0.7;
+      }
+    }
+    .layer-mode-footer {
+      background-color: #2e2f34;
+      height: 60px;
+      padding: 0.1rem 0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      .layer-mode-apply-button {
+        width: 40%;
+        button {
+          width: 100%;
         }
       }
     }
+  }
   .tools-ext {
     position: absolute;
     height: 100%;
@@ -225,7 +228,7 @@ const SidePaneStyle = styled.div`
                 width: 100%;
                 height: 100px;
                 padding: 0;
-                img {s
+                img {
                   max-width: 100%;
                   max-height: 100%;
                 }

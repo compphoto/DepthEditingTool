@@ -7,8 +7,8 @@ import { selectors as imageSelectors } from "store/image";
 import { Button, UncontrolledCollapse, CardBody, Card, FormGroup, Label, Input } from "reactstrap";
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdCancel } from "react-icons/md";
-import { AiOutlineClose, AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdDownload, MdCancel } from "react-icons/md";
+import { AiOutlinePlus } from "react-icons/ai";
 
 import {
   addScaleShift,
@@ -142,14 +142,26 @@ export function SidePane({
               </CardBody>
             </Card>
             {key !== 0 ? (
-              <div
-                onClick={e => {
-                  e.stopPropagation();
-                  removeLayer(key);
-                }}
-                className="remove-layer"
-              >
-                <MdCancel />
+              <div className="top-right-options">
+                <div
+                  onClick={e => {
+                    e.stopPropagation();
+                    image = canvasToImage(operationStack.layerStack[key].bitmap);
+                    window.location.href = image;
+                  }}
+                  className="top-right-option"
+                >
+                  <MdDownload />
+                </div>
+                <div
+                  onClick={e => {
+                    e.stopPropagation();
+                    removeLayer(key);
+                  }}
+                  className="top-right-option"
+                >
+                  <MdCancel />
+                </div>
               </div>
             ) : null}
           </div>
