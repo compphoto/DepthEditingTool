@@ -15,7 +15,7 @@ const ThreeDViewerStyle = styled.div`
     }
   }
   .x-div {
-    width: 90%;
+    width: 80%;
     height: 100%;
     display: flex;
     flex-direction: column;
