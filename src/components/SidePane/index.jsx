@@ -173,7 +173,7 @@ export function SidePane({
   }, [operationStack.layerStack]);
   useEffect(() => {
     const { activeIndex, layerStack } = operationStack;
-    if (parameters.histogramParams.pixelRange && activeIndex > -1) {
+    if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
       addEffect({
         name: "depthStack",
         value: {
@@ -185,7 +185,7 @@ export function SidePane({
   }, [toolsParameters.disparity]);
   useEffect(() => {
     const { activeIndex, layerStack } = operationStack;
-    if (parameters.histogramParams.pixelRange && activeIndex > -1) {
+    if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
       addEffect({
         name: "depthStack",
         value: {

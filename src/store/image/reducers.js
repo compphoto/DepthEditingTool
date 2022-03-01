@@ -168,7 +168,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         },
         toolsParameters: {
           disparity: 0,
-          scale: 0,
+          scale: 1,
           brightness: 0,
           contrast: 0,
           sharpness: 0,
