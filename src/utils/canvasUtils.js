@@ -296,7 +296,7 @@ export const scaleSelection = (image, context, canvas, scale) => {
   }
 };
 
-export const adjustTone = (image, context, boundingBox, cpS, cp1, cp2, cpE) => {
+export const adjustTone = (image, context, canvas, cpS, cp1, cp2, cpE) => {
   function getT(x, cpSx, cp1x, cp2x, cpEx) {
     let a = -cpSx + 3 * cp1x - 3 * cp2x + cpEx;
     let b = 3 * cpSx - 6 * cp1x + 3 * cp2x;
@@ -323,22 +323,29 @@ export const adjustTone = (image, context, boundingBox, cpS, cp1, cp2, cpE) => {
   function getY(y, h = 200) {
     return (255 * (h - y)) / h;
   }
-  if (context && boundingBox) {
-    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
+  if (context && canvas) {
+    const bitmapCanvas = cloneCanvas(canvas);
+    const bitmapContext = bitmapCanvas.getContext("2d");
+    const imageData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
-      let output = getD(
-        getT(src[i], getX(cpS.x), getX(cp1.x), getX(cp2.x), getX(cpE.x)),
-        getY(cpS.y),
-        getY(cp1.y),
-        getY(cp2.y),
-        getY(cpE.y)
-      );
-      src[i] = output;
-      src[i + 1] = output;
-      src[i + 2] = output;
+      if (src[i + 3] !== 0) {
+        let output = getD(
+          getT(src[i], getX(cpS.x), getX(cp1.x), getX(cp2.x), getX(cpE.x)),
+          getY(cpS.y),
+          getY(cp1.y),
+          getY(cp2.y),
+          getY(cpE.y)
+        );
+        src[i] = output;
+        src[i + 1] = output;
+        src[i + 2] = output;
+      }
     }
-    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
+    bitmapContext.putImageData(imageData, 0, 0);
+    context.globalCompositeOperation = "source-over";
+    context.drawImage(bitmapCanvas, 0, 0);
+    return bitmapCanvas;
   }
 };
 

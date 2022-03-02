@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import PointCurveStyle from "./style";
-import { dimensionToBox, adjustTone, getBoundingArea } from "utils/canvasUtils";
+import { dimensionToBox, adjustTone, getBoundingArea, cloneCanvas } from "utils/canvasUtils";
 
 let objectUrl = null;
 let circle1 = new Path2D();
@@ -134,7 +134,7 @@ class PointCurve extends Component {
   render() {
     const { pointCurveRef } = this;
     const { cpS, cp1, cp2, cpE, selectedControl } = this.state;
-    const { memoryDepthCanvas, parameters, addEffect } = this.props;
+    const { parameters, operationStack, addEffect } = this.props;
     return (
       <PointCurveStyle>
         <canvas
@@ -143,39 +143,31 @@ class PointCurve extends Component {
           ref={pointCurveRef}
           onMouseOut={e => {
             if (selectedControl) {
-              const { croppedArea } = parameters;
-              let newArea = null;
-              if (croppedArea) {
-                newArea = croppedArea;
-              } else {
-                newArea = getBoundingArea(memoryDepthCanvas);
+              const { activeIndex, layerStack } = operationStack;
+              if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
+                addEffect({
+                  name: "depthStack",
+                  value: {
+                    func: adjustTone,
+                    params: [cloneCanvas(layerStack[activeIndex].bitmap), cpS, cp1, cp2, cpE]
+                  }
+                });
               }
-              addEffect({
-                name: "depthStack",
-                value: {
-                  func: adjustTone,
-                  params: [newArea, cpS, cp1, cp2, cpE]
-                }
-              });
             }
           }}
           // onMouseOver={e => selectedControl && this.setState({ selectedControl: null })}
           onMouseUp={e => {
             if (selectedControl) {
-              const { croppedArea } = parameters;
-              let newArea = null;
-              if (croppedArea) {
-                newArea = croppedArea;
-              } else {
-                newArea = getBoundingArea(memoryDepthCanvas);
+              const { activeIndex, layerStack } = operationStack;
+              if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
+                addEffect({
+                  name: "depthStack",
+                  value: {
+                    func: adjustTone,
+                    params: [cloneCanvas(layerStack[activeIndex].bitmap), cpS, cp1, cp2, cpE]
+                  }
+                });
               }
-              addEffect({
-                name: "depthStack",
-                value: {
-                  func: adjustTone,
-                  params: [newArea, cpS, cp1, cp2, cpE]
-                }
-              });
             }
             this.setState({ selectedControl: null });
           }}
@@ -187,7 +179,8 @@ class PointCurve extends Component {
 
 const mapStateToProps = state => ({
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
-  parameters: imageSelectors.parameters(state)
+  parameters: imageSelectors.parameters(state),
+  operationStack: imageSelectors.operationStack(state)
 });
 
 const mapDispatchToProps = {
