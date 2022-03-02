@@ -296,42 +296,6 @@ export const scaleSelection = (image, context, canvas, scale) => {
   }
 };
 
-export const editBrightness = (image, context, boundingBox, brightness) => {
-  if (context && boundingBox) {
-    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
-    const src = imageData.data;
-    for (let i = 0; i < src.length; i += 4) {
-      src[i] += 255 * (brightness / 100);
-      src[i + 1] += 255 * (brightness / 100);
-      src[i + 2] += 255 * (brightness / 100);
-    }
-    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
-  }
-};
-
-export const editContrast = (image, context, boundingBox, contrast) => {
-  function truncateColor(value) {
-    if (value < 0) {
-      value = 0;
-    } else if (value > 255) {
-      value = 255;
-    }
-    return value;
-  }
-
-  if (context && boundingBox) {
-    const factor = (259.0 * (contrast + 255.0)) / (255.0 * (259.0 - contrast));
-    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
-    const src = imageData.data;
-    for (let i = 0; i < src.length; i += 4) {
-      src[i] = truncateColor(factor * (src[i] - 128.0) + 128.0);
-      src[i + 1] = truncateColor(factor * (src[i + 1] - 128.0) + 128.0);
-      src[i + 2] = truncateColor(factor * (src[i + 2] - 128.0) + 128.0);
-    }
-    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
-  }
-};
-
 export const adjustTone = (image, context, boundingBox, cpS, cp1, cp2, cpE) => {
   function getT(x, cpSx, cp1x, cp2x, cpEx) {
     let a = -cpSx + 3 * cp1x - 3 * cp2x + cpEx;

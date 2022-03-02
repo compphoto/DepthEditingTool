@@ -13,8 +13,6 @@ import { AiOutlinePlus } from "react-icons/ai";
 import {
   addScaleShift,
   cloneCanvas,
-  editBrightness,
-  editContrast,
   editHighlightPixelArea,
   getRgbBitmap,
   scaleSelection,
@@ -51,9 +49,6 @@ export function SidePane({
   const [tempToolsParams, setTempToolsParams] = useState({
     disparity: 0,
     scale: 1,
-    brightness: 0,
-    contrast: 0,
-    sharpness: 0,
     aConstant: 0,
     bConstant: 0
   });
@@ -207,42 +202,6 @@ export function SidePane({
       addEffect({
         name: "depthStack",
         value: {
-          func: editBrightness,
-          params: [newArea, toolsParameters.brightness]
-        }
-      });
-    }
-  }, [toolsParameters.brightness]);
-  useEffect(() => {
-    if (memoryDepthCanvas) {
-      const { croppedArea } = parameters;
-      let newArea = null;
-      if (croppedArea) {
-        newArea = croppedArea;
-      } else {
-        newArea = getBoundingArea(memoryDepthCanvas);
-      }
-      addEffect({
-        name: "depthStack",
-        value: {
-          func: editContrast,
-          params: [newArea, toolsParameters.contrast]
-        }
-      });
-    }
-  }, [toolsParameters.contrast]);
-  useEffect(() => {
-    if (memoryDepthCanvas) {
-      const { croppedArea } = parameters;
-      let newArea = null;
-      if (croppedArea) {
-        newArea = croppedArea;
-      } else {
-        newArea = getBoundingArea(memoryDepthCanvas);
-      }
-      addEffect({
-        name: "depthStack",
-        value: {
           func: addScaleShift,
           params: [newArea, toolsParameters.aConstant, toolsParameters.bConstant]
         }
@@ -374,105 +333,6 @@ export function SidePane({
                         name="scale"
                         type="number"
                         value={tempToolsParams.scale}
-                      />
-                    </div>
-                  </FormGroup>
-                </CardBody>
-              </Card>
-            </UncontrolledCollapse>
-          </div>
-          <div className="w-100 mt-3 tool-ext-section">
-            <p className="mb-1">Brightness &#38; Color</p>
-            <Button className="mt-4 mb-2 dropdown-button" size="sm" color="secondary" id="basic-adjust-toggler">
-              Basic Adjust
-            </Button>
-            <UncontrolledCollapse style={{ width: "100%" }} toggler="#basic-adjust-toggler">
-              <Card className="tool-ext-card">
-                <CardBody className="tool-ext-card-body">
-                  <FormGroup className="w-100">
-                    <Label for="brightness">Brightness</Label>
-                    <div className="tool-ext-input d-flex justify-content-between w-100">
-                      <Input
-                        disabled={!memoryDepthCanvas}
-                        onChange={onHandleChange}
-                        onMouseUp={onHandleUpdate}
-                        className="tool-ext-input-slider"
-                        id="brightness"
-                        name="brightness"
-                        min="-100"
-                        max="100"
-                        type="range"
-                        value={tempToolsParams.brightness}
-                      />
-                      <Input
-                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
-                        onChange={onHandleChange}
-                        onMouseLeave={onHandleUpdate}
-                        onKeyDown={onHandleEnter}
-                        size="sm"
-                        className="tool-ext-input-number"
-                        id="brightness"
-                        name="brightness"
-                        type="number"
-                        value={tempToolsParams.brightness}
-                      />
-                    </div>
-                  </FormGroup>
-                  <FormGroup className="w-100">
-                    <Label for="contrast">Contrast</Label>
-                    <div className="tool-ext-input d-flex justify-content-between w-100">
-                      <Input
-                        disabled={!memoryDepthCanvas}
-                        onChange={onHandleChange}
-                        onMouseUp={onHandleUpdate}
-                        className="tool-ext-input-slider"
-                        id="contrast"
-                        name="contrast"
-                        min="0"
-                        max="100"
-                        type="range"
-                        value={tempToolsParams.contrast}
-                      />
-                      <Input
-                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
-                        onChange={onHandleChange}
-                        onMouseLeave={onHandleUpdate}
-                        onKeyDown={onHandleEnter}
-                        size="sm"
-                        className="tool-ext-input-number"
-                        id="contrast"
-                        name="contrast"
-                        type="number"
-                        value={tempToolsParams.contrast}
-                      />
-                    </div>
-                  </FormGroup>
-                  <FormGroup className="w-100">
-                    <Label for="sharpness">Sharpness</Label>
-                    <div className="tool-ext-input d-flex justify-content-between w-100">
-                      <Input
-                        disabled={!memoryDepthCanvas}
-                        onChange={onHandleChange}
-                        onMouseUp={onHandleUpdate}
-                        className="tool-ext-input-slider"
-                        id="sharpness"
-                        name="sharpness"
-                        min="-100"
-                        max="100"
-                        type="range"
-                        value={tempToolsParams.sharpness}
-                      />
-                      <Input
-                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
-                        onChange={onHandleChange}
-                        onMouseLeave={onHandleUpdate}
-                        onKeyDown={onHandleEnter}
-                        size="sm"
-                        className="tool-ext-input-number"
-                        id="sharpness"
-                        name="sharpness"
-                        type="number"
-                        value={tempToolsParams.sharpness}
                       />
                     </div>
                   </FormGroup>

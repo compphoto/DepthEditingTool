@@ -60,9 +60,6 @@ const initialState = {
   toolsParameters: {
     disparity: 0,
     scale: 1,
-    brightness: 0,
-    contrast: 0,
-    sharpness: 0,
     aConstant: 0,
     bConstant: 0
   },
@@ -169,9 +166,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         toolsParameters: {
           disparity: 0,
           scale: 1,
-          brightness: 0,
-          contrast: 0,
-          sharpness: 0,
           aConstant: 0,
           bConstant: 0
         },
@@ -268,9 +262,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
               toolsParameters: {
                 disparity: 0,
                 scale: 1,
-                brightness: 0,
-                contrast: 0,
-                sharpness: 0,
                 aConstant: 0,
                 bConstant: 0
               }
@@ -287,9 +278,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           toolsParameters: {
             disparity: 0,
             scale: 1,
-            brightness: 0,
-            contrast: 0,
-            sharpness: 0,
             aConstant: 0,
             bConstant: 0
           }
