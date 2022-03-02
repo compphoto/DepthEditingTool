@@ -1,12 +1,12 @@
 import React from "react";
 import { HiOutlineAdjustments } from "react-icons/hi";
 import { IoMdColorFill } from "react-icons/io";
-import { AiFillTool } from "react-icons/ai";
+import { BiSelection } from "react-icons/bi";
 
 const Tools = [
   {
-    name: "Tools",
-    icon: <AiFillTool />
+    name: "Selection",
+    icon: <BiSelection />
   },
   {
     name: "Adjust",
