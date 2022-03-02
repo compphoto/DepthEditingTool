@@ -70,6 +70,7 @@ class PointCurve extends Component {
     pointCurveContext.fill(circle2);
   };
   moveCurve = e => {
+    if (e.buttons !== 1) return;
     const { selectedControl } = this.state;
     if (selectedControl === "cp1") {
       this.setState(
@@ -140,8 +141,25 @@ class PointCurve extends Component {
           width="200px"
           height="200px"
           ref={pointCurveRef}
-          onMouseOut={e => selectedControl && this.setState({ selectedControl: null })}
-          onMouseOver={e => selectedControl && this.setState({ selectedControl: null })}
+          onMouseOut={e => {
+            if (selectedControl) {
+              const { croppedArea } = parameters;
+              let newArea = null;
+              if (croppedArea) {
+                newArea = croppedArea;
+              } else {
+                newArea = getBoundingArea(memoryDepthCanvas);
+              }
+              addEffect({
+                name: "depthStack",
+                value: {
+                  func: adjustTone,
+                  params: [newArea, cpS, cp1, cp2, cpE]
+                }
+              });
+            }
+          }}
+          // onMouseOver={e => selectedControl && this.setState({ selectedControl: null })}
           onMouseUp={e => {
             if (selectedControl) {
               const { croppedArea } = parameters;

@@ -292,7 +292,6 @@ class DepthViewer extends Component {
   render() {
     const { depthImageRef } = this;
     const {
-      mainDepthCanvas,
       memoryDepthCanvas,
       rgbScaleParams,
       depthScaleParams,
@@ -301,10 +300,8 @@ class DepthViewer extends Component {
       scribbleParams,
       storeScribbleParams,
       storeScaleParams,
-      storeParameters,
-      addOperation
+      storeParameters
     } = this.props;
-    const { pixelRange, domain, values, update } = parameters.histogramParams;
     const depthCanvas = depthImageRef.current;
     return (
       <DepthViewerStyle>
