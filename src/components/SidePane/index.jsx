@@ -191,19 +191,13 @@ export function SidePane({
     }
   }, [toolsParameters.scale]);
   useEffect(() => {
-    if (memoryDepthCanvas) {
-      const { croppedArea } = parameters;
-      let newArea = null;
-      if (croppedArea) {
-        newArea = croppedArea;
-      } else {
-        newArea = getBoundingArea(memoryDepthCanvas);
-      }
+    const { activeIndex, layerStack } = operationStack;
+    if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
       addEffect({
         name: "depthStack",
         value: {
           func: addScaleShift,
-          params: [newArea, toolsParameters.aConstant, toolsParameters.bConstant]
+          params: [cloneCanvas(layerStack[activeIndex].bitmap), toolsParameters.aConstant, toolsParameters.bConstant]
         }
       });
     }

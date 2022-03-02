@@ -342,17 +342,24 @@ export const adjustTone = (image, context, boundingBox, cpS, cp1, cp2, cpE) => {
   }
 };
 
-export const addScaleShift = (image, context, boundingBox, a, b) => {
-  if (context && boundingBox) {
-    const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
+export const addScaleShift = (image, context, canvas, a, b) => {
+  if (context && canvas) {
+    const bitmapCanvas = cloneCanvas(canvas);
+    const bitmapContext = bitmapCanvas.getContext("2d");
+    const imageData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
-      let output = a * src[i] + 255 * (b / 2);
-      src[i] = output;
-      src[i + 1] = output;
-      src[i + 2] = output;
+      if (src[i + 3] !== 0) {
+        let output = a * src[i] + 255 * (b / 2);
+        src[i] = output;
+        src[i + 1] = output;
+        src[i + 2] = output;
+      }
     }
-    context.putImageData(imageData, boundingBox[0], boundingBox[1]);
+    bitmapContext.putImageData(imageData, 0, 0);
+    context.globalCompositeOperation = "source-over";
+    context.drawImage(bitmapCanvas, 0, 0);
+    return bitmapCanvas;
   }
 };
 
