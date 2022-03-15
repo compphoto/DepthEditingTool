@@ -20,7 +20,7 @@ import {
   canvasToImage
 } from "utils/canvasUtils";
 import PointCurve from "components/PointCurve";
-import ToolBox from "config/toolBox";
+import { SelectionBox } from "config/toolBox";
 
 export function SidePane({
   toolExtOpen,
@@ -73,7 +73,7 @@ export function SidePane({
 
   const onModifyBitmap = () => {
     if (memoryDepthCanvas) {
-      if (ToolBox[tools.currentTool].type === "boundingBox") {
+      if (SelectionBox[tools.currentTool].type === "boundingBox") {
         const { croppedCanvasImage, croppedArea, histogramParams } = parameters;
         const { activeIndex, layerStack } = operationStack;
         if (activeIndex > 0) {
@@ -86,7 +86,7 @@ export function SidePane({
             newArea = getBoundingArea(memoryDepthCanvas);
             newCroppedCanvasImage = cloneCanvas(memoryDepthCanvas);
           }
-          const newBitmapCanvas = ToolBox[tools.currentTool].func(
+          const newBitmapCanvas = SelectionBox[tools.currentTool].func(
             cloneCanvas(layerStack[activeIndex].bitmap),
             newCroppedCanvasImage,
             newArea,
@@ -208,7 +208,7 @@ export function SidePane({
         <div className="tool-ext w-100">
           <div className="tool-ext-selection">
             <div disabled={operationStack.activeIndex <= 0} className="tool-ext-selection-icons">
-              {Object.keys(ToolBox).map((key, index) => (
+              {Object.keys(SelectionBox).map((key, index) => (
                 <div
                   key={index}
                   onClick={() => {
@@ -220,13 +220,13 @@ export function SidePane({
                     tools[key] && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
                   }
                 >
-                  {ToolBox[key].icon}
+                  {SelectionBox[key].icon}
                 </div>
               ))}
             </div>
             <div className="d-flex">
               <Button
-                disabled={!tools.currentTool || ToolBox[tools.currentTool].type !== "boundingBox"}
+                disabled={!tools.currentTool || SelectionBox[tools.currentTool].type !== "boundingBox"}
                 size="sm"
                 className="mx-2"
                 color="secondary"
@@ -241,7 +241,7 @@ export function SidePane({
                   : "Select"}
               </Button>
               <Button
-                disabled={!tools.currentTool || ToolBox[tools.currentTool].type !== "boundingBox"}
+                disabled={!tools.currentTool || SelectionBox[tools.currentTool].type !== "boundingBox"}
                 size="sm"
                 className="mx-2"
                 color="secondary"

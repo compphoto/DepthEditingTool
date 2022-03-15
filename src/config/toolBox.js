@@ -11,7 +11,7 @@ import {
   modifySubtractSelection
 } from "utils/toolBoxUtils";
 
-const ToolBox = {
+export const SelectionBox = {
   singleSelection: {
     name: "ToolBox",
     icon: <MdCropDin />,
@@ -55,5 +55,3 @@ const ToolBox = {
     func: null
   }
 };
-
-export default ToolBox;
