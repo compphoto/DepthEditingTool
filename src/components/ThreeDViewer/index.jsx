@@ -72,12 +72,6 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
                   displacementScale={0.7}
                 />
               </mesh>
-              <OrbitControls
-                maxAzimuthAngle={Math.PI / 4}
-                maxPolarAngle={Math.PI}
-                minAzimuthAngle={-Math.PI / 4}
-                minPolarAngle={0}
-              />
             </group>
           </Suspense>
         </Canvas>
