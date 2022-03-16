@@ -4,7 +4,7 @@ import { toolExtActions } from "store/toolext";
 import { imageActions } from "store/image";
 import { selectors as toolExtSelectors } from "store/toolext";
 import { selectors as imageSelectors } from "store/image";
-import { Button, UncontrolledCollapse, CardBody, Card, FormGroup, Label, Input } from "reactstrap";
+import { Button, UncontrolledCollapse, CardBody, Card, FormGroup, Label, Input, UncontrolledTooltip } from "reactstrap";
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdDownload, MdCancel } from "react-icons/md";
@@ -35,7 +35,6 @@ export function SidePane({
   selectTool,
   initImage,
   storeToolParameters,
-  storeParameters,
   addEffect,
   addLayer,
   updateLayerIndex,
@@ -102,7 +101,7 @@ export function SidePane({
     }
   };
   useEffect(() => {
-    const { activeIndex, layerStack } = operationStack;
+    const { activeIndex } = operationStack;
     if (activeIndex === 0) {
       toggleTool(1);
     }
@@ -207,11 +206,15 @@ export function SidePane({
                       selectTool(key);
                     }
                   }}
+                  id={`tooltip-${index}`}
                   className={
                     tools[key] && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
                   }
                 >
                   {SelectionBox[key].icon}
+                  <UncontrolledTooltip placement="bottom" target={`tooltip-${index}`}>
+                    {SelectionBox[key].tooltip}
+                  </UncontrolledTooltip>
                 </div>
               ))}
             </div>

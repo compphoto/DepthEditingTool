@@ -13,44 +13,44 @@ import {
 
 export const SelectionBox = {
   singleSelection: {
-    name: "ToolBox",
+    name: "Single Selection",
     icon: <MdCropDin />,
-    tooltip: "test",
+    tooltip: "single",
     type: "boundingBox",
     func: modifySingleSelection
   },
   addSelection: {
-    name: "Adjust",
+    name: "Multiple Selection",
     icon: <RiCheckboxMultipleBlankLine />,
-    tooltip: "test",
+    tooltip: "multiple",
     type: "boundingBox",
     func: modifyAddSelection
   },
   subtractSelection: {
-    name: "Effects",
+    name: "Subtract Selection",
     icon: <BsSubtract />,
-    tooltip: "test",
+    tooltip: "subtract",
     type: "boundingBox",
     func: modifySubtractSelection
   },
   intersectSelection: {
-    name: "Effects",
+    name: "Intersection Selection",
     icon: <BiIntersect />,
-    tooltip: "test",
+    tooltip: "intersection",
     type: "boundingBox",
     func: modifyIntersectSelection
   },
   panTool: {
-    name: "Effects",
+    name: "Pan",
     icon: <MdOutlinePanTool />,
-    tooltip: "test",
+    tooltip: "pan",
     type: "pan",
     func: null
   },
   scribbleTool: {
-    name: "Effects",
+    name: "Scribble",
     icon: <ImPencil />,
-    tooltip: "test",
+    tooltip: "scribble",
     type: "scribble",
     func: null
   }
