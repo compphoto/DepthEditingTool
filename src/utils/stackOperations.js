@@ -57,12 +57,10 @@ export const runDepthOperations = image => {
     }
   });
   const storeAction = require("store/store");
-  const depthBitmapCanvas = store.getState().image.depthBitmapCanvas;
   let data = {
     memoryDepthCanvas: cloneCanvas(memoryDepthCanvas),
     displayDepthCanvas: cloneCanvas(displayDepthCanvas),
-    cacheDepthCanvas: cloneCanvas(memoryDepthCanvas),
-    depthBitmapCanvas: depthBitmapCanvas === null ? cloneCanvas(memoryDepthCanvas) : depthBitmapCanvas
+    cacheDepthCanvas: cloneCanvas(memoryDepthCanvas)
   };
   storeAction.default.dispatch(imageActions.initImage(data));
 };

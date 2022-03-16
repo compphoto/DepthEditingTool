@@ -28,7 +28,6 @@ export function SidePane({
   mainDepthCanvas,
   memoryDepthCanvas,
   displayRgbCanvas,
-  depthBitmapCanvas,
   tools,
   toolsParameters,
   parameters,
@@ -42,7 +41,8 @@ export function SidePane({
   updateLayerIndex,
   updateLayer,
   removeLayer,
-  removeAllLayers
+  removeAllLayers,
+  clear
 }) {
   const [activeTool, setActiveTool] = useState(0);
   const [layers, setLayers] = useState(null);
@@ -73,7 +73,7 @@ export function SidePane({
 
   const onModifyBitmap = () => {
     if (memoryDepthCanvas) {
-      if (SelectionBox[tools.currentTool].type === "boundingBox") {
+      if (!tools.currentTool || SelectionBox[tools.currentTool].type === "boundingBox") {
         const { croppedCanvasImage, croppedArea, histogramParams } = parameters;
         const { activeIndex, layerStack } = operationStack;
         if (activeIndex > 0) {
@@ -86,7 +86,7 @@ export function SidePane({
             newArea = getBoundingArea(memoryDepthCanvas);
             newCroppedCanvasImage = cloneCanvas(memoryDepthCanvas);
           }
-          const newBitmapCanvas = SelectionBox[tools.currentTool].func(
+          const newBitmapCanvas = SelectionBox[tools.currentTool || "singleSelection"].func(
             cloneCanvas(layerStack[activeIndex].bitmap),
             newCroppedCanvasImage,
             newArea,
@@ -96,16 +96,7 @@ export function SidePane({
           initImage({
             rgbBitmapCanvas: getRgbBitmap(cloneCanvas(layerStack[activeIndex].bitmap), cloneCanvas(displayRgbCanvas))
           });
-          storeParameters({
-            croppedCanvasImage: null,
-            croppedArea: null,
-            histogramParams: {
-              pixelRange: [0, 255],
-              domain: [0, 255],
-              values: [0, 255],
-              update: [0, 255]
-            }
-          });
+          clear();
         }
       }
     }
@@ -226,11 +217,13 @@ export function SidePane({
             </div>
             <div className="d-flex">
               <Button
-                disabled={!tools.currentTool || SelectionBox[tools.currentTool].type !== "boundingBox"}
+                disabled={tools.currentTool && SelectionBox[tools.currentTool].type !== "boundingBox"}
                 size="sm"
                 className="mx-2"
                 color="secondary"
-                onClick={onModifyBitmap}
+                onClick={() => {
+                  onModifyBitmap();
+                }}
               >
                 {tools.singleSelection || tools.addSelection
                   ? "Add"
@@ -241,15 +234,11 @@ export function SidePane({
                   : "Select"}
               </Button>
               <Button
-                disabled={!tools.currentTool || SelectionBox[tools.currentTool].type !== "boundingBox"}
+                disabled={tools.currentTool && SelectionBox[tools.currentTool].type !== "boundingBox"}
                 size="sm"
                 className="mx-2"
                 color="secondary"
-                onClick={() => {
-                  const bitmapContext = depthBitmapCanvas.getContext("2d");
-                  bitmapContext.clearRect(0, 0, depthBitmapCanvas.width, depthBitmapCanvas.height);
-                  setBitmapImage(canvasToImage(depthBitmapCanvas));
-                }}
+                onClick={() => {}}
               >
                 Clear
               </Button>
@@ -492,7 +481,6 @@ const mapStateToProps = state => ({
   displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
-  depthBitmapCanvas: imageSelectors.depthBitmapCanvas(state),
   layerMode: imageSelectors.layerMode(state),
   tools: imageSelectors.tools(state),
   toolsParameters: imageSelectors.toolsParameters(state),
@@ -513,7 +501,8 @@ const mapDispatchToProps = {
   updateLayer: imageActions.updateLayer,
   removeLayer: imageActions.removeLayer,
   removeAllLayers: imageActions.removeAllLayers,
-  storeToolParameters: imageActions.storeToolParameters
+  storeToolParameters: imageActions.storeToolParameters,
+  clear: imageActions.clear
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SidePane);

@@ -19,7 +19,6 @@ export function ImageEditor({
   selectionImageUrl,
   mainDepthCanvas,
   memoryDepthCanvas,
-  depthBitmapCanvas,
   operationStack,
   zoomIn,
   zoomOut,
@@ -196,7 +195,6 @@ const mapStateToProps = state => ({
   selectionImageUrl: imageSelectors.selectionImageUrl(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
-  depthBitmapCanvas: imageSelectors.depthBitmapCanvas(state),
   layerMode: imageSelectors.layerMode(state),
   operationStack: imageSelectors.operationStack(state)
 });

@@ -15,7 +15,6 @@ const initialState = {
   prevRgbSize: { width: null, height: null },
   prevDepthSize: { width: null, height: null },
   rgbBitmapCanvas: null,
-  depthBitmapCanvas: null,
   layerMode: false,
   scribbleParams: {
     pos: { x: 0, y: 0 },
@@ -146,7 +145,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         cacheDepthCanvas: null,
         prevDepthSize: { width: null, height: null },
         rgbBitmapCanvas: null,
-        depthBitmapCanvas: null,
         layerMode: false,
         scribbleParams: {
           pos: { x: 0, y: 0 },

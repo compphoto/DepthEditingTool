@@ -49,7 +49,6 @@ class DepthViewer extends Component {
       mainDepthCanvas,
       displayDepthCanvas,
       prevDepthSize,
-      depthBitmapCanvas,
       layerMode,
       scribbleParams,
       depthScaleParams,
@@ -178,10 +177,6 @@ class DepthViewer extends Component {
             update: [0, 255]
           }
         });
-        if (depthBitmapCanvas) {
-          const bitmapContext = depthBitmapCanvas.getContext("2d");
-          bitmapContext.clearRect(0, 0, depthBitmapCanvas.width, depthBitmapCanvas.height);
-        }
       }
     }
   }
@@ -481,7 +476,6 @@ const mapStateToProps = state => ({
   displayDepthCanvas: imageSelectors.displayDepthCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   prevDepthSize: imageSelectors.prevDepthSize(state),
-  depthBitmapCanvas: imageSelectors.depthBitmapCanvas(state),
   scribbleParams: imageSelectors.scribbleParams(state),
   layerMode: imageSelectors.layerMode(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
