@@ -15,6 +15,7 @@ import {
   highlightPixelAreaRgb
 } from "utils/canvasUtils";
 import { runCachedRgbOperations, runRgbOperations } from "utils/stackOperations";
+import { SelectionBox } from "config/toolBox";
 
 let objectUrl = null;
 
@@ -175,59 +176,82 @@ class RgbViewer extends Component {
           height={(window.innerHeight / 1200) * 352}
           ref={rgbImageRef}
           onMouseDown={e => {
-            storeScaleParams({
-              name: "rgbScaleParams",
-              value: {
-                startDragOffset: {
-                  x: e.clientX - rgbScaleParams.translatePos.x,
-                  y: e.clientY - rgbScaleParams.translatePos.y
-                },
-                mouseDown: true
+            if (tools.currentTool) {
+              if (SelectionBox[tools.currentTool].type === "pan") {
+                storeScaleParams({
+                  name: "rgbScaleParams",
+                  value: {
+                    startDragOffset: {
+                      x: e.clientX - rgbScaleParams.translatePos.x,
+                      y: e.clientY - rgbScaleParams.translatePos.y
+                    },
+                    mouseDown: true
+                  }
+                });
+                storeScaleParams({
+                  name: "depthScaleParams",
+                  value: {
+                    startDragOffset: {
+                      x: e.clientX - depthScaleParams.translatePos.x,
+                      y: e.clientY - depthScaleParams.translatePos.y
+                    },
+                    mouseDown: true
+                  }
+                });
               }
-            });
-            storeScaleParams({
-              name: "depthScaleParams",
-              value: {
-                startDragOffset: {
-                  x: e.clientX - depthScaleParams.translatePos.x,
-                  y: e.clientY - depthScaleParams.translatePos.y
-                },
-                mouseDown: true
-              }
-            });
+            }
           }}
           onMouseUp={e => {
-            rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-            depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+            if (tools.currentTool) {
+              if (SelectionBox[tools.currentTool].type === "pan") {
+                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+                depthScaleParams.mouseDown &&
+                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+              }
+            }
           }}
           onMouseOver={e => {
-            rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-            depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+            if (tools.currentTool) {
+              if (SelectionBox[tools.currentTool].type === "pan") {
+                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+                depthScaleParams.mouseDown &&
+                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+              }
+            }
           }}
           onMouseOut={e => {
-            rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-            depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+            if (tools.currentTool) {
+              if (SelectionBox[tools.currentTool].type === "pan") {
+                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+                depthScaleParams.mouseDown &&
+                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+              }
+            }
           }}
           onMouseMove={e => {
-            if (depthScaleParams.mouseDown && !tools.currentTool) {
-              storeScaleParams({
-                name: "rgbScaleParams",
-                value: {
-                  translatePos: {
-                    x: e.clientX - rgbScaleParams.startDragOffset.x,
-                    y: e.clientY - rgbScaleParams.startDragOffset.y
-                  }
+            if (tools.currentTool) {
+              if (SelectionBox[tools.currentTool].type === "pan") {
+                if (depthScaleParams.mouseDown) {
+                  storeScaleParams({
+                    name: "rgbScaleParams",
+                    value: {
+                      translatePos: {
+                        x: e.clientX - rgbScaleParams.startDragOffset.x,
+                        y: e.clientY - rgbScaleParams.startDragOffset.y
+                      }
+                    }
+                  });
+                  storeScaleParams({
+                    name: "depthScaleParams",
+                    value: {
+                      translatePos: {
+                        x: e.clientX - depthScaleParams.startDragOffset.x,
+                        y: e.clientY - depthScaleParams.startDragOffset.y
+                      }
+                    }
+                  });
                 }
-              });
-              storeScaleParams({
-                name: "depthScaleParams",
-                value: {
-                  translatePos: {
-                    x: e.clientX - depthScaleParams.startDragOffset.x,
-                    y: e.clientY - depthScaleParams.startDragOffset.y
-                  }
-                }
-              });
+              }
             }
           }}
         ></canvas>
