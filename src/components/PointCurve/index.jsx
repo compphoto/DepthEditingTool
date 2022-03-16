@@ -76,8 +76,8 @@ class PointCurve extends Component {
       this.setState(
         {
           cp1: {
-            x: e.layerX,
-            y: e.layerY
+            x: e.offsetX,
+            y: e.offsetY
           }
         },
         () => {
@@ -89,8 +89,8 @@ class PointCurve extends Component {
       this.setState(
         {
           cp2: {
-            x: e.layerX,
-            y: e.layerY
+            x: e.offsetX,
+            y: e.offsetY
           }
         },
         () => {
@@ -102,10 +102,10 @@ class PointCurve extends Component {
   selectCurve = e => {
     const { cp1, cp2 } = this.state;
     let sc = null;
-    if (this.isPointInPath(cp1.x, cp1.y, e.layerX, e.layerY)) {
+    if (this.isPointInPath(cp1.x, cp1.y, e.offsetX, e.offsetY)) {
       sc = "cp1";
     }
-    if (this.isPointInPath(cp2.x, cp2.y, e.layerX, e.layerY)) {
+    if (this.isPointInPath(cp2.x, cp2.y, e.offsetX, e.offsetY)) {
       sc = "cp2";
     }
     this.setState({ selectedControl: sc });

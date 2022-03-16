@@ -224,8 +224,8 @@ class DepthViewer extends Component {
     let { memoryDepthCanvas, depthScaleParams, storeParameters } = this.props;
     let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
     if (memoryDepthCanvas) {
-      let x = event.layerX;
-      let y = event.layerY;
+      let x = event.offsetX;
+      let y = event.offsetY;
       if (initBoundingBox) {
         let depthCanvasDimension = getDimension(
           memoryDepthCanvas,
@@ -236,6 +236,8 @@ class DepthViewer extends Component {
           scale
         );
         let [image_x1, image_y1, image_x2, image_y2] = depthCanvasDimension;
+        console.warn("X ", x, " X Dimension", image_x1, " ", image_x2);
+        console.warn("Y ", y, " Y Dimension", image_y1, " ", image_y2);
         let new_x = Math.max(Math.min(initBoundingBox.x, x), image_x1);
         let new_y = Math.max(Math.min(initBoundingBox.y, y), image_y1);
         let new_w = Math.min(Math.max(initBoundingBox.x, x), image_x2) - new_x;
