@@ -509,7 +509,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           ...state.operationStack,
           rgbStack: [...rgbStack],
           depthStack: [...depthStack],
-          layerStack: [...layerStack]
+          layerStack: [...layerStack],
+          activeIndex: 0
         }
       };
     case types.REMOVE_ITEM:
