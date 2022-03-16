@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Grid from "assets/images/png/mask-grid.png";
 // #2e2f34
 
 const SidePaneStyle = styled.div`
@@ -59,6 +60,10 @@ const SidePaneStyle = styled.div`
             height: 120px;
             padding: 0;
             img {
+              background-image: url(${Grid});
+              background-repeat: no-repeat;
+              background-attachment: fixed;
+              background-size: contain;
               max-width: 100%;
               max-height: 100%;
             }
