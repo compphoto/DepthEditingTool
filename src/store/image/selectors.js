@@ -2,6 +2,7 @@ export const selectors = {
   rgbImageUrl: state => state.image.rgbImageUrl,
   depthImageUrl: state => state.image.depthImageUrl,
   selectionImageUrl: state => state.image.selectionImageUrl,
+  maskImageUrl: state => state.image.maskImageUrl,
   mainRgbCanvas: state => state.image.mainRgbCanvas,
   mainDepthCanvas: state => state.image.mainDepthCanvas,
   displayRgbCanvas: state => state.image.displayRgbCanvas,

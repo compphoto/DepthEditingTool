@@ -410,3 +410,27 @@ export const getScribbleRange = (depthCanvas, path) => {
 
   return [mini, maxi];
 };
+
+export const maskToImage = (maskCanvas, depthCanvas) => {
+  if (maskCanvas && depthCanvas) {
+    const bitmapCanvas = document.createElement("canvas");
+    const bitmapContext = bitmapCanvas.getContext("2d");
+    bitmapCanvas.width = depthCanvas.width;
+    bitmapCanvas.height = depthCanvas.height;
+
+    const bitmapData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
+    const bitmapSrc = bitmapData.data;
+    const maskSrc = maskCanvas.getContext("2d").getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height).data;
+    const depthSrc = depthCanvas.getContext("2d").getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height).data;
+
+    for (let i = 0; i < bitmapSrc.length; i += 4) {
+      bitmapSrc[i] = depthSrc[i];
+      bitmapSrc[i + 1] = depthSrc[i + 1];
+      bitmapSrc[i + 2] = depthSrc[i + 2];
+      bitmapSrc[i + 3] = maskSrc[i];
+    }
+    bitmapContext.putImageData(bitmapData, 0, 0);
+
+    return bitmapCanvas;
+  }
+};

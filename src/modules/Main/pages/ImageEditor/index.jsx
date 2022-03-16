@@ -9,7 +9,7 @@ import { ImUndo2 } from "react-icons/im";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
-import { canvasToImage, cloneCanvas } from "utils/canvasUtils";
+import { canvasToImage, cloneCanvas, maskToImage } from "utils/canvasUtils";
 import {} from "utils/stackOperations";
 import { getImageUrl } from "utils/getImageFromFile";
 
@@ -17,6 +17,7 @@ let objectUrl = null;
 
 export function ImageEditor({
   selectionImageUrl,
+  maskImageUrl,
   mainDepthCanvas,
   memoryDepthCanvas,
   operationStack,
@@ -45,6 +46,17 @@ export function ImageEditor({
       };
     }
   }, [selectionImageUrl]);
+  useEffect(() => {
+    if (maskImageUrl) {
+      let maskImage = new Image();
+      objectUrl = getImageUrl(maskImageUrl);
+      maskImage.src = objectUrl;
+      maskImage.onload = () => {
+        let maskBitmap = maskToImage(cloneCanvas(maskImage), mainDepthCanvas);
+        updateLayer({ bitmap: maskBitmap, toolsParameters: null });
+      };
+    }
+  }, [maskImageUrl]);
   return (
     <ImageEditorStyle>
       <Helmet>
@@ -72,6 +84,7 @@ export function ImageEditor({
           onChange={onHandleChange}
           accept="image/png"
         />
+        <input id="upload-mask-image" type="file" name="maskImageUrl" onChange={onHandleChange} accept="image/png" />
         <Container fluid>
           <div className="nav-bar">
             <div className="nav-intro">
@@ -102,7 +115,15 @@ export function ImageEditor({
                         openAttachment("upload-selection-image");
                       }}
                     >
-                      <label htmlFor="upload-selection-image">Open Selection Image</label>
+                      <label htmlFor="upload-selection-image">Import Selection Image</label>
+                    </DropdownItem>
+                    <DropdownItem
+                      disabled={operationStack.activeIndex < 1}
+                      onClick={() => {
+                        openAttachment("upload-mask-image");
+                      }}
+                    >
+                      <label htmlFor="upload-mask-image">Import Selection Mask</label>
                     </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>
@@ -193,6 +214,7 @@ export function ImageEditor({
 
 const mapStateToProps = state => ({
   selectionImageUrl: imageSelectors.selectionImageUrl(state),
+  maskImageUrl: imageSelectors.maskImageUrl(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   layerMode: imageSelectors.layerMode(state),
