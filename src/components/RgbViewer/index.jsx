@@ -5,6 +5,7 @@ import { selectors as imageSelectors } from "store/image";
 import RgbViewerStyle from "./style";
 import { getImageUrl } from "utils/getImageFromFile";
 import {
+  canvasResize,
   cloneCanvas,
   downScaleBox,
   drawBox,
@@ -59,6 +60,10 @@ class RgbViewer extends Component {
       objectUrl = getImageUrl(rgbImageUrl);
       rgbImage.src = objectUrl;
       rgbImage.onload = () => {
+        if (Math.max(rgbImage.height, rgbImage.width) > 1000) {
+          rgbImage = canvasResize(rgbImage);
+        }
+        console.warn(rgbImage.height, rgbImage.width);
         initRgb(cloneCanvas(rgbImage));
       };
     }

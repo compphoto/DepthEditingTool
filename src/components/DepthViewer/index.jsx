@@ -20,7 +20,8 @@ import {
   upScalePoint,
   downScalePoint,
   getScribbleRange,
-  boxToDimension
+  boxToDimension,
+  canvasResize
 } from "utils/canvasUtils";
 import { runDepthOperations, runCachedDepthOperations } from "utils/stackOperations";
 import { SelectionBox } from "config/toolBox";
@@ -72,6 +73,10 @@ class DepthViewer extends Component {
       objectUrl = getImageUrl(depthImageUrl);
       depthImage.src = objectUrl;
       depthImage.onload = () => {
+        if (Math.max(depthImage.height, depthImage.width) > 1000) {
+          depthImage = canvasResize(depthImage);
+        }
+        console.warn(depthImage.height, depthImage.width);
         initDepth(cloneCanvas(depthImage));
       };
     }

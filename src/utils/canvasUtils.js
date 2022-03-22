@@ -6,6 +6,20 @@ export const canvasToImage = canvas => {
   return null;
 };
 
+export const canvasResize = (oldCanvas, size = 1000) => {
+  if (oldCanvas) {
+    const maxi = Math.max(oldCanvas.width, oldCanvas.height);
+    const ratio = maxi / size;
+    const newCanvas = document.createElement("canvas");
+    const context = newCanvas.getContext("2d");
+    newCanvas.width = oldCanvas.width / ratio;
+    newCanvas.height = oldCanvas.height / ratio;
+    context.drawImage(oldCanvas, 0, 0, oldCanvas.width, oldCanvas.height, 0, 0, newCanvas.width, newCanvas.height);
+    return newCanvas;
+  }
+  return null;
+};
+
 export const cloneCanvas = oldCanvas => {
   if (oldCanvas) {
     const newCanvas = document.createElement("canvas");
