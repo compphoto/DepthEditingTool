@@ -15,6 +15,7 @@ export const imageActions = {
   addLayer: () => ({ type: types.ADD_LAYER }),
   updateLayerIndex: index => ({ type: types.UPDATE_LAYER_INDEX, payload: index }),
   updateLayer: payload => ({ type: types.UPDATE_LAYER, payload: payload }),
+  duplicateLayer: key => ({ type: types.DUPLICATE_LAYER, payload: key }),
   removeLayer: key => ({ type: types.REMOVE_LAYER, payload: key }),
   removeAllLayers: () => ({ type: types.REMOVE_ALL_LAYER }),
   addOperation: payload => ({ type: types.ADD_OPERATION, payload: payload }),

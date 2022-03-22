@@ -7,7 +7,7 @@ import { selectors as imageSelectors } from "store/image";
 import { Button, UncontrolledCollapse, CardBody, Card, FormGroup, Label, Input, UncontrolledTooltip } from "reactstrap";
 import SidePaneStyle from "./style";
 import Tools from "config/tools";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdDownload, MdCancel } from "react-icons/md";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdDownload, MdDelete, MdContentCopy } from "react-icons/md";
 import { AiOutlinePlus } from "react-icons/ai";
 
 import {
@@ -39,6 +39,7 @@ export function SidePane({
   addLayer,
   updateLayerIndex,
   updateLayer,
+  duplicateLayer,
   removeLayer,
   removeAllLayers,
   clear
@@ -131,6 +132,15 @@ export function SidePane({
                 <div
                   onClick={e => {
                     e.stopPropagation();
+                    duplicateLayer(key);
+                  }}
+                  className="top-right-option"
+                >
+                  <MdContentCopy />
+                </div>
+                <div
+                  onClick={e => {
+                    e.stopPropagation();
                     image = canvasToImage(operationStack.layerStack[key].bitmap);
                     window.location.href = image;
                   }}
@@ -145,7 +155,7 @@ export function SidePane({
                   }}
                   className="top-right-option"
                 >
-                  <MdCancel />
+                  <MdDelete />
                 </div>
               </div>
             ) : null}
@@ -502,6 +512,7 @@ const mapDispatchToProps = {
   addLayer: imageActions.addLayer,
   updateLayerIndex: imageActions.updateLayerIndex,
   updateLayer: imageActions.updateLayer,
+  duplicateLayer: imageActions.duplicateLayer,
   removeLayer: imageActions.removeLayer,
   removeAllLayers: imageActions.removeAllLayers,
   storeToolParameters: imageActions.storeToolParameters,

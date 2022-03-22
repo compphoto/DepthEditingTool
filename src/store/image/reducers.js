@@ -314,6 +314,20 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           layerStack: layerStack
         }
       };
+    case types.DUPLICATE_LAYER:
+      var layerStack = [...state.operationStack.layerStack];
+      var index = payload;
+      var layer = {
+        ...layerStack[index]
+      };
+      layerStack.splice(index + 1, 0, layer);
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          layerStack: layerStack
+        }
+      };
     case types.REMOVE_LAYER:
       var newLayerStack = [...state.operationStack.layerStack];
       if (payload !== -1) {

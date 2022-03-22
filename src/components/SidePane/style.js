@@ -72,17 +72,18 @@ const SidePaneStyle = styled.div`
         .top-right-options {
           position: absolute;
           top: 0%;
-          left: 80%;
+          left: 89%;
           display: none;
+          flex-direction: column;
           .top-right-option {
             margin-left: 0.5rem;
-            color: #7e838e;
+            color: #6d727d;
             svg {
-              height: 1rem;
-              width: 1rem;
+              height: 1.2rem;
+              width: 1.2rem;
             }
             &:hover {
-              color: #fff;
+              color: #999da6;
             }
           }
         }
