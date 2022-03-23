@@ -8,14 +8,21 @@ export const runRgbOperations = image => {
   displayRgbCanvas.height = image.height;
   const cachedRgbContext = displayRgbCanvas.getContext("2d");
   let stack = store.getState().image.operationStack["rgbStack"];
-  stack.forEach(element => {
+  let data = {};
+  stack.forEach((element, index) => {
+    if (index === stack.length - 1) {
+      data = {
+        ...data,
+        cacheRgbCanvas: cloneCanvas(displayRgbCanvas)
+      };
+    }
     element.params ? element.func(image, cachedRgbContext, ...element.params) : element.func(image, cachedRgbContext);
   });
   const storeAction = require("store/store");
   const rgbBitmapCanvas = store.getState().image.rgbBitmapCanvas;
-  let data = {
+  data = {
+    ...data,
     displayRgbCanvas: cloneCanvas(displayRgbCanvas),
-    cacheRgbCanvas: cloneCanvas(displayRgbCanvas),
     rgbBitmapCanvas: rgbBitmapCanvas === null ? cloneCanvas(displayRgbCanvas) : rgbBitmapCanvas
   };
   storeAction.default.dispatch(imageActions.initImage(data));
@@ -46,21 +53,28 @@ export const runDepthOperations = image => {
   const memoryDepthContext = memoryDepthCanvas.getContext("2d");
   const displayDepthContext = displayDepthCanvas.getContext("2d");
   let stack = store.getState().image.operationStack["depthStack"];
-  stack.forEach(element => {
+  let data = {};
+  stack.forEach((element, index) => {
     element.params
       ? element.func(image, displayDepthContext, ...element.params)
       : element.func(image, displayDepthContext);
     if (element.type === "effect") {
+      if (index === stack.length - 1) {
+        data = {
+          ...data,
+          cacheDepthCanvas: cloneCanvas(memoryDepthCanvas)
+        };
+      }
       element.params
         ? element.func(image, memoryDepthContext, ...element.params)
         : element.func(image, memoryDepthContext);
     }
   });
   const storeAction = require("store/store");
-  let data = {
+  data = {
+    ...data,
     memoryDepthCanvas: cloneCanvas(memoryDepthCanvas),
-    displayDepthCanvas: cloneCanvas(displayDepthCanvas),
-    cacheDepthCanvas: cloneCanvas(memoryDepthCanvas)
+    displayDepthCanvas: cloneCanvas(displayDepthCanvas)
   };
   storeAction.default.dispatch(imageActions.initImage(data));
 };

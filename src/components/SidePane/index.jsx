@@ -213,7 +213,12 @@ export function SidePane({
         name: "depthStack",
         value: {
           func: addScaleShift,
-          params: [cloneCanvas(layerStack[activeIndex].bitmap), toolsParameters.aConstant, toolsParameters.bConstant]
+          params: [
+            cloneCanvas(layerStack[activeIndex].bitmap),
+            cacheDepthCanvas,
+            toolsParameters.aConstant,
+            toolsParameters.bConstant
+          ]
         }
       });
     }

@@ -134,7 +134,7 @@ class PointCurve extends Component {
   render() {
     const { pointCurveRef } = this;
     const { cpS, cp1, cp2, cpE, selectedControl } = this.state;
-    const { parameters, operationStack, addEffect } = this.props;
+    const { cacheDepthCanvas, parameters, operationStack, addEffect } = this.props;
     return (
       <PointCurveStyle>
         <canvas
@@ -149,7 +149,7 @@ class PointCurve extends Component {
                   name: "depthStack",
                   value: {
                     func: adjustTone,
-                    params: [cloneCanvas(layerStack[activeIndex].bitmap), cpS, cp1, cp2, cpE]
+                    params: [cloneCanvas(layerStack[activeIndex].bitmap), cacheDepthCanvas, cpS, cp1, cp2, cpE]
                   }
                 });
               }
@@ -164,7 +164,7 @@ class PointCurve extends Component {
                   name: "depthStack",
                   value: {
                     func: adjustTone,
-                    params: [cloneCanvas(layerStack[activeIndex].bitmap), cpS, cp1, cp2, cpE]
+                    params: [cloneCanvas(layerStack[activeIndex].bitmap), cacheDepthCanvas, cpS, cp1, cp2, cpE]
                   }
                 });
               }
@@ -179,6 +179,7 @@ class PointCurve extends Component {
 
 const mapStateToProps = state => ({
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
+  cacheDepthCanvas: imageSelectors.cacheDepthCanvas(state),
   parameters: imageSelectors.parameters(state),
   operationStack: imageSelectors.operationStack(state)
 });

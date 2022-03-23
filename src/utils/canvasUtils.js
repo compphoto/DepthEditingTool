@@ -279,7 +279,7 @@ export const invertBitmap = (mainCanvas, bitmapCanvas) => {
 };
 
 export const editHighlightPixelArea = (image, context, canvas, depthCanvas, depth) => {
-  if (context && canvas) {
+  if (context && canvas && depthCanvas) {
     const bitmapCanvas = cloneCanvas(canvas);
     const bitmapContext = bitmapCanvas.getContext("2d");
     bitmapContext.globalCompositeOperation = "source-in";
@@ -302,7 +302,7 @@ export const editHighlightPixelArea = (image, context, canvas, depthCanvas, dept
 };
 
 export const scaleSelection = (image, context, canvas, depthCanvas, scale) => {
-  if (context && canvas) {
+  if (context && canvas && depthCanvas) {
     const bitmapCanvas = cloneCanvas(canvas);
     const bitmapContext = bitmapCanvas.getContext("2d");
     bitmapContext.globalCompositeOperation = "source-in";
@@ -333,7 +333,7 @@ export const scaleSelection = (image, context, canvas, depthCanvas, scale) => {
   }
 };
 
-export const adjustTone = (image, context, canvas, cpS, cp1, cp2, cpE) => {
+export const adjustTone = (image, context, canvas, depthCanvas, cpS, cp1, cp2, cpE) => {
   function getT(x, cpSx, cp1x, cp2x, cpEx) {
     let a = -cpSx + 3 * cp1x - 3 * cp2x + cpEx;
     let b = 3 * cpSx - 6 * cp1x + 3 * cp2x;
@@ -360,9 +360,11 @@ export const adjustTone = (image, context, canvas, cpS, cp1, cp2, cpE) => {
   function getY(y, h = 200) {
     return (255 * (h - y)) / h;
   }
-  if (context && canvas) {
+  if (context && canvas && depthCanvas) {
     const bitmapCanvas = cloneCanvas(canvas);
     const bitmapContext = bitmapCanvas.getContext("2d");
+    bitmapContext.globalCompositeOperation = "source-in";
+    bitmapContext.drawImage(depthCanvas, 0, 0);
     const imageData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
@@ -386,10 +388,12 @@ export const adjustTone = (image, context, canvas, cpS, cp1, cp2, cpE) => {
   }
 };
 
-export const addScaleShift = (image, context, canvas, a, b) => {
-  if (context && canvas) {
+export const addScaleShift = (image, context, canvas, depthCanvas, a, b) => {
+  if (context && canvas && depthCanvas) {
     const bitmapCanvas = cloneCanvas(canvas);
     const bitmapContext = bitmapCanvas.getContext("2d");
+    bitmapContext.globalCompositeOperation = "source-in";
+    bitmapContext.drawImage(depthCanvas, 0, 0);
     const imageData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
