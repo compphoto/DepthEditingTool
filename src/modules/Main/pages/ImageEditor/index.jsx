@@ -9,7 +9,7 @@ import { ImUndo2 } from "react-icons/im";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
-import { canvasToImage, cloneCanvas, maskToImage } from "utils/canvasUtils";
+import { canvasToImage, cloneCanvas, downloadCanvas, maskToImage } from "utils/canvasUtils";
 import {} from "utils/stackOperations";
 import { getImageUrl } from "utils/getImageFromFile";
 
@@ -191,8 +191,7 @@ export function ImageEditor({
               </Button>
               <Button
                 onClick={() => {
-                  let image = canvasToImage(memoryDepthCanvas);
-                  window.location.href = image;
+                  downloadCanvas(memoryDepthCanvas, "modified-depth.png");
                 }}
                 disabled={memoryDepthCanvas === null}
                 size="sm"

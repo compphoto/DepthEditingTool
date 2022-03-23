@@ -6,6 +6,16 @@ export const canvasToImage = canvas => {
   return null;
 };
 
+export const downloadCanvas = (canvas, fileName) => {
+  if (canvas) {
+    let image = canvasToImage(canvas);
+    var downloadLink = document.createElement("a");
+    downloadLink.download = fileName;
+    downloadLink.href = image;
+    downloadLink.click();
+  }
+};
+
 export const canvasResize = (oldCanvas, size = 1000) => {
   if (oldCanvas) {
     const maxi = Math.max(oldCanvas.width, oldCanvas.height);

@@ -19,7 +19,8 @@ import {
   scaleSelection,
   getBoundingArea,
   canvasToImage,
-  invertBitmap
+  invertBitmap,
+  downloadCanvas
 } from "utils/canvasUtils";
 import PointCurve from "components/PointCurve";
 import { SelectionBox } from "config/toolBox";
@@ -156,8 +157,7 @@ export function SidePane({
                 <div
                   onClick={e => {
                     e.stopPropagation();
-                    image = canvasToImage(operationStack.layerStack[key].bitmap);
-                    window.location.href = image;
+                    downloadCanvas(operationStack.layerStack[key].bitmap, "bitmap.png");
                   }}
                   className="top-right-option"
                 >
