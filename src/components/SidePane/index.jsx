@@ -298,8 +298,9 @@ export function SidePane({
                         className="tool-ext-input-slider"
                         id="disparity"
                         name="disparity"
-                        min="-100"
-                        max="100"
+                        min="-1"
+                        max="1"
+                        step={0.01}
                         type="range"
                         value={tempToolsParams.disparity}
                       />
@@ -313,6 +314,9 @@ export function SidePane({
                         id="disparity"
                         name="disparity"
                         type="number"
+                        min="-1"
+                        max="1"
+                        step={0.01}
                         value={tempToolsParams.disparity}
                       />
                     </div>
@@ -343,6 +347,9 @@ export function SidePane({
                         id="scale"
                         name="scale"
                         type="number"
+                        min="0"
+                        max="1"
+                        step={0.01}
                         value={tempToolsParams.scale}
                       />
                     </div>
@@ -386,6 +393,9 @@ export function SidePane({
                         id="aConstant"
                         name="aConstant"
                         type="number"
+                        min="0"
+                        max="2"
+                        step={0.01}
                         value={tempToolsParams.aConstant}
                       />
                     </div>
@@ -416,6 +426,9 @@ export function SidePane({
                         id="bConstant"
                         name="bConstant"
                         type="number"
+                        min="0"
+                        max="2"
+                        step={0.01}
                         value={tempToolsParams.bConstant}
                       />
                     </div>

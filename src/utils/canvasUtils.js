@@ -286,9 +286,9 @@ export const editHighlightPixelArea = (image, context, canvas, depth) => {
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
       if (src[i + 3] !== 0) {
-        src[i] += 255 * (depth / 100);
-        src[i + 1] += 255 * (depth / 100);
-        src[i + 2] += 255 * (depth / 100);
+        src[i] += 255 * (depth / 1);
+        src[i + 1] += 255 * (depth / 1);
+        src[i + 2] += 255 * (depth / 1);
       }
     }
     bitmapContext.putImageData(imageData, 0, 0);
