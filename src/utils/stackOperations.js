@@ -59,7 +59,7 @@ export const runDepthOperations = image => {
       ? element.func(image, displayDepthContext, ...element.params)
       : element.func(image, displayDepthContext);
     if (element.type === "effect") {
-      if (index === stack.length - 1) {
+      if (stack.length > 1 && index === stack.length - 1) {
         data = {
           ...data,
           cacheDepthCanvas: cloneCanvas(memoryDepthCanvas)

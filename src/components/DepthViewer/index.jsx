@@ -99,20 +99,21 @@ class DepthViewer extends Component {
     // If operation is added to the stack, rerun all operations in operation stack
     if (prevProps.operationStack.depthStack !== operationStack.depthStack) {
       if (mainDepthCanvas) {
-        let prevStack = prevProps.operationStack.depthStack;
-        let currentStack = operationStack.depthStack;
-        console.warn("current", currentStack);
-        console.warn("previous", prevStack);
-        if (
-          prevStack.length > 1 &&
-          currentStack.length > 1 &&
-          prevStack[prevStack.length - 1].func.toString() === currentStack[currentStack.length - 1].func.toString()
-        ) {
-          console.warn("called cache");
-          runCachedDepthOperations(mainDepthCanvas);
-        } else {
-          runDepthOperations(mainDepthCanvas);
-        }
+        runDepthOperations(mainDepthCanvas);
+        // let prevStack = prevProps.operationStack.depthStack;
+        // let currentStack = operationStack.depthStack;
+        // console.warn("current", currentStack);
+        // console.warn("previous", prevStack);
+        // if (
+        //   prevStack.length > 1 &&
+        //   currentStack.length > 1 &&
+        //   prevStack[prevStack.length - 1].func.toString() === currentStack[currentStack.length - 1].func.toString()
+        // ) {
+        //   console.warn("called cache");
+        //   runCachedDepthOperations(mainDepthCanvas);
+        // } else {
+        //   runDepthOperations(mainDepthCanvas);
+        // }
       }
     }
     if (

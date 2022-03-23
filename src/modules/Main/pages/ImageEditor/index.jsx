@@ -152,6 +152,7 @@ export function ImageEditor({
                   <DropdownToggle>Edit</DropdownToggle>
                   <DropdownMenu>
                     <DropdownItem
+                      disabled={memoryDepthCanvas === null}
                       onClick={() => {
                         undo();
                       }}
@@ -159,6 +160,7 @@ export function ImageEditor({
                       <label>Undo</label>
                     </DropdownItem>
                     <DropdownItem
+                      disabled={memoryDepthCanvas === null || mainRgbCanvas === null}
                       onClick={() => {
                         clear();
                       }}
@@ -166,6 +168,7 @@ export function ImageEditor({
                       <label>Clear</label>
                     </DropdownItem>
                     <DropdownItem
+                      disabled={memoryDepthCanvas === null || mainRgbCanvas === null}
                       onClick={() => {
                         reset();
                       }}
