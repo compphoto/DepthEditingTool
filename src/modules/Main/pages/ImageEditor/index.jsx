@@ -151,11 +151,27 @@ export function ImageEditor({
                 <UncontrolledDropdown>
                   <DropdownToggle>Edit</DropdownToggle>
                   <DropdownMenu>
-                    <DropdownItem header>Header</DropdownItem>
-                    <DropdownItem>Action</DropdownItem>
-                    <DropdownItem>Another Action</DropdownItem>
-                    <DropdownItem divider />
-                    <DropdownItem>Another Action</DropdownItem>
+                    <DropdownItem
+                      onClick={() => {
+                        undo();
+                      }}
+                    >
+                      <label>Undo</label>
+                    </DropdownItem>
+                    <DropdownItem
+                      onClick={() => {
+                        clear();
+                      }}
+                    >
+                      <label>Clear</label>
+                    </DropdownItem>
+                    <DropdownItem
+                      onClick={() => {
+                        reset();
+                      }}
+                    >
+                      <label>Reset</label>
+                    </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>
               </div>
@@ -178,34 +194,6 @@ export function ImageEditor({
                 color="outline"
               >
                 <AiOutlinePlus />
-              </Button>
-              <Button
-                onClick={() => {
-                  undo();
-                }}
-                size="sm"
-                color="outline"
-              >
-                <ImUndo2 />
-              </Button>
-              <Button
-                onClick={() => {
-                  clear();
-                }}
-                size="sm"
-                color="secondary"
-              >
-                Clear
-              </Button>
-              <Button
-                onClick={() => {
-                  reset();
-                }}
-                size="sm"
-                color="secondary"
-                className="mx-3"
-              >
-                Reset
               </Button>
             </div>
           </div>
