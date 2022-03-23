@@ -43,6 +43,7 @@ const ImageEditorStyle = styled.div`
               }
             }
             .dropdown-menu {
+              z-index: 1200;
               .dropdown-item {
                 padding: 0.75rem 1rem;
                 p {

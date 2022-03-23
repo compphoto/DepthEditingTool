@@ -9,7 +9,7 @@ import { ImUndo2 } from "react-icons/im";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
-import { canvasToImage, cloneCanvas, downloadCanvas, maskToImage } from "utils/canvasUtils";
+import { cloneCanvas, downloadCanvas, maskToImage } from "utils/canvasUtils";
 import {} from "utils/stackOperations";
 import { getImageUrl } from "utils/getImageFromFile";
 
@@ -18,6 +18,7 @@ let objectUrl = null;
 export function ImageEditor({
   selectionImageUrl,
   maskImageUrl,
+  mainRgbCanvas,
   mainDepthCanvas,
   memoryDepthCanvas,
   operationStack,
@@ -128,6 +129,23 @@ export function ImageEditor({
                     >
                       <label htmlFor="upload-mask-image">Import Selection Mask</label>
                     </DropdownItem>
+                    <DropdownItem divider />
+                    <DropdownItem
+                      disabled={mainRgbCanvas === null}
+                      onClick={() => {
+                        downloadCanvas(mainRgbCanvas, "modified-rgb.png");
+                      }}
+                    >
+                      <label>Export RGB Image</label>
+                    </DropdownItem>
+                    <DropdownItem
+                      disabled={memoryDepthCanvas === null}
+                      onClick={() => {
+                        downloadCanvas(memoryDepthCanvas, "modified-depth.png");
+                      }}
+                    >
+                      <label>Export Depth Image</label>
+                    </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>
                 <UncontrolledDropdown>
@@ -189,16 +207,6 @@ export function ImageEditor({
               >
                 Reset
               </Button>
-              <Button
-                onClick={() => {
-                  downloadCanvas(memoryDepthCanvas, "modified-depth.png");
-                }}
-                disabled={memoryDepthCanvas === null}
-                size="sm"
-                color="primary"
-              >
-                Download
-              </Button>
             </div>
           </div>
         </Container>
@@ -217,6 +225,7 @@ export function ImageEditor({
 const mapStateToProps = state => ({
   selectionImageUrl: imageSelectors.selectionImageUrl(state),
   maskImageUrl: imageSelectors.maskImageUrl(state),
+  mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   layerMode: imageSelectors.layerMode(state),
