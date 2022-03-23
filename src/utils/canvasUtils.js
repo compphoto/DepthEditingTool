@@ -278,10 +278,12 @@ export const invertBitmap = (mainCanvas, bitmapCanvas) => {
   }
 };
 
-export const editHighlightPixelArea = (image, context, canvas, depth) => {
+export const editHighlightPixelArea = (image, context, canvas, depthCanvas, depth) => {
   if (context && canvas) {
     const bitmapCanvas = cloneCanvas(canvas);
     const bitmapContext = bitmapCanvas.getContext("2d");
+    bitmapContext.globalCompositeOperation = "source-in";
+    bitmapContext.drawImage(depthCanvas, 0, 0);
     const imageData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
@@ -299,10 +301,12 @@ export const editHighlightPixelArea = (image, context, canvas, depth) => {
   }
 };
 
-export const scaleSelection = (image, context, canvas, scale) => {
+export const scaleSelection = (image, context, canvas, depthCanvas, scale) => {
   if (context && canvas) {
     const bitmapCanvas = cloneCanvas(canvas);
     const bitmapContext = bitmapCanvas.getContext("2d");
+    bitmapContext.globalCompositeOperation = "source-in";
+    bitmapContext.drawImage(depthCanvas, 0, 0);
     const imageData = bitmapContext.getImageData(0, 0, bitmapCanvas.width, bitmapCanvas.height);
     const src = imageData.data;
     let sum = 0;

@@ -10,7 +10,6 @@ export const imageActions = {
   storeScaleParams: payload => ({ type: types.STORE_SCALE_PARAMS, payload: payload }),
   storeToolParameters: payload => ({ type: types.STORE_TOOL_PARAMETERS, payload: payload }),
   storeParameters: payload => ({ type: types.STORE_PARAMETERS, payload: payload }),
-  toggleLayerMode: () => ({ type: types.TOGGLE_LAYER_MODE }),
   initLayer: () => ({ type: types.INIT_LAYER }),
   addLayer: () => ({ type: types.ADD_LAYER }),
   updateLayerIndex: index => ({ type: types.UPDATE_LAYER_INDEX, payload: index }),

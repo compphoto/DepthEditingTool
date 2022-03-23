@@ -216,7 +216,6 @@ const mapStateToProps = state => ({
   mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
-  layerMode: imageSelectors.layerMode(state),
   operationStack: imageSelectors.operationStack(state)
 });
 

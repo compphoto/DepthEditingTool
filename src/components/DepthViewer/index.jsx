@@ -50,7 +50,6 @@ class DepthViewer extends Component {
       mainDepthCanvas,
       displayDepthCanvas,
       prevDepthSize,
-      layerMode,
       scribbleParams,
       depthScaleParams,
       tools,
@@ -98,8 +97,8 @@ class DepthViewer extends Component {
       }
     }
     // If operation is added to the stack, rerun all operations in operation stack
-    if (prevProps.operationStack.depthStack !== operationStack.depthStack || prevProps.layerMode !== layerMode) {
-      if (!layerMode && mainDepthCanvas) {
+    if (prevProps.operationStack.depthStack !== operationStack.depthStack) {
+      if (mainDepthCanvas) {
         let prevStack = prevProps.operationStack.depthStack;
         let currentStack = operationStack.depthStack;
         if (
@@ -484,7 +483,6 @@ const mapStateToProps = state => ({
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   prevDepthSize: imageSelectors.prevDepthSize(state),
   scribbleParams: imageSelectors.scribbleParams(state),
-  layerMode: imageSelectors.layerMode(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
   depthScaleParams: imageSelectors.depthScaleParams(state),
   tools: imageSelectors.tools(state),

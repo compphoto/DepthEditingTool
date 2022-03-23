@@ -40,7 +40,6 @@ class RgbViewer extends Component {
       mainRgbCanvas,
       displayRgbCanvas,
       memoryDepthCanvas,
-      layerMode,
       rgbScaleParams,
       prevRgbSize,
       parameters,
@@ -84,8 +83,8 @@ class RgbViewer extends Component {
       }
     }
     // If operation is added to the stack, rerun all operations in operation stack
-    if (prevProps.operationStack.rgbStack !== operationStack.rgbStack || prevProps.layerMode !== layerMode) {
-      if (!layerMode && mainRgbCanvas) {
+    if (prevProps.operationStack.rgbStack !== operationStack.rgbStack) {
+      if (mainRgbCanvas) {
         let prevStack = prevProps.operationStack.rgbStack;
         let currentStack = operationStack.rgbStack;
         if (
@@ -273,7 +272,6 @@ const mapStateToProps = state => ({
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   prevRgbSize: imageSelectors.prevRgbSize(state),
   rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
-  layerMode: imageSelectors.layerMode(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
   depthScaleParams: imageSelectors.depthScaleParams(state),
   tools: imageSelectors.tools(state),

@@ -16,7 +16,6 @@ const initialState = {
   prevRgbSize: { width: null, height: null },
   prevDepthSize: { width: null, height: null },
   rgbBitmapCanvas: null,
-  layerMode: false,
   scribbleParams: {
     pos: { x: 0, y: 0 },
     offset: {},
@@ -146,7 +145,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         cacheDepthCanvas: null,
         prevDepthSize: { width: null, height: null },
         rgbBitmapCanvas: null,
-        layerMode: false,
         scribbleParams: {
           pos: { x: 0, y: 0 },
           offset: {},
@@ -244,11 +242,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           ...state.parameters,
           ...payload
         }
-      };
-    case types.TOGGLE_LAYER_MODE:
-      return {
-        ...state,
-        layerMode: !state.layerMode
       };
     case types.INIT_LAYER:
       return {

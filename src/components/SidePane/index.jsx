@@ -30,6 +30,7 @@ export function SidePane({
   toolExtActions,
   mainDepthCanvas,
   memoryDepthCanvas,
+  cacheDepthCanvas,
   displayRgbCanvas,
   tools,
   toolsParameters,
@@ -188,7 +189,7 @@ export function SidePane({
         name: "depthStack",
         value: {
           func: editHighlightPixelArea,
-          params: [cloneCanvas(layerStack[activeIndex].bitmap), toolsParameters.disparity]
+          params: [cloneCanvas(layerStack[activeIndex].bitmap), cacheDepthCanvas, toolsParameters.disparity]
         }
       });
     }
@@ -200,7 +201,7 @@ export function SidePane({
         name: "depthStack",
         value: {
           func: scaleSelection,
-          params: [cloneCanvas(layerStack[activeIndex].bitmap), toolsParameters.scale]
+          params: [cloneCanvas(layerStack[activeIndex].bitmap), cacheDepthCanvas, toolsParameters.scale]
         }
       });
     }
@@ -521,8 +522,8 @@ const mapStateToProps = state => ({
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
+  cacheDepthCanvas: imageSelectors.cacheDepthCanvas(state),
   rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
-  layerMode: imageSelectors.layerMode(state),
   tools: imageSelectors.tools(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),
@@ -536,7 +537,6 @@ const mapDispatchToProps = {
   addEffect: imageActions.addEffect,
   removeOperation: imageActions.removeOperation,
   storeParameters: imageActions.storeParameters,
-  toggleLayerMode: imageActions.toggleLayerMode,
   addLayer: imageActions.addLayer,
   updateLayerIndex: imageActions.updateLayerIndex,
   updateLayer: imageActions.updateLayer,
