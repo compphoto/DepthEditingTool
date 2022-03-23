@@ -55,7 +55,15 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
       </div>
       <div className="x-div">
         <div className="x-slider">
-          <Input onChange={onHandleChange} id="focalLength" name="focalLength" min="3" max="150" type="range" />
+          <Input
+            onChange={onHandleChange}
+            value={focalLength}
+            id="focalLength"
+            name="focalLength"
+            min="3"
+            max="150"
+            type="range"
+          />
         </div>
         <Canvas>
           <Camera fov={75} near={0.1} far={100} position={[0, 0, 2]} focalLength={focalLength} />
