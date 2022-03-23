@@ -9,6 +9,7 @@ import SidePaneStyle from "./style";
 import Tools from "config/tools";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdDownload, MdDelete, MdContentCopy } from "react-icons/md";
 import { AiOutlinePlus } from "react-icons/ai";
+import { RiArrowUpDownLine } from "react-icons/ri";
 
 import {
   addScaleShift,
@@ -17,7 +18,8 @@ import {
   getRgbBitmap,
   scaleSelection,
   getBoundingArea,
-  canvasToImage
+  canvasToImage,
+  invertBitmap
 } from "utils/canvasUtils";
 import PointCurve from "components/PointCurve";
 import { SelectionBox } from "config/toolBox";
@@ -92,7 +94,7 @@ export function SidePane({
             newArea,
             histogramParams.pixelRange
           );
-          updateLayer({ bitmap: newBitmapCanvas, toolsParameters: null });
+          updateLayer({ index: activeIndex, value: { bitmap: newBitmapCanvas, toolsParameters: null } });
           initImage({
             rgbBitmapCanvas: getRgbBitmap(cloneCanvas(layerStack[activeIndex].bitmap), cloneCanvas(displayRgbCanvas))
           });
@@ -129,6 +131,19 @@ export function SidePane({
             </Card>
             {key !== 0 ? (
               <div className="top-right-options">
+                <div
+                  onClick={e => {
+                    e.stopPropagation();
+                    let newBitmapCanvas = invertBitmap(
+                      cloneCanvas(memoryDepthCanvas),
+                      cloneCanvas(operationStack.layerStack[key].bitmap)
+                    );
+                    updateLayer({ index: key, value: { bitmap: newBitmapCanvas, toolsParameters: null } });
+                  }}
+                  className="top-right-option"
+                >
+                  <RiArrowUpDownLine />
+                </div>
                 <div
                   onClick={e => {
                     e.stopPropagation();

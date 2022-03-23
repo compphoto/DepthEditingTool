@@ -300,11 +300,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         }
       };
     case types.UPDATE_LAYER:
+      var { index, value } = payload;
       var layerStack = [...state.operationStack.layerStack];
-      var index = state.operationStack.activeIndex;
       var layer = {
         ...layerStack[index],
-        ...payload
+        ...value
       };
       layerStack[index] = layer;
       return {

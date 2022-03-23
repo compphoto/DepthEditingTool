@@ -259,6 +259,15 @@ export const modifyBitmap = (bitmapCanvas, croppedCanvas, box, currentTool, pixe
   return bitmapCanvas;
 };
 
+export const invertBitmap = (mainCanvas, bitmapCanvas) => {
+  if (mainCanvas && bitmapCanvas) {
+    const mainContext = mainCanvas.getContext("2d");
+    mainContext.globalCompositeOperation = "destination-out";
+    mainContext.drawImage(bitmapCanvas, 0, 0);
+    return mainCanvas;
+  }
+};
+
 export const editHighlightPixelArea = (image, context, canvas, depth) => {
   if (context && canvas) {
     const bitmapCanvas = cloneCanvas(canvas);

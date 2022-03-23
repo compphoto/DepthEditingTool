@@ -42,7 +42,10 @@ export function ImageEditor({
       objectUrl = getImageUrl(selectionImageUrl);
       selectionImage.src = objectUrl;
       selectionImage.onload = () => {
-        updateLayer({ bitmap: cloneCanvas(selectionImage), toolsParameters: null });
+        updateLayer({
+          index: operationStack.activeIndex,
+          value: { bitmap: cloneCanvas(selectionImage), toolsParameters: null }
+        });
       };
     }
   }, [selectionImageUrl]);
@@ -53,7 +56,7 @@ export function ImageEditor({
       maskImage.src = objectUrl;
       maskImage.onload = () => {
         let maskBitmap = maskToImage(cloneCanvas(maskImage), mainDepthCanvas);
-        updateLayer({ bitmap: maskBitmap, toolsParameters: null });
+        updateLayer({ index: operationStack.activeIndex, value: { bitmap: maskBitmap, toolsParameters: null } });
       };
     }
   }, [maskImageUrl]);
