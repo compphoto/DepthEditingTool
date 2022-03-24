@@ -134,7 +134,7 @@ class PointCurve extends Component {
   render() {
     const { pointCurveRef } = this;
     const { cpS, cp1, cp2, cpE, selectedControl } = this.state;
-    const { cacheDepthCanvas, parameters, operationStack, addEffect } = this.props;
+    let { cacheDepthCanvas, memoryDepthCanvas, parameters, operationStack, addEffect } = this.props;
     return (
       <PointCurveStyle>
         <canvas
