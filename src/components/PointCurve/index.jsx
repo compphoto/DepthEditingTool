@@ -145,11 +145,25 @@ class PointCurve extends Component {
             if (selectedControl) {
               const { activeIndex, layerStack } = operationStack;
               if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
+                if (
+                  operationStack["depthStack"].length !== 0 &&
+                  operationStack["depthStack"][operationStack["depthStack"].length - 1].func.name.toString() !=
+                    "adjustTone"
+                ) {
+                  cacheDepthCanvas = cloneCanvas(memoryDepthCanvas);
+                }
                 addEffect({
                   name: "depthStack",
                   value: {
                     func: adjustTone,
-                    params: [cloneCanvas(layerStack[activeIndex].bitmap), cacheDepthCanvas, cpS, cp1, cp2, cpE]
+                    params: [
+                      cloneCanvas(layerStack[activeIndex].bitmap),
+                      cacheDepthCanvas || memoryDepthCanvas,
+                      cpS,
+                      cp1,
+                      cp2,
+                      cpE
+                    ]
                   }
                 });
               }
@@ -160,11 +174,25 @@ class PointCurve extends Component {
             if (selectedControl) {
               const { activeIndex, layerStack } = operationStack;
               if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
+                if (
+                  operationStack["depthStack"].length !== 0 &&
+                  operationStack["depthStack"][operationStack["depthStack"].length - 1].func.name.toString() !=
+                    "adjustTone"
+                ) {
+                  cacheDepthCanvas = cloneCanvas(memoryDepthCanvas);
+                }
                 addEffect({
                   name: "depthStack",
                   value: {
                     func: adjustTone,
-                    params: [cloneCanvas(layerStack[activeIndex].bitmap), cacheDepthCanvas, cpS, cp1, cp2, cpE]
+                    params: [
+                      cloneCanvas(layerStack[activeIndex].bitmap),
+                      cacheDepthCanvas || memoryDepthCanvas,
+                      cpS,
+                      cp1,
+                      cp2,
+                      cpE
+                    ]
                   }
                 });
               }

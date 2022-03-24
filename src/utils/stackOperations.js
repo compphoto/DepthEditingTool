@@ -10,7 +10,7 @@ export const runRgbOperations = image => {
   let stack = store.getState().image.operationStack["rgbStack"];
   let data = {};
   stack.forEach((element, index) => {
-    if (index === stack.length - 1) {
+    if (stack.length > 1 && index === stack.length - 1) {
       data = {
         ...data,
         cacheRgbCanvas: cloneCanvas(displayRgbCanvas)

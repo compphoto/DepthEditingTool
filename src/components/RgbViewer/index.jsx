@@ -85,17 +85,18 @@ class RgbViewer extends Component {
     // If operation is added to the stack, rerun all operations in operation stack
     if (prevProps.operationStack.rgbStack !== operationStack.rgbStack) {
       if (mainRgbCanvas) {
-        let prevStack = prevProps.operationStack.rgbStack;
-        let currentStack = operationStack.rgbStack;
-        if (
-          prevStack.length > 1 &&
-          currentStack.length > 1 &&
-          prevStack[prevStack.length - 1].func.toString() === currentStack[currentStack.length - 1].func.toString()
-        ) {
-          runCachedRgbOperations(mainRgbCanvas);
-        } else {
-          runRgbOperations(mainRgbCanvas);
-        }
+        runRgbOperations(mainRgbCanvas);
+        // let prevStack = prevProps.operationStack.rgbStack;
+        // let currentStack = operationStack.rgbStack;
+        // if (
+        //   prevStack.length > 1 &&
+        //   currentStack.length > 1 &&
+        //   prevStack[prevStack.length - 1].func.toString() === currentStack[currentStack.length - 1].func.toString()
+        // ) {
+        //   runCachedRgbOperations(mainRgbCanvas);
+        // } else {
+        //   runRgbOperations(mainRgbCanvas);
+        // }
       }
     }
     if (
