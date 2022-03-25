@@ -12,7 +12,7 @@ const initialState = {
   memoryDepthCanvas: null,
   displayDepthCanvas: null,
   cacheDepthCanvas: null,
-  isEffectNew: false,
+  isEffectNew: true,
   prevRgbSize: { width: null, height: null },
   prevDepthSize: { width: null, height: null },
   rgbBitmapCanvas: null,
@@ -386,6 +386,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       ) {
         state.operationStack[name].pop();
       } else {
+        console.warn("use cache");
         isEffectNew = true;
         cacheDepthCanvas = cloneCanvas(state.memoryDepthCanvas);
       }
