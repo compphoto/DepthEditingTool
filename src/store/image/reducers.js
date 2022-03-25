@@ -379,14 +379,18 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       };
     case types.ADD_EFFECT:
       var { name, value } = payload;
+      var cacheDepthCanvas = state.cacheDepthCanvas;
       if (
         state.operationStack[name].length !== 0 &&
         state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString()
       ) {
         state.operationStack[name].pop();
+      } else {
+        cacheDepthCanvas = cloneCanvas(state.memoryDepthCanvas);
       }
       return {
         ...state,
+        cacheDepthCanvas,
         operationStack: {
           ...state.operationStack,
           [name]: [...state.operationStack[name], { ...value, type: "effect" }]

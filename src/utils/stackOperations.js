@@ -8,20 +8,12 @@ export const runRgbOperations = image => {
   displayRgbCanvas.height = image.height;
   const cachedRgbContext = displayRgbCanvas.getContext("2d");
   let stack = store.getState().image.operationStack["rgbStack"];
-  let data = {};
-  stack.forEach((element, index) => {
-    if (stack.length > 1 && index === stack.length - 1) {
-      data = {
-        ...data,
-        cacheRgbCanvas: cloneCanvas(displayRgbCanvas)
-      };
-    }
+  stack.forEach(element => {
     element.params ? element.func(image, cachedRgbContext, ...element.params) : element.func(image, cachedRgbContext);
   });
   const storeAction = require("store/store");
   const rgbBitmapCanvas = store.getState().image.rgbBitmapCanvas;
-  data = {
-    ...data,
+  let data = {
     displayRgbCanvas: cloneCanvas(displayRgbCanvas),
     rgbBitmapCanvas: rgbBitmapCanvas === null ? cloneCanvas(displayRgbCanvas) : rgbBitmapCanvas
   };
@@ -53,26 +45,18 @@ export const runDepthOperations = image => {
   const memoryDepthContext = memoryDepthCanvas.getContext("2d");
   const displayDepthContext = displayDepthCanvas.getContext("2d");
   let stack = store.getState().image.operationStack["depthStack"];
-  let data = {};
-  stack.forEach((element, index) => {
+  stack.forEach(element => {
     element.params
       ? element.func(image, displayDepthContext, ...element.params)
       : element.func(image, displayDepthContext);
     if (element.type === "effect") {
-      if (stack.length > 1 && index === stack.length - 1) {
-        data = {
-          ...data,
-          cacheDepthCanvas: cloneCanvas(memoryDepthCanvas)
-        };
-      }
       element.params
         ? element.func(image, memoryDepthContext, ...element.params)
         : element.func(image, memoryDepthContext);
     }
   });
   const storeAction = require("store/store");
-  data = {
-    ...data,
+  let data = {
     memoryDepthCanvas: cloneCanvas(memoryDepthCanvas),
     displayDepthCanvas: cloneCanvas(displayDepthCanvas)
   };
