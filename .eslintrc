@@ -16,7 +16,7 @@
   "extends": ["plugin:react/recommended", "plugin:prettier/recommended"],
   "rules": {
     "prettier/prettier": ["error", { "endOfLine": "auto" }],
-    // "no-console": ["error", { "allow": ["warn", "error"] }],
+    "no-console": ["error", { "allow": ["warn", "error"] }],
     "react/prop-types": 0,
     "react/display-name": "off"
   }

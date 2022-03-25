@@ -76,7 +76,6 @@ class DepthViewer extends Component {
         if (Math.max(depthImage.height, depthImage.width) > 1000) {
           depthImage = canvasResize(depthImage);
         }
-        console.warn(depthImage.height, depthImage.width);
         initDepth(cloneCanvas(depthImage));
       };
     }
@@ -235,8 +234,6 @@ class DepthViewer extends Component {
           scale
         );
         let [image_x1, image_y1, image_x2, image_y2] = depthCanvasDimension;
-        console.warn("X ", x, " X Dimension", image_x1, " ", image_x2);
-        console.warn("Y ", y, " Y Dimension", image_y1, " ", image_y2);
         let new_x = Math.max(Math.min(initBoundingBox.x, x), image_x1);
         let new_y = Math.max(Math.min(initBoundingBox.y, y), image_y1);
         let new_w = Math.min(Math.max(initBoundingBox.x, x), image_x2) - new_x;

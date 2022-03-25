@@ -62,7 +62,6 @@ class RgbViewer extends Component {
         if (Math.max(rgbImage.height, rgbImage.width) > 1000) {
           rgbImage = canvasResize(rgbImage);
         }
-        console.warn(rgbImage.height, rgbImage.width);
         initRgb(cloneCanvas(rgbImage));
       };
     }
