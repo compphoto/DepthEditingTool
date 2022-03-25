@@ -15,7 +15,7 @@ import {
   getRatio,
   highlightPixelAreaRgb
 } from "utils/canvasUtils";
-import { runCachedRgbOperations, runRgbOperations } from "utils/stackOperations";
+import { runRgbOperations } from "utils/stackOperations";
 import { SelectionBox } from "config/toolBox";
 
 let objectUrl = null;
@@ -86,17 +86,6 @@ class RgbViewer extends Component {
     if (prevProps.operationStack.rgbStack !== operationStack.rgbStack) {
       if (mainRgbCanvas) {
         runRgbOperations(mainRgbCanvas);
-        // let prevStack = prevProps.operationStack.rgbStack;
-        // let currentStack = operationStack.rgbStack;
-        // if (
-        //   prevStack.length > 1 &&
-        //   currentStack.length > 1 &&
-        //   prevStack[prevStack.length - 1].func.toString() === currentStack[currentStack.length - 1].func.toString()
-        // ) {
-        //   runCachedRgbOperations(mainRgbCanvas);
-        // } else {
-        //   runRgbOperations(mainRgbCanvas);
-        // }
       }
     }
     if (

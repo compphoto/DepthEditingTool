@@ -11,8 +11,8 @@ const initialState = {
   displayRgbCanvas: null,
   memoryDepthCanvas: null,
   displayDepthCanvas: null,
-  cacheRgbCanvas: null,
   cacheDepthCanvas: null,
+  isEffectNew: false,
   prevRgbSize: { width: null, height: null },
   prevDepthSize: { width: null, height: null },
   rgbBitmapCanvas: null,
@@ -112,7 +112,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         ...state,
         mainRgbCanvas: payload,
         displayRgbCanvas: null,
-        cacheRgbCanvas: null,
         prevRgbSize: { width: null, height: null },
         rgbBitmapCanvas: null,
         rgbScaleParams: rgbScaleParams,
@@ -379,14 +378,21 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       };
     case types.ADD_EFFECT:
       var { name, value } = payload;
+      var cacheDepthCanvas = state.cacheDepthCanvas;
+      var isEffectNew = false;
       if (
         state.operationStack[name].length !== 0 &&
         state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString()
       ) {
         state.operationStack[name].pop();
+      } else {
+        isEffectNew = true;
+        cacheDepthCanvas = cloneCanvas(state.memoryDepthCanvas);
       }
       return {
         ...state,
+        cacheDepthCanvas,
+        isEffectNew,
         operationStack: {
           ...state.operationStack,
           [name]: [...state.operationStack[name], { ...value, type: "effect" }]
