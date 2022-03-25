@@ -6,31 +6,16 @@ export const runRgbOperations = image => {
   const displayRgbCanvas = document.createElement("canvas");
   displayRgbCanvas.width = image.width;
   displayRgbCanvas.height = image.height;
-  const cachedRgbContext = displayRgbCanvas.getContext("2d");
+  const displayRgbContext = displayRgbCanvas.getContext("2d");
   let stack = store.getState().image.operationStack["rgbStack"];
   stack.forEach(element => {
-    element.params ? element.func(image, cachedRgbContext, ...element.params) : element.func(image, cachedRgbContext);
+    element.params ? element.func(image, displayRgbContext, ...element.params) : element.func(image, displayRgbContext);
   });
   const storeAction = require("store/store");
   const rgbBitmapCanvas = store.getState().image.rgbBitmapCanvas;
   let data = {
     displayRgbCanvas: cloneCanvas(displayRgbCanvas),
     rgbBitmapCanvas: rgbBitmapCanvas === null ? cloneCanvas(displayRgbCanvas) : rgbBitmapCanvas
-  };
-  storeAction.default.dispatch(imageActions.initImage(data));
-};
-
-export const runCachedRgbOperations = image => {
-  const displayRgbCanvas = cloneCanvas(store.getState().image.cacheRgbCanvas);
-  const displayRgbContext = displayRgbCanvas.getContext("2d");
-  let stack = store.getState().image.operationStack["rgbStack"];
-  const lastOperation = stack[stack.length - 1];
-  lastOperation.params
-    ? lastOperation.func(image, displayRgbContext, ...lastOperation.params)
-    : lastOperation.func(image, displayRgbContext);
-  const storeAction = require("store/store");
-  let data = {
-    displayRgbCanvas: displayRgbCanvas
   };
   storeAction.default.dispatch(imageActions.initImage(data));
 };
