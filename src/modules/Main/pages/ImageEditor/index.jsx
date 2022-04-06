@@ -2,20 +2,31 @@ import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
+import { djangoActions } from "store/django";
+import { selectors as djangoSelectors } from "store/django";
 import { Helmet } from "react-helmet";
 import { Container, Button, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
-import { ImUndo2 } from "react-icons/im";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
-import { cloneCanvas, downloadCanvas, maskToImage } from "utils/canvasUtils";
-import {} from "utils/stackOperations";
+import { canvasToImage, cloneCanvas, downloadCanvas, getGroundMask, maskToImage } from "utils/canvasUtils";
 import { getImageUrl } from "utils/getImageFromFile";
 
 let objectUrl = null;
 
+function arrayBufferToBase64(buffer) {
+  var binary = "";
+  var bytes = new Uint8Array(buffer);
+  var len = bytes.byteLength;
+  for (var i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
+}
+
 export function ImageEditor({
+  groundImage,
   selectionImageUrl,
   maskImageUrl,
   mainRgbCanvas,
@@ -28,7 +39,8 @@ export function ImageEditor({
   clear,
   reset,
   handleChange,
-  updateLayer
+  updateLayer,
+  getGround
 }) {
   const onHandleChange = e => {
     handleChange(e);
@@ -61,6 +73,17 @@ export function ImageEditor({
       };
     }
   }, [maskImageUrl]);
+  useEffect(() => {
+    if (groundImage) {
+      let groundMaskImage = new Image();
+      groundMaskImage.src = "data:image/png;base64," + arrayBufferToBase64(groundImage);
+      groundMaskImage.onload = () => {
+        let rectangle = [0, 384, 768, 384];
+        let groundMaskBitmap = getGroundMask(groundMaskImage, mainDepthCanvas, rectangle);
+        updateLayer({ index: operationStack.activeIndex, value: { bitmap: groundMaskBitmap, toolsParameters: null } });
+      };
+    }
+  }, [groundImage]);
   return (
     <ImageEditorStyle>
       <Helmet>
@@ -198,6 +221,24 @@ export function ImageEditor({
               >
                 <AiOutlinePlus />
               </Button>
+              <Button
+                disabled={memoryDepthCanvas === null}
+                onClick={() => {
+                  let points =
+                    "[(366, 35, 0.8431372549019608),(166, 35, 0.47843137254901963),(66, 100, 0.33725490196078434),(316, 200, 0.7411764705882353),(216, 300, 0.38823529411764707),(266, 500, 0.5764705882352941),(166, 750, 0.3254901960784314)]";
+                  let formData = new FormData();
+                  formData.append("image", canvasToImage(memoryDepthCanvas));
+                  formData.append("rectangle", "(0, 384, 768, 384)");
+                  formData.append("points", points);
+                  formData.append("z_length", 250);
+                  formData.append("threshold", 1);
+                  getGround(formData);
+                }}
+                size="sm"
+                color="primary"
+              >
+                Test Estimate
+              </Button>
             </div>
           </div>
         </Container>
@@ -214,6 +255,7 @@ export function ImageEditor({
 }
 
 const mapStateToProps = state => ({
+  groundImage: djangoSelectors.groundImage(state),
   selectionImageUrl: imageSelectors.selectionImageUrl(state),
   maskImageUrl: imageSelectors.maskImageUrl(state),
   mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
@@ -223,6 +265,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
+  getGround: djangoActions.getGround,
   handleChange: imageActions.handleChange,
   updateLayer: imageActions.updateLayer,
   addEffect: imageActions.addEffect,
