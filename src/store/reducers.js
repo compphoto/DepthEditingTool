@@ -1,10 +1,10 @@
 import { combineReducers } from "redux";
-import { testReducer } from "./test";
+import { djangoReducer } from "./django";
 import { toolExtReducer } from "./toolext";
 import { imageReducer } from "./image";
 
 const appReducer = combineReducers({
-  test: testReducer,
+  django: djangoReducer,
   toolExt: toolExtReducer,
   image: imageReducer
 });

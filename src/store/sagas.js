@@ -1,6 +1,6 @@
 import { all } from "redux-saga/effects";
-import { testSagas } from "./test";
+import { djangoSagas } from "./django";
 
 export default function* sagas() {
-  yield all([...testSagas]);
+  yield all([...djangoSagas]);
 }
