@@ -223,6 +223,9 @@ const SidePaneStyle = styled.div`
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            .tool-ext-selection-title {
+              margin: 1.5rem 0 0.5rem 0;
+            }
             .tool-ext-selection-image-card {
               background: #1e1f22;
               width: 100%;
@@ -244,7 +247,6 @@ const SidePaneStyle = styled.div`
               width: 100%;
               display: flex;
               flex-wrap: wrap;
-              margin-bottom: 2rem;
               .selection-tool {
                 flex-shrink: 0;
                 width: 50px;

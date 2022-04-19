@@ -55,3 +55,20 @@ export const SelectionBox = {
     func: null
   }
 };
+
+export const GroundBox = {
+  rectangleTool: {
+    name: "Ground Area",
+    icon: <MdCropDin />,
+    tooltip: "ground area",
+    type: "boundingBox",
+    func: null
+  },
+  scribbleTool: {
+    name: "Scribble",
+    icon: <ImPencil />,
+    tooltip: "scribble",
+    type: "scribble",
+    func: null
+  }
+};

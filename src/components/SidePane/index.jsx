@@ -1,5 +1,6 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { connect } from "react-redux";
+import { djangoActions } from "store/django";
 import { toolExtActions } from "store/toolext";
 import { imageActions } from "store/image";
 import { selectors as toolExtSelectors } from "store/toolext";
@@ -23,7 +24,7 @@ import {
   downloadCanvas
 } from "utils/canvasUtils";
 import PointCurve from "components/PointCurve";
-import { SelectionBox } from "config/toolBox";
+import { GroundBox, SelectionBox } from "config/toolBox";
 
 export function SidePane({
   toolExtOpen,
@@ -33,12 +34,17 @@ export function SidePane({
   cacheDepthCanvas,
   displayRgbCanvas,
   tools,
+  groundTools,
   toolsParameters,
   parameters,
+  groundParams,
   operationStack,
   selectTool,
+  selectGroundTool,
   initImage,
   storeToolParameters,
+  storeGroundParams,
+  storeScribbleParams,
   addEffect,
   addLayer,
   updateLayerIndex,
@@ -46,7 +52,9 @@ export function SidePane({
   duplicateLayer,
   removeLayer,
   removeAllLayers,
-  clear
+  clear,
+  getGround,
+  setRectangle
 }) {
   const [activeTool, setActiveTool] = useState(0);
   const [layers, setLayers] = useState(null);
@@ -259,21 +267,24 @@ export function SidePane({
                       selectTool(key);
                     }
                   }}
-                  id={`tooltip-${index}`}
+                  id={`tool-tooltip-${index}`}
                   className={
                     tools[key] && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
                   }
                 >
                   {SelectionBox[key].icon}
-                  <UncontrolledTooltip placement="bottom" target={`tooltip-${index}`}>
+                  <UncontrolledTooltip placement="bottom" target={`tool-tooltip-${index}`}>
                     {SelectionBox[key].tooltip}
                   </UncontrolledTooltip>
                 </div>
               ))}
             </div>
-            <div className="d-flex">
+            <div className="d-flex my-2">
               <Button
-                disabled={tools.currentTool && SelectionBox[tools.currentTool].type !== "boundingBox"}
+                disabled={
+                  (tools.currentTool && SelectionBox[tools.currentTool].type !== "boundingBox") ||
+                  groundTools.currentTool
+                }
                 size="sm"
                 className="mx-2"
                 color="secondary"
@@ -297,6 +308,56 @@ export function SidePane({
                 onClick={() => {}}
               >
                 Clear
+              </Button>
+            </div>
+            <p className="tool-ext-selection-title">Ground Selection</p>
+            <div disabled={operationStack.activeIndex <= 0} className="tool-ext-selection-icons">
+              {Object.keys(GroundBox).map((key, index) => (
+                <div
+                  key={index}
+                  onClick={() => {
+                    if (memoryDepthCanvas) {
+                      selectGroundTool(key);
+                    }
+                  }}
+                  id={`ground-tooltip-${index}`}
+                  className={
+                    groundTools[key] && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
+                  }
+                >
+                  {GroundBox[key].icon}
+                  <UncontrolledTooltip placement="bottom" target={`ground-tooltip-${index}`}>
+                    {GroundBox[key].tooltip}
+                  </UncontrolledTooltip>
+                </div>
+              ))}
+            </div>
+            <div className="d-flex my-2">
+              <Button
+                disabled={!memoryDepthCanvas || tools.currentTool} // should also be disabled if no ground params
+                size="sm"
+                className="mx-2"
+                color="secondary"
+                onClick={() => {
+                  let rectangle = groundParams["rectangle"];
+                  let points = groundParams["path"];
+                  let formData = new FormData();
+                  formData.append("image", canvasToImage(memoryDepthCanvas));
+                  formData.append("rectangle", JSON.stringify(rectangle));
+                  formData.append("points", JSON.stringify(points));
+                  formData.append("z_length", 250);
+                  formData.append("threshold", 1);
+                  storeGroundParams({ rectangle: null, path: null });
+                  storeScribbleParams({
+                    pos: { x: 0, y: 0 },
+                    offset: {},
+                    path: []
+                  });
+                  setRectangle(rectangle);
+                  getGround(formData);
+                }}
+              >
+                Estimate Ground
               </Button>
             </div>
           </div>
@@ -552,18 +613,25 @@ const mapStateToProps = state => ({
   cacheDepthCanvas: imageSelectors.cacheDepthCanvas(state),
   rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
   tools: imageSelectors.tools(state),
+  groundTools: imageSelectors.groundTools(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),
+  groundParams: imageSelectors.groundParams(state),
   operationStack: imageSelectors.operationStack(state)
 });
 
 const mapDispatchToProps = {
+  getGround: djangoActions.getGround,
+  setRectangle: djangoActions.setRectangle,
   toolExtActions: toolExtActions.toggleToolExt,
   initImage: imageActions.initImage,
   selectTool: imageActions.selectTool,
+  selectGroundTool: imageActions.selectGroundTool,
   addEffect: imageActions.addEffect,
   removeOperation: imageActions.removeOperation,
   storeParameters: imageActions.storeParameters,
+  storeGroundParams: imageActions.storeGroundParams,
+  storeScribbleParams: imageActions.storeScribbleParams,
   addLayer: imageActions.addLayer,
   updateLayerIndex: imageActions.updateLayerIndex,
   updateLayer: imageActions.updateLayer,

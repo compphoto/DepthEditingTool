@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import RgbViewerStyle from "./style";
-import { getImageUrl } from "utils/getImageFromFile";
+import { getImageUrl } from "utils/generalUtils";
 import {
   canvasResize,
   cloneCanvas,
