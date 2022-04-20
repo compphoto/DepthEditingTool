@@ -54,6 +54,7 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   return (
     <ThreeDViewerStyle>
       <div className="v-slider">
+        Y
         <Input onChange={onHandleChange} id="vAngle" name="vAngle" orient="vertical" min="-45" max="45" type="range" />
       </div>
       <div className="x-div">
@@ -67,6 +68,7 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
             max="100"
             type="range"
           />
+          F
         </div>
         <Canvas>
           <Camera fov={75} near={0.1} far={100} position={[0, 0, 2]} focalLength={focalLength} />
@@ -87,10 +89,11 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
           </Suspense>
         </Canvas>
         <div className="x-slider">
-          <Input onChange={onHandleChange} id="hAngle" name="hAngle" min="-45" max="45" type="range" />
+          <Input onChange={onHandleChange} id="hAngle" name="hAngle" min="-45" max="45" type="range" />X
         </div>
       </div>
       <div className="v-slider">
+        D
         <Input
           onChange={onHandleChange}
           value={displacementScale}

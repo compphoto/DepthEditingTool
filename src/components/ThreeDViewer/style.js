@@ -7,6 +7,7 @@ const ThreeDViewerStyle = styled.div`
   .v-slider {
     width: 10%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     input[type="range"][orient="vertical"] {
