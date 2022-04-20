@@ -25,6 +25,7 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   const [colorMap, setColorMap] = useState(false);
   const [displacementMap, setDisplacementMap] = useState(false);
   const [focalLength, setFocalLength] = useState(35);
+  const [displacementScale, setDisplacementScale] = useState(0.7);
   const [angle, setAngle] = useState({
     hAngle: 0,
     vAngle: 0
@@ -33,6 +34,8 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
     let { name, value } = e.target;
     if (name === "focalLength") {
       setFocalLength(+value);
+    } else if (name === "displacementScale") {
+      setDisplacementScale(+value);
     } else {
       setAngle({ ...angle, [name]: (value / 180) * Math.PI });
     }
@@ -61,7 +64,7 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
             id="focalLength"
             name="focalLength"
             min="3"
-            max="150"
+            max="100"
             type="range"
           />
         </div>
@@ -77,7 +80,7 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
                   side={DoubleSide}
                   map={colorMap}
                   displacementMap={displacementMap}
-                  displacementScale={0.7}
+                  displacementScale={displacementScale}
                 />
               </mesh>
             </group>
@@ -86,6 +89,19 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
         <div className="x-slider">
           <Input onChange={onHandleChange} id="hAngle" name="hAngle" min="-45" max="45" type="range" />
         </div>
+      </div>
+      <div className="v-slider">
+        <Input
+          onChange={onHandleChange}
+          value={displacementScale}
+          id="displacementScale"
+          name="displacementScale"
+          orient="vertical"
+          min="0.5"
+          max="3"
+          step="0.1"
+          type="range"
+        />
       </div>
     </ThreeDViewerStyle>
   );
