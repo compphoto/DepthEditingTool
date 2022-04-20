@@ -68,7 +68,7 @@ const initialState = {
   toolsParameters: {
     disparity: 0,
     scale: 1,
-    aConstant: 0,
+    aConstant: 1,
     bConstant: 0
   },
   parameters: {
@@ -180,7 +180,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         toolsParameters: {
           disparity: 0,
           scale: 1,
-          aConstant: 0,
+          aConstant: 1,
           bConstant: 0
         },
         parameters: {
@@ -335,7 +335,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
               toolsParameters: {
                 disparity: 0,
                 scale: 1,
-                aConstant: 0,
+                aConstant: 1,
                 bConstant: 0
               }
             }
@@ -351,7 +351,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           toolsParameters: {
             disparity: 0,
             scale: 1,
-            aConstant: 0,
+            aConstant: 1,
             bConstant: 0
           }
         }

@@ -61,7 +61,7 @@ export function SidePane({
   const [tempToolsParams, setTempToolsParams] = useState({
     disparity: 0,
     scale: 1,
-    aConstant: 0,
+    aConstant: 1,
     bConstant: 0
   });
 
