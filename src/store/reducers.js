@@ -10,9 +10,6 @@ const appReducer = combineReducers({
 });
 
 const rootReducer = (state, action) => {
-  if (action.type === "AUTH_FAIL") {
-    return (state = undefined);
-  }
   return appReducer(state, action);
 };
 
