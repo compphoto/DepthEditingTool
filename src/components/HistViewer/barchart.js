@@ -8,6 +8,7 @@ class BarChart extends React.Component {
       labels: data.map((val, i) => i),
       datasets: [
         {
+          label: "Depth Count",
           backgroundColor: data.map((val, i) =>
             i >= highlight[0] && i <= highlight[1] ? "rgba(135, 206, 235, 1)" : "rgba(255, 99, 132, 0.2)"
           ),
