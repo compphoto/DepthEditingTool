@@ -1,10 +1,17 @@
-# Getting Started with Create React App
+# Interactive editing of Monocular Depths
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This folder contains the following subdirectories:
 
-## Setup
+- `DepthEditingTool`: This contains the source files for the web editing application.
+- `sample_images`: This contains 3 sample RGB images with their corresponding depth maps for test purposes.
 
-### Node Installation
+## Setting up the interface
+
+This application requires NodeJs to run. Follow the installation guide below to setup Nodejs and its dependencies.
+
+NOTE: This application runs only on the web browser and does not interact with a backend server.
+
+### Installation
 
 Download and install Nodejs from the [official website](https://nodejs.org/en/download/).
 <br>
@@ -22,35 +29,11 @@ Run the following scripts on the terminal to setup `yarn`:
 
 ## Available Scripts
 
-In the project directory, you can run:
+In the `DepthEditingTool` directory, you can run:
 
 ### `yarn install` or `yarn`
 
-Download node modules for the depth editing application.
-
-### `yarn start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `yarn start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `yarn start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+This command downloads the node module dependencies for the depth editing application.
 
 ### `yarn start`
 
@@ -62,8 +45,12 @@ You will also see any lint errors in the console.
 
 ## Issues
 
-Yarn breaks for Nodejs 17.
+`Yarn` breaks for Nodejs 17.
 
 ### Solution
 
 Run `export NODE_OPTIONS=--openssl-legacy-provider` on the terminal.
+
+<br>
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
