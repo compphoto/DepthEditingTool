@@ -7,15 +7,18 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ### Node Installation
 
 Download and install Nodejs from the [official website](https://nodejs.org/en/download/).
+<br>
 Test if installation was successful by running the following on the terminal:
-`node -v` - The system should display the Node.js version installed on your system
-`npm -v` - The system should display the NPM version installed on your system
+
+- `node -v`: The system should display the Node.js version installed on your system
+- `npm -v`: The system should display the NPM version installed on your system
 
 ### Yarn Setup
 
 Run the following scripts on the terminal to setup `yarn`:
-`npm install -g npm` - Setup `npm` globally
-`npm install --global yarn` - Setup `yarn` globally
+
+- `npm install -g npm`: Setup `npm` globally
+- `npm install --global yarn`: Setup `yarn` globally
 
 ## Available Scripts
 
