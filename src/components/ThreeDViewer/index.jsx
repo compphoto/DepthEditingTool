@@ -25,6 +25,7 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   const [colorMap, setColorMap] = useState(false);
   const [displacementMap, setDisplacementMap] = useState(false);
   const [focalLength, setFocalLength] = useState(35);
+  const [displacementScale, setDisplacementScale] = useState(0.7);
   const [angle, setAngle] = useState({
     hAngle: 0,
     vAngle: 0
@@ -33,6 +34,8 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
     let { name, value } = e.target;
     if (name === "focalLength") {
       setFocalLength(+value);
+    } else if (name === "displacementScale") {
+      setDisplacementScale(+value);
     } else {
       setAngle({ ...angle, [name]: (value / 180) * Math.PI });
     }
@@ -51,6 +54,7 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   return (
     <ThreeDViewerStyle>
       <div className="v-slider">
+        Y
         <Input onChange={onHandleChange} id="vAngle" name="vAngle" orient="vertical" min="-45" max="45" type="range" />
       </div>
       <div className="x-div">
@@ -61,9 +65,10 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
             id="focalLength"
             name="focalLength"
             min="3"
-            max="150"
+            max="100"
             type="range"
           />
+          F
         </div>
         <Canvas>
           <Camera fov={75} near={0.1} far={100} position={[0, 0, 2]} focalLength={focalLength} />
@@ -77,15 +82,29 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
                   side={DoubleSide}
                   map={colorMap}
                   displacementMap={displacementMap}
-                  displacementScale={0.7}
+                  displacementScale={displacementScale}
                 />
               </mesh>
             </group>
           </Suspense>
         </Canvas>
         <div className="x-slider">
-          <Input onChange={onHandleChange} id="hAngle" name="hAngle" min="-45" max="45" type="range" />
+          <Input onChange={onHandleChange} id="hAngle" name="hAngle" min="-45" max="45" type="range" />X
         </div>
+      </div>
+      <div className="v-slider">
+        D
+        <Input
+          onChange={onHandleChange}
+          value={displacementScale}
+          id="displacementScale"
+          name="displacementScale"
+          orient="vertical"
+          min="0.5"
+          max="3"
+          step="0.1"
+          type="range"
+        />
       </div>
     </ThreeDViewerStyle>
   );

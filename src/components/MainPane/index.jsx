@@ -3,15 +3,11 @@ import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as toolExtSelectors } from "store/toolext";
 import { selectors as imageSelectors } from "store/image";
-import { Button } from "reactstrap";
-import { AiOutlinePlus } from "react-icons/ai";
-import { RiDeleteBin5Fill } from "react-icons/ri";
 import DepthViewer from "components/DepthViewer";
 import RgbViewer from "components/RgbViewer";
 import HistViewer from "components/HistViewer";
 import ThreeDViewer from "components/ThreeDViewer";
 import MainPaneStyle from "./style";
-import { getImageUrl } from "utils/getImageFromFile";
 import { canvasToImage, cropCanvas } from "utils/canvasUtils";
 
 class MainPane extends Component {

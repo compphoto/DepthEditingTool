@@ -56,10 +56,19 @@ const initialState = {
     panTool: false,
     scribbleTool: false
   },
+  groundTools: {
+    currentTool: null,
+    rectangleTool: false,
+    scribbleTool: false
+  },
+  groundParams: {
+    rectangle: null,
+    path: null
+  },
   toolsParameters: {
     disparity: 0,
     scale: 1,
-    aConstant: 0,
+    aConstant: 1,
     bConstant: 0
   },
   parameters: {
@@ -159,10 +168,19 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           panTool: false,
           scribbleTool: false
         },
+        groundTools: {
+          currentTool: null,
+          rectangleTool: false,
+          scribbleTool: false
+        },
+        groundParams: {
+          rectangle: null,
+          path: null
+        },
         toolsParameters: {
           disparity: 0,
           scale: 1,
-          aConstant: 0,
+          aConstant: 1,
           bConstant: 0
         },
         parameters: {
@@ -190,6 +208,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
             ...state.tools,
             currentTool: null,
             [payload]: false
+          },
+          groundTools: {
+            currentTool: null,
+            rectangleTool: false,
+            scribbleTool: false
           }
         };
       }
@@ -207,7 +230,58 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           };
       return {
         ...state,
-        tools: newTools
+        tools: newTools,
+        groundTools: {
+          currentTool: null,
+          rectangleTool: false,
+          scribbleTool: false
+        }
+      };
+    case types.SELECT_GROUND_TOOL:
+      var prevTool = state.groundTools.currentTool;
+      if (prevTool === payload) {
+        return {
+          ...state,
+          groundTools: {
+            ...state.groundTools,
+            currentTool: null,
+            [payload]: false
+          },
+          tools: {
+            currentTool: null,
+            singleSelection: false,
+            addSelection: false,
+            subtractSelection: false,
+            intersectSelection: false,
+            panTool: false,
+            scribbleTool: false
+          }
+        };
+      }
+      var newGroundTools = prevTool
+        ? {
+            ...state.groundTools,
+            currentTool: payload,
+            [payload]: true,
+            [prevTool]: false
+          }
+        : {
+            ...state.groundTools,
+            currentTool: payload,
+            [payload]: true
+          };
+      return {
+        ...state,
+        groundTools: newGroundTools,
+        tools: {
+          currentTool: null,
+          singleSelection: false,
+          addSelection: false,
+          subtractSelection: false,
+          intersectSelection: false,
+          panTool: false,
+          scribbleTool: false
+        }
       };
     case types.STORE_SCRIBBLE_PARAMS:
       return {
@@ -224,6 +298,14 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         [name]: {
           ...state[name],
           ...value
+        }
+      };
+    case types.STORE_GROUND_PARAMS:
+      return {
+        ...state,
+        groundParams: {
+          ...state.groundParams,
+          ...payload
         }
       };
     case types.STORE_TOOL_PARAMETERS:
@@ -253,7 +335,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
               toolsParameters: {
                 disparity: 0,
                 scale: 1,
-                aConstant: 0,
+                aConstant: 1,
                 bConstant: 0
               }
             }
@@ -269,7 +351,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           toolsParameters: {
             disparity: 0,
             scale: 1,
-            aConstant: 0,
+            aConstant: 1,
             bConstant: 0
           }
         }

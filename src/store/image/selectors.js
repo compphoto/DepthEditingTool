@@ -17,7 +17,9 @@ export const selectors = {
   rgbScaleParams: state => state.image.rgbScaleParams,
   depthScaleParams: state => state.image.depthScaleParams,
   tools: state => state.image.tools,
+  groundTools: state => state.image.groundTools,
   toolsParameters: state => state.image.toolsParameters,
   parameters: state => state.image.parameters,
+  groundParams: state => state.image.groundParams,
   operationStack: state => state.image.operationStack
 };
