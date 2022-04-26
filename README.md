@@ -24,7 +24,7 @@ Run the following scripts on the terminal to setup `yarn`:
 
 In the project directory, you can run:
 
-### `yarn install` OR `yarn`
+### `yarn install` or `yarn`
 
 Download node modules for the depth editing application.
 
