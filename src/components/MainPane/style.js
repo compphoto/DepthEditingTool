@@ -14,7 +14,6 @@ const MainPaneStyle = styled.div`
     .main-row {
       height: 100%;
       width: 100%;
-      overflow: hidden;
       display: flex;
       justify-content: space-between;
       .main-column {
@@ -22,7 +21,8 @@ const MainPaneStyle = styled.div`
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        margin: 10px;
+        padding: 10px;
+        width: 50%;
         .box {
           background-color: #d9dadd;
           margin: 10px;
