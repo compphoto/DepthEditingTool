@@ -398,7 +398,8 @@ export const addScaleShift = (image, context, canvas, depthCanvas, a, b) => {
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
       if (src[i + 3] !== 0) {
-        let output = a * src[i] + 255 * (b / 2);
+        let depth = a * (1 / (src[i] + 1e-9)) + (1 / (255 + 1e-9)) * (b / 2);
+        let output = 1 / depth;
         src[i] = output;
         src[i + 1] = output;
         src[i + 2] = output;
