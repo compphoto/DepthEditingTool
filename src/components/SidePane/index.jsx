@@ -269,7 +269,9 @@ export function SidePane({
                   }}
                   id={`tool-tooltip-${index}`}
                   className={
-                    tools[key] && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
+                    tools.currentTool === key && memoryDepthCanvas
+                      ? "selection-tool selection-tool-active"
+                      : "selection-tool"
                   }
                 >
                   {SelectionBox[key].icon}

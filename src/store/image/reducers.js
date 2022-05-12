@@ -201,36 +201,12 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       };
     case types.SELECT_TOOL:
       var prevTool = state.tools.currentTool;
-      if (prevTool === payload) {
-        return {
-          ...state,
-          tools: {
-            ...state.tools,
-            currentTool: null,
-            [payload]: false
-          },
-          groundTools: {
-            currentTool: null,
-            rectangleTool: false,
-            scribbleTool: false
-          }
-        };
-      }
-      var newTools = prevTool
-        ? {
-            ...state.tools,
-            currentTool: payload,
-            [payload]: true,
-            [prevTool]: false
-          }
-        : {
-            ...state.tools,
-            currentTool: payload,
-            [payload]: true
-          };
       return {
         ...state,
-        tools: newTools,
+        tools: {
+          ...state.tools,
+          currentTool: prevTool === payload ? null : payload
+        },
         groundTools: {
           currentTool: null,
           rectangleTool: false,
