@@ -464,7 +464,9 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       var isEffectNew = false;
       if (
         state.operationStack[name].length !== 0 &&
-        state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString()
+        state.operationStack[name][state.operationStack[name].length - 1].func.name.toString() ===
+          value.func.name.toString() &&
+        state.operationStack[name][state.operationStack[name].length - 1].id === value.id
       ) {
         state.operationStack[name].pop();
       } else {
@@ -478,7 +480,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         isEffectNew,
         operationStack: {
           ...state.operationStack,
-          [name]: [...state.operationStack[name], { ...value, type: "effect" }]
+          [name]: [...state.operationStack[name], { ...value, type: "effect", id: state.operationStack.activeIndex }]
         }
       };
     case types.ZOOM_IN:
