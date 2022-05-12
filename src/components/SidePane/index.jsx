@@ -324,7 +324,9 @@ export function SidePane({
                   }}
                   id={`ground-tooltip-${index}`}
                   className={
-                    groundTools[key] && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
+                    groundTools.currentTool === key && memoryDepthCanvas
+                      ? "selection-tool selection-tool-active"
+                      : "selection-tool"
                   }
                 >
                   {GroundBox[key].icon}

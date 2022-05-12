@@ -215,40 +215,12 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       };
     case types.SELECT_GROUND_TOOL:
       var prevTool = state.groundTools.currentTool;
-      if (prevTool === payload) {
-        return {
-          ...state,
-          groundTools: {
-            ...state.groundTools,
-            currentTool: null,
-            [payload]: false
-          },
-          tools: {
-            currentTool: null,
-            singleSelection: false,
-            addSelection: false,
-            subtractSelection: false,
-            intersectSelection: false,
-            panTool: false,
-            scribbleTool: false
-          }
-        };
-      }
-      var newGroundTools = prevTool
-        ? {
-            ...state.groundTools,
-            currentTool: payload,
-            [payload]: true,
-            [prevTool]: false
-          }
-        : {
-            ...state.groundTools,
-            currentTool: payload,
-            [payload]: true
-          };
       return {
         ...state,
-        groundTools: newGroundTools,
+        groundTools: {
+          ...state.groundTools,
+          currentTool: prevTool === payload ? null : payload
+        },
         tools: {
           currentTool: null,
           singleSelection: false,
