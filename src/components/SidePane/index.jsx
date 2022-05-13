@@ -33,8 +33,8 @@ export function SidePane({
   memoryDepthCanvas,
   cacheDepthCanvas,
   displayRgbCanvas,
-  tools,
-  groundTools,
+  activeDepthTool,
+  activeGroundTool,
   toolsParameters,
   parameters,
   groundParams,
@@ -85,7 +85,7 @@ export function SidePane({
 
   const onModifyBitmap = () => {
     if (memoryDepthCanvas) {
-      if (!tools.currentTool || SelectionBox[tools.currentTool].type === "boundingBox") {
+      if (!activeDepthTool || SelectionBox[activeDepthTool].type === "boundingBox") {
         const { croppedCanvasImage, croppedArea, histogramParams } = parameters;
         const { activeIndex, layerStack } = operationStack;
         if (activeIndex > 0) {
@@ -98,7 +98,7 @@ export function SidePane({
             newArea = getBoundingArea(memoryDepthCanvas);
             newCroppedCanvasImage = cloneCanvas(memoryDepthCanvas);
           }
-          const newBitmapCanvas = SelectionBox[tools.currentTool || "singleSelection"].func(
+          const newBitmapCanvas = SelectionBox[activeDepthTool || "singleSelection"].func(
             cloneCanvas(layerStack[activeIndex].bitmap),
             newCroppedCanvasImage,
             newArea,
@@ -269,7 +269,7 @@ export function SidePane({
                   }}
                   id={`tool-tooltip-${index}`}
                   className={
-                    tools.currentTool === key && memoryDepthCanvas
+                    activeDepthTool === key && memoryDepthCanvas
                       ? "selection-tool selection-tool-active"
                       : "selection-tool"
                   }
@@ -283,10 +283,7 @@ export function SidePane({
             </div>
             <div className="d-flex my-2">
               <Button
-                disabled={
-                  (tools.currentTool && SelectionBox[tools.currentTool].type !== "boundingBox") ||
-                  groundTools.currentTool
-                }
+                disabled={(activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox") || activeGroundTool}
                 size="sm"
                 className="mx-2"
                 color="secondary"
@@ -294,16 +291,16 @@ export function SidePane({
                   onModifyBitmap();
                 }}
               >
-                {tools.singleSelection || tools.addSelection
+                {activeDepthTool === "singleSelection" || activeDepthTool === "addSelection"
                   ? "Add"
-                  : tools.subtractSelection
+                  : activeDepthTool === "subtractSelection"
                   ? "Subtract"
-                  : tools.intersectSelection
+                  : activeDepthTool === "intersectSelection"
                   ? "Intersect"
                   : "Select"}
               </Button>
               <Button
-                disabled={tools.currentTool && SelectionBox[tools.currentTool].type !== "boundingBox"}
+                disabled={activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox"}
                 size="sm"
                 className="mx-2"
                 color="secondary"
@@ -324,7 +321,7 @@ export function SidePane({
                   }}
                   id={`ground-tooltip-${index}`}
                   className={
-                    groundTools.currentTool === key && memoryDepthCanvas
+                    activeGroundTool === key && memoryDepthCanvas
                       ? "selection-tool selection-tool-active"
                       : "selection-tool"
                   }
@@ -338,7 +335,7 @@ export function SidePane({
             </div>
             <div className="d-flex my-2">
               <Button
-                disabled={!memoryDepthCanvas || tools.currentTool} // should also be disabled if no ground params
+                disabled={!memoryDepthCanvas || activeDepthTool} // should also be disabled if no ground params
                 size="sm"
                 className="mx-2"
                 color="secondary"
@@ -616,8 +613,8 @@ const mapStateToProps = state => ({
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   cacheDepthCanvas: imageSelectors.cacheDepthCanvas(state),
   rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
-  tools: imageSelectors.tools(state),
-  groundTools: imageSelectors.groundTools(state),
+  activeDepthTool: imageSelectors.activeDepthTool(state),
+  activeGroundTool: imageSelectors.activeGroundTool(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),
   groundParams: imageSelectors.groundParams(state),

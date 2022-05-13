@@ -149,7 +149,6 @@ class RangeSlider extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  tools: imageSelectors.tools(state),
   parameters: imageSelectors.parameters(state)
 });
 

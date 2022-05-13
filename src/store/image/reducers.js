@@ -47,20 +47,8 @@ const initialState = {
     startDragOffset: {},
     mouseDown: false
   },
-  tools: {
-    currentTool: null,
-    singleSelection: false,
-    addSelection: false,
-    subtractSelection: false,
-    intersectSelection: false,
-    panTool: false,
-    scribbleTool: false
-  },
-  groundTools: {
-    currentTool: null,
-    rectangleTool: false,
-    scribbleTool: false
-  },
+  activeDepthTool: null,
+  activeGroundTool: null,
   groundParams: {
     rectangle: null,
     path: null
@@ -159,20 +147,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           path: []
         },
         depthScaleParams: depthScaleParams,
-        tools: {
-          currentTool: null,
-          singleSelection: false,
-          addSelection: false,
-          subtractSelection: false,
-          intersectSelection: false,
-          panTool: false,
-          scribbleTool: false
-        },
-        groundTools: {
-          currentTool: null,
-          rectangleTool: false,
-          scribbleTool: false
-        },
+        activeDepthTool: null,
+        activeGroundTool: null,
         groundParams: {
           rectangle: null,
           path: null
@@ -200,36 +176,18 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         }
       };
     case types.SELECT_TOOL:
-      var prevTool = state.tools.currentTool;
+      var prevTool = state.activeDepthTool;
       return {
         ...state,
-        tools: {
-          ...state.tools,
-          currentTool: prevTool === payload ? null : payload
-        },
-        groundTools: {
-          currentTool: null,
-          rectangleTool: false,
-          scribbleTool: false
-        }
+        activeDepthTool: prevTool === payload ? null : payload,
+        activeGroundTool: null
       };
     case types.SELECT_GROUND_TOOL:
-      var prevTool = state.groundTools.currentTool;
+      var prevTool = state.activeGroundTool;
       return {
         ...state,
-        groundTools: {
-          ...state.groundTools,
-          currentTool: prevTool === payload ? null : payload
-        },
-        tools: {
-          currentTool: null,
-          singleSelection: false,
-          addSelection: false,
-          subtractSelection: false,
-          intersectSelection: false,
-          panTool: false,
-          scribbleTool: false
-        }
+        activeGroundTool: prevTool === payload ? null : payload,
+        activeDepthTool: null
       };
     case types.STORE_SCRIBBLE_PARAMS:
       return {
