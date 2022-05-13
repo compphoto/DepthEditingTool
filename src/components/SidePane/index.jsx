@@ -283,7 +283,9 @@ export function SidePane({
             </div>
             <div className="d-flex my-2">
               <Button
-                disabled={(activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox") || activeGroundTool}
+                disabled={
+                  (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox") || activeGroundTool !== null
+                }
                 size="sm"
                 className="mx-2"
                 color="secondary"
@@ -335,7 +337,7 @@ export function SidePane({
             </div>
             <div className="d-flex my-2">
               <Button
-                disabled={!memoryDepthCanvas || activeDepthTool} // should also be disabled if no ground params
+                disabled={!memoryDepthCanvas || activeDepthTool !== null} // should also be disabled if no ground params
                 size="sm"
                 className="mx-2"
                 color="secondary"
