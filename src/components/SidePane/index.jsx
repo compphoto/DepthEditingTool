@@ -399,7 +399,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
-                        size="sm"
+                        bsSize="sm"
                         className="tool-ext-input-number"
                         id="disparity"
                         name="disparity"
@@ -432,7 +432,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
-                        size="sm"
+                        bsSize="sm"
                         className="tool-ext-input-number"
                         id="scale"
                         name="scale"
@@ -478,7 +478,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
-                        size="sm"
+                        bsSize="sm"
                         className="tool-ext-input-number"
                         id="aConstant"
                         name="aConstant"
@@ -511,7 +511,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
-                        size="sm"
+                        bsSize="sm"
                         className="tool-ext-input-number"
                         id="bConstant"
                         name="bConstant"
