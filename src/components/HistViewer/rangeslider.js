@@ -73,7 +73,7 @@ class RangeSlider extends React.Component {
             )}
           </Ticks>
         </Slider>
-        <Grid container alignItems="center" justify="space-around" style={{ marginTop: "88px" }}>
+        <Grid container alignItems="center" justifyContent="space-around" style={{ marginTop: "88px" }}>
           <Grid item xs={4} style={{ textAlign: "right" }}>
             <TextField
               variant="outlined"
