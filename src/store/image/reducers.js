@@ -366,6 +366,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       };
     case types.ADD_EFFECT:
       var { name, value } = payload;
+      var params = value.params;
       var cacheDepthCanvas = state.cacheDepthCanvas;
       var isEffectNew = false;
       var currentId = state.operationStack.activeIndex;
@@ -380,13 +381,16 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         isEffectNew = true;
         cacheDepthCanvas = cloneCanvas(state.memoryDepthCanvas);
       }
+      if (Array.isArray(params) && params.length) {
+        params.push(cacheDepthCanvas);
+      }
       return {
         ...state,
         cacheDepthCanvas,
         isEffectNew,
         operationStack: {
           ...state.operationStack,
-          [name]: [...state.operationStack[name], { ...value, type: "effect", id: currentId }]
+          [name]: [...state.operationStack[name], { ...value, params: params, type: "effect", id: currentId }]
         }
       };
     case types.ZOOM_IN:

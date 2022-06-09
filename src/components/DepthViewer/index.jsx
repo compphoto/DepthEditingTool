@@ -92,7 +92,8 @@ class DepthViewer extends Component {
         addEffect({
           name: "depthStack",
           value: {
-            func: drawCanvasImage
+            func: drawCanvasImage,
+            params: []
           }
         });
         initLayer();

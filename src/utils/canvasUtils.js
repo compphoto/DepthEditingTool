@@ -278,7 +278,7 @@ export const invertBitmap = (mainCanvas, bitmapCanvas) => {
   }
 };
 
-export const editHighlightPixelArea = (image, context, canvas, depthCanvas, depth) => {
+export const editHighlightPixelArea = (image, context, canvas, depth, depthCanvas) => {
   if (context && canvas && depthCanvas) {
     const bitmapCanvas = cloneCanvas(canvas);
     const bitmapContext = bitmapCanvas.getContext("2d");
@@ -301,7 +301,7 @@ export const editHighlightPixelArea = (image, context, canvas, depthCanvas, dept
   }
 };
 
-export const scaleSelection = (image, context, canvas, depthCanvas, scale) => {
+export const scaleSelection = (image, context, canvas, scale, depthCanvas) => {
   if (context && canvas && depthCanvas) {
     const bitmapCanvas = cloneCanvas(canvas);
     const bitmapContext = bitmapCanvas.getContext("2d");
@@ -333,7 +333,7 @@ export const scaleSelection = (image, context, canvas, depthCanvas, scale) => {
   }
 };
 
-export const adjustTone = (image, context, canvas, depthCanvas, cpS, cp1, cp2, cpE) => {
+export const adjustTone = (image, context, canvas, cpS, cp1, cp2, cpE, depthCanvas) => {
   function getT(x, cpSx, cp1x, cp2x, cpEx) {
     let a = -cpSx + 3 * cp1x - 3 * cp2x + cpEx;
     let b = 3 * cpSx - 6 * cp1x + 3 * cp2x;
@@ -388,7 +388,7 @@ export const adjustTone = (image, context, canvas, depthCanvas, cpS, cp1, cp2, c
   }
 };
 
-export const addScaleShift = (image, context, canvas, depthCanvas, a, b) => {
+export const addScaleShift = (image, context, canvas, a, b, depthCanvas) => {
   if (context && canvas && depthCanvas) {
     const bitmapCanvas = cloneCanvas(canvas);
     const bitmapContext = bitmapCanvas.getContext("2d");

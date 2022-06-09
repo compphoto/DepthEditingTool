@@ -76,7 +76,8 @@ class RgbViewer extends Component {
         addEffect({
           name: "rgbStack",
           value: {
-            func: drawCanvasImage
+            func: drawCanvasImage,
+            params: []
           }
         });
       }

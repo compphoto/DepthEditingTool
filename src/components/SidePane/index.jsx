@@ -193,19 +193,11 @@ export function SidePane({
   useEffect(() => {
     const { activeIndex, layerStack } = operationStack;
     if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
-      let cacheCanvas = cacheDepthCanvas;
-      if (
-        operationStack["depthStack"].length !== 0 &&
-        operationStack["depthStack"][operationStack["depthStack"].length - 1].func.name.toString() !=
-          "editHighlightPixelArea"
-      ) {
-        cacheCanvas = memoryDepthCanvas;
-      }
       addEffect({
         name: "depthStack",
         value: {
           func: editHighlightPixelArea,
-          params: [cloneCanvas(layerStack[activeIndex].bitmap), cacheCanvas, toolsParameters.disparity]
+          params: [cloneCanvas(layerStack[activeIndex].bitmap), toolsParameters.disparity]
         }
       });
     }
@@ -213,18 +205,11 @@ export function SidePane({
   useEffect(() => {
     const { activeIndex, layerStack } = operationStack;
     if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
-      let cacheCanvas = cacheDepthCanvas;
-      if (
-        operationStack["depthStack"].length !== 0 &&
-        operationStack["depthStack"][operationStack["depthStack"].length - 1].func.name.toString() != "scaleSelection"
-      ) {
-        cacheCanvas = memoryDepthCanvas;
-      }
       addEffect({
         name: "depthStack",
         value: {
           func: scaleSelection,
-          params: [cloneCanvas(layerStack[activeIndex].bitmap), cacheCanvas, toolsParameters.scale]
+          params: [cloneCanvas(layerStack[activeIndex].bitmap), toolsParameters.scale]
         }
       });
     }
@@ -232,23 +217,11 @@ export function SidePane({
   useEffect(() => {
     const { activeIndex, layerStack } = operationStack;
     if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
-      let cacheCanvas = cacheDepthCanvas;
-      if (
-        operationStack["depthStack"].length !== 0 &&
-        operationStack["depthStack"][operationStack["depthStack"].length - 1].func.name.toString() != "addScaleShift"
-      ) {
-        cacheCanvas = memoryDepthCanvas;
-      }
       addEffect({
         name: "depthStack",
         value: {
           func: addScaleShift,
-          params: [
-            cloneCanvas(layerStack[activeIndex].bitmap),
-            cacheCanvas,
-            toolsParameters.aConstant,
-            toolsParameters.bConstant
-          ]
+          params: [cloneCanvas(layerStack[activeIndex].bitmap), toolsParameters.aConstant, toolsParameters.bConstant]
         }
       });
     }
