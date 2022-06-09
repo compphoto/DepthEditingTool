@@ -368,15 +368,15 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       var { name, value } = payload;
       var cacheDepthCanvas = state.cacheDepthCanvas;
       var isEffectNew = false;
+      var currentId = state.operationStack.activeIndex;
       if (
         state.operationStack[name].length !== 0 &&
         state.operationStack[name][state.operationStack[name].length - 1].func.name.toString() ===
           value.func.name.toString() &&
-        state.operationStack[name][state.operationStack[name].length - 1].id === value.id
+        state.operationStack[name][state.operationStack[name].length - 1].id === currentId
       ) {
         state.operationStack[name].pop();
       } else {
-        console.warn("use cache");
         isEffectNew = true;
         cacheDepthCanvas = cloneCanvas(state.memoryDepthCanvas);
       }
@@ -386,7 +386,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         isEffectNew,
         operationStack: {
           ...state.operationStack,
-          [name]: [...state.operationStack[name], { ...value, type: "effect", id: state.operationStack.activeIndex }]
+          [name]: [...state.operationStack[name], { ...value, type: "effect", id: currentId }]
         }
       };
     case types.ZOOM_IN:
