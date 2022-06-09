@@ -23,19 +23,15 @@ class BarChart extends React.Component {
         display: false
       },
       scales: {
-        xAxes: [
-          {
-            display: false
+        xAxes: {
+          display: false
+        },
+        yAxes: {
+          display: false,
+          ticks: {
+            min: 0
           }
-        ],
-        yAxes: [
-          {
-            display: false,
-            ticks: {
-              min: 0
-            }
-          }
-        ]
+        }
       }
     };
     return <Bar data={barData} options={options} />;

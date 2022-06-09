@@ -76,7 +76,8 @@ class RgbViewer extends Component {
         addEffect({
           name: "rgbStack",
           value: {
-            func: drawCanvasImage
+            func: drawCanvasImage,
+            params: []
           }
         });
       }
@@ -157,7 +158,7 @@ class RgbViewer extends Component {
       rgbScaleParams,
       depthScaleParams,
       parameters,
-      tools,
+      activeDepthTool,
       storeScaleParams,
       storeParameters,
       addOperation
@@ -169,8 +170,8 @@ class RgbViewer extends Component {
           height={(window.innerHeight / 1200) * 352}
           ref={rgbImageRef}
           onMouseDown={e => {
-            if (tools.currentTool) {
-              if (SelectionBox[tools.currentTool].type === "pan") {
+            if (activeDepthTool) {
+              if (SelectionBox[activeDepthTool].type === "pan") {
                 storeScaleParams({
                   name: "rgbScaleParams",
                   value: {
@@ -195,8 +196,8 @@ class RgbViewer extends Component {
             }
           }}
           onMouseUp={e => {
-            if (tools.currentTool) {
-              if (SelectionBox[tools.currentTool].type === "pan") {
+            if (activeDepthTool) {
+              if (SelectionBox[activeDepthTool].type === "pan") {
                 rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
                 depthScaleParams.mouseDown &&
                   storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
@@ -204,8 +205,8 @@ class RgbViewer extends Component {
             }
           }}
           onMouseOver={e => {
-            if (tools.currentTool) {
-              if (SelectionBox[tools.currentTool].type === "pan") {
+            if (activeDepthTool) {
+              if (SelectionBox[activeDepthTool].type === "pan") {
                 rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
                 depthScaleParams.mouseDown &&
                   storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
@@ -213,8 +214,8 @@ class RgbViewer extends Component {
             }
           }}
           onMouseOut={e => {
-            if (tools.currentTool) {
-              if (SelectionBox[tools.currentTool].type === "pan") {
+            if (activeDepthTool) {
+              if (SelectionBox[activeDepthTool].type === "pan") {
                 rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
                 depthScaleParams.mouseDown &&
                   storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
@@ -222,8 +223,8 @@ class RgbViewer extends Component {
             }
           }}
           onMouseMove={e => {
-            if (tools.currentTool) {
-              if (SelectionBox[tools.currentTool].type === "pan") {
+            if (activeDepthTool) {
+              if (SelectionBox[activeDepthTool].type === "pan") {
                 if (depthScaleParams.mouseDown) {
                   storeScaleParams({
                     name: "rgbScaleParams",
@@ -263,7 +264,7 @@ const mapStateToProps = state => ({
   rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
   depthScaleParams: imageSelectors.depthScaleParams(state),
-  tools: imageSelectors.tools(state),
+  activeDepthTool: imageSelectors.activeDepthTool(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),
   operationStack: imageSelectors.operationStack(state)

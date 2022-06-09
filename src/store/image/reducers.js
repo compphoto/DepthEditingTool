@@ -47,20 +47,8 @@ const initialState = {
     startDragOffset: {},
     mouseDown: false
   },
-  tools: {
-    currentTool: null,
-    singleSelection: false,
-    addSelection: false,
-    subtractSelection: false,
-    intersectSelection: false,
-    panTool: false,
-    scribbleTool: false
-  },
-  groundTools: {
-    currentTool: null,
-    rectangleTool: false,
-    scribbleTool: false
-  },
+  activeDepthTool: null,
+  activeGroundTool: null,
   groundParams: {
     rectangle: null,
     path: null
@@ -159,20 +147,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           path: []
         },
         depthScaleParams: depthScaleParams,
-        tools: {
-          currentTool: null,
-          singleSelection: false,
-          addSelection: false,
-          subtractSelection: false,
-          intersectSelection: false,
-          panTool: false,
-          scribbleTool: false
-        },
-        groundTools: {
-          currentTool: null,
-          rectangleTool: false,
-          scribbleTool: false
-        },
+        activeDepthTool: null,
+        activeGroundTool: null,
         groundParams: {
           rectangle: null,
           path: null
@@ -200,88 +176,18 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         }
       };
     case types.SELECT_TOOL:
-      var prevTool = state.tools.currentTool;
-      if (prevTool === payload) {
-        return {
-          ...state,
-          tools: {
-            ...state.tools,
-            currentTool: null,
-            [payload]: false
-          },
-          groundTools: {
-            currentTool: null,
-            rectangleTool: false,
-            scribbleTool: false
-          }
-        };
-      }
-      var newTools = prevTool
-        ? {
-            ...state.tools,
-            currentTool: payload,
-            [payload]: true,
-            [prevTool]: false
-          }
-        : {
-            ...state.tools,
-            currentTool: payload,
-            [payload]: true
-          };
+      var prevTool = state.activeDepthTool;
       return {
         ...state,
-        tools: newTools,
-        groundTools: {
-          currentTool: null,
-          rectangleTool: false,
-          scribbleTool: false
-        }
+        activeDepthTool: prevTool === payload ? null : payload,
+        activeGroundTool: null
       };
     case types.SELECT_GROUND_TOOL:
-      var prevTool = state.groundTools.currentTool;
-      if (prevTool === payload) {
-        return {
-          ...state,
-          groundTools: {
-            ...state.groundTools,
-            currentTool: null,
-            [payload]: false
-          },
-          tools: {
-            currentTool: null,
-            singleSelection: false,
-            addSelection: false,
-            subtractSelection: false,
-            intersectSelection: false,
-            panTool: false,
-            scribbleTool: false
-          }
-        };
-      }
-      var newGroundTools = prevTool
-        ? {
-            ...state.groundTools,
-            currentTool: payload,
-            [payload]: true,
-            [prevTool]: false
-          }
-        : {
-            ...state.groundTools,
-            currentTool: payload,
-            [payload]: true
-          };
+      var prevTool = state.activeGroundTool;
       return {
         ...state,
-        groundTools: newGroundTools,
-        tools: {
-          currentTool: null,
-          singleSelection: false,
-          addSelection: false,
-          subtractSelection: false,
-          intersectSelection: false,
-          panTool: false,
-          scribbleTool: false
-        }
+        activeGroundTool: prevTool === payload ? null : payload,
+        activeDepthTool: null
       };
     case types.STORE_SCRIBBLE_PARAMS:
       return {
@@ -460,17 +366,23 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       };
     case types.ADD_EFFECT:
       var { name, value } = payload;
+      var params = value.params;
       var cacheDepthCanvas = state.cacheDepthCanvas;
       var isEffectNew = false;
+      var currentId = state.operationStack.activeIndex;
       if (
         state.operationStack[name].length !== 0 &&
-        state.operationStack[name][state.operationStack[name].length - 1].func.toString() === value.func.toString()
+        state.operationStack[name][state.operationStack[name].length - 1].func.name.toString() ===
+          value.func.name.toString() &&
+        state.operationStack[name][state.operationStack[name].length - 1].id === currentId
       ) {
         state.operationStack[name].pop();
       } else {
-        console.warn("use cache");
         isEffectNew = true;
         cacheDepthCanvas = cloneCanvas(state.memoryDepthCanvas);
+      }
+      if (Array.isArray(params) && params.length) {
+        params.push(cacheDepthCanvas);
       }
       return {
         ...state,
@@ -478,7 +390,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         isEffectNew,
         operationStack: {
           ...state.operationStack,
-          [name]: [...state.operationStack[name], { ...value, type: "effect" }]
+          [name]: [...state.operationStack[name], { ...value, params: params, type: "effect", id: currentId }]
         }
       };
     case types.ZOOM_IN:

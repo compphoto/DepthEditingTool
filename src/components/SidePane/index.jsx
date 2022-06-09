@@ -33,8 +33,8 @@ export function SidePane({
   memoryDepthCanvas,
   cacheDepthCanvas,
   displayRgbCanvas,
-  tools,
-  groundTools,
+  activeDepthTool,
+  activeGroundTool,
   toolsParameters,
   parameters,
   groundParams,
@@ -85,7 +85,7 @@ export function SidePane({
 
   const onModifyBitmap = () => {
     if (memoryDepthCanvas) {
-      if (!tools.currentTool || SelectionBox[tools.currentTool].type === "boundingBox") {
+      if (!activeDepthTool || SelectionBox[activeDepthTool].type === "boundingBox") {
         const { croppedCanvasImage, croppedArea, histogramParams } = parameters;
         const { activeIndex, layerStack } = operationStack;
         if (activeIndex > 0) {
@@ -98,7 +98,7 @@ export function SidePane({
             newArea = getBoundingArea(memoryDepthCanvas);
             newCroppedCanvasImage = cloneCanvas(memoryDepthCanvas);
           }
-          const newBitmapCanvas = SelectionBox[tools.currentTool || "singleSelection"].func(
+          const newBitmapCanvas = SelectionBox[activeDepthTool || "singleSelection"].func(
             cloneCanvas(layerStack[activeIndex].bitmap),
             newCroppedCanvasImage,
             newArea,
@@ -193,19 +193,11 @@ export function SidePane({
   useEffect(() => {
     const { activeIndex, layerStack } = operationStack;
     if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
-      let cacheCanvas = cacheDepthCanvas;
-      if (
-        operationStack["depthStack"].length !== 0 &&
-        operationStack["depthStack"][operationStack["depthStack"].length - 1].func.name.toString() !=
-          "editHighlightPixelArea"
-      ) {
-        cacheCanvas = memoryDepthCanvas;
-      }
       addEffect({
         name: "depthStack",
         value: {
           func: editHighlightPixelArea,
-          params: [cloneCanvas(layerStack[activeIndex].bitmap), cacheCanvas, toolsParameters.disparity]
+          params: [cloneCanvas(layerStack[activeIndex].bitmap), toolsParameters.disparity]
         }
       });
     }
@@ -213,18 +205,11 @@ export function SidePane({
   useEffect(() => {
     const { activeIndex, layerStack } = operationStack;
     if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
-      let cacheCanvas = cacheDepthCanvas;
-      if (
-        operationStack["depthStack"].length !== 0 &&
-        operationStack["depthStack"][operationStack["depthStack"].length - 1].func.name.toString() != "scaleSelection"
-      ) {
-        cacheCanvas = memoryDepthCanvas;
-      }
       addEffect({
         name: "depthStack",
         value: {
           func: scaleSelection,
-          params: [cloneCanvas(layerStack[activeIndex].bitmap), cacheCanvas, toolsParameters.scale]
+          params: [cloneCanvas(layerStack[activeIndex].bitmap), toolsParameters.scale]
         }
       });
     }
@@ -232,23 +217,11 @@ export function SidePane({
   useEffect(() => {
     const { activeIndex, layerStack } = operationStack;
     if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
-      let cacheCanvas = cacheDepthCanvas;
-      if (
-        operationStack["depthStack"].length !== 0 &&
-        operationStack["depthStack"][operationStack["depthStack"].length - 1].func.name.toString() != "addScaleShift"
-      ) {
-        cacheCanvas = memoryDepthCanvas;
-      }
       addEffect({
         name: "depthStack",
         value: {
           func: addScaleShift,
-          params: [
-            cloneCanvas(layerStack[activeIndex].bitmap),
-            cacheCanvas,
-            toolsParameters.aConstant,
-            toolsParameters.bConstant
-          ]
+          params: [cloneCanvas(layerStack[activeIndex].bitmap), toolsParameters.aConstant, toolsParameters.bConstant]
         }
       });
     }
@@ -269,7 +242,9 @@ export function SidePane({
                   }}
                   id={`tool-tooltip-${index}`}
                   className={
-                    tools[key] && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
+                    activeDepthTool === key && memoryDepthCanvas
+                      ? "selection-tool selection-tool-active"
+                      : "selection-tool"
                   }
                 >
                   {SelectionBox[key].icon}
@@ -282,8 +257,7 @@ export function SidePane({
             <div className="d-flex my-2">
               <Button
                 disabled={
-                  (tools.currentTool && SelectionBox[tools.currentTool].type !== "boundingBox") ||
-                  groundTools.currentTool
+                  (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox") || activeGroundTool !== null
                 }
                 size="sm"
                 className="mx-2"
@@ -292,16 +266,16 @@ export function SidePane({
                   onModifyBitmap();
                 }}
               >
-                {tools.singleSelection || tools.addSelection
+                {activeDepthTool === "singleSelection" || activeDepthTool === "addSelection"
                   ? "Add"
-                  : tools.subtractSelection
+                  : activeDepthTool === "subtractSelection"
                   ? "Subtract"
-                  : tools.intersectSelection
+                  : activeDepthTool === "intersectSelection"
                   ? "Intersect"
                   : "Select"}
               </Button>
               <Button
-                disabled={tools.currentTool && SelectionBox[tools.currentTool].type !== "boundingBox"}
+                disabled={activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox"}
                 size="sm"
                 className="mx-2"
                 color="secondary"
@@ -322,7 +296,9 @@ export function SidePane({
                   }}
                   id={`ground-tooltip-${index}`}
                   className={
-                    groundTools[key] && memoryDepthCanvas ? "selection-tool selection-tool-active" : "selection-tool"
+                    activeGroundTool === key && memoryDepthCanvas
+                      ? "selection-tool selection-tool-active"
+                      : "selection-tool"
                   }
                 >
                   {GroundBox[key].icon}
@@ -334,7 +310,7 @@ export function SidePane({
             </div>
             <div className="d-flex my-2">
               <Button
-                disabled={!memoryDepthCanvas || tools.currentTool} // should also be disabled if no ground params
+                disabled={!memoryDepthCanvas || activeDepthTool !== null} // should also be disabled if no ground params
                 size="sm"
                 className="mx-2"
                 color="secondary"
@@ -398,7 +374,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
-                        size="sm"
+                        bsSize="sm"
                         className="tool-ext-input-number"
                         id="disparity"
                         name="disparity"
@@ -431,7 +407,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
-                        size="sm"
+                        bsSize="sm"
                         className="tool-ext-input-number"
                         id="scale"
                         name="scale"
@@ -477,7 +453,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
-                        size="sm"
+                        bsSize="sm"
                         className="tool-ext-input-number"
                         id="aConstant"
                         name="aConstant"
@@ -510,7 +486,7 @@ export function SidePane({
                         onChange={onHandleChange}
                         onMouseLeave={onHandleUpdate}
                         onKeyDown={onHandleEnter}
-                        size="sm"
+                        bsSize="sm"
                         className="tool-ext-input-number"
                         id="bConstant"
                         name="bConstant"
@@ -612,8 +588,8 @@ const mapStateToProps = state => ({
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   cacheDepthCanvas: imageSelectors.cacheDepthCanvas(state),
   rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
-  tools: imageSelectors.tools(state),
-  groundTools: imageSelectors.groundTools(state),
+  activeDepthTool: imageSelectors.activeDepthTool(state),
+  activeGroundTool: imageSelectors.activeGroundTool(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),
   groundParams: imageSelectors.groundParams(state),

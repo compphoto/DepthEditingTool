@@ -9,7 +9,7 @@ export const runRgbOperations = image => {
   const displayRgbContext = displayRgbCanvas.getContext("2d");
   let stack = store.getState().image.operationStack["rgbStack"];
   stack.forEach(element => {
-    element.params ? element.func(image, displayRgbContext, ...element.params) : element.func(image, displayRgbContext);
+    element.func(image, displayRgbContext, ...element.params);
   });
   const storeAction = require("store/store");
   const rgbBitmapCanvas = store.getState().image.rgbBitmapCanvas;
@@ -31,13 +31,9 @@ export const runDepthOperations = image => {
   const displayDepthContext = displayDepthCanvas.getContext("2d");
   let stack = store.getState().image.operationStack["depthStack"];
   stack.forEach(element => {
-    element.params
-      ? element.func(image, displayDepthContext, ...element.params)
-      : element.func(image, displayDepthContext);
+    element.func(image, displayDepthContext, ...element.params);
     if (element.type === "effect") {
-      element.params
-        ? element.func(image, memoryDepthContext, ...element.params)
-        : element.func(image, memoryDepthContext);
+      element.func(image, memoryDepthContext, ...element.params);
     }
   });
   const storeAction = require("store/store");
@@ -55,13 +51,9 @@ export const runCachedDepthOperations = image => {
   const displayDepthContext = displayDepthCanvas.getContext("2d");
   let stack = store.getState().image.operationStack["depthStack"];
   const lastOperation = stack[stack.length - 1];
-  lastOperation.params
-    ? lastOperation.func(image, displayDepthContext, ...lastOperation.params)
-    : lastOperation.func(image, displayDepthContext);
+  lastOperation.func(image, displayDepthContext, ...lastOperation.params);
   if (lastOperation.type === "effect") {
-    lastOperation.params
-      ? lastOperation.func(image, memoryDepthContext, ...lastOperation.params)
-      : lastOperation.func(image, memoryDepthCanvas);
+    lastOperation.func(image, memoryDepthContext, ...lastOperation.params);
   }
   const storeAction = require("store/store");
   let data = {
