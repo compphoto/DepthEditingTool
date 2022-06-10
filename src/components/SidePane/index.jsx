@@ -535,7 +535,7 @@ export function SidePane({
         <div className="layer-mode-footer text-center">
           <div className="layer-mode-apply-button mx-2">
             <Button size="sm" color="secondary" onClick={addLayer}>
-              Add
+              Select/Cancel
             </Button>
           </div>
           <div className="layer-mode-apply-button mx-2">
@@ -564,13 +564,7 @@ export function SidePane({
         </div>
         <div className="tools-ext-body">
           <div className="tools-ext-elements">
-            {activeTool === 0 && operationStack.activeIndex !== 0
-              ? toolBox()
-              : activeTool === 1
-              ? adjust()
-              : activeTool === 2
-              ? effect()
-              : null}
+            {activeTool === 0 && operationStack.activeIndex !== 0 ? toolBox() : activeTool === 1 ? adjust() : null}
             <Button onClick={toolExtActions} className="toggle-button">
               {toolExtOpen ? <MdKeyboardArrowLeft /> : <MdKeyboardArrowRight />}
             </Button>

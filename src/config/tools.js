@@ -11,10 +11,6 @@ const Tools = [
   {
     name: "Adjust",
     icon: <HiOutlineAdjustments />
-  },
-  {
-    name: "Effects",
-    icon: <IoMdColorFill />
   }
 ];
 
