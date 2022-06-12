@@ -1,4 +1,4 @@
-import { canvasLike, cloneCanvas } from "utils/canvasUtils";
+import { canvasLike, cloneCanvas, mergeBitmap } from "utils/canvasUtils";
 import { types } from "./constants";
 
 const initialState = {
@@ -364,10 +364,30 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         }
       };
     case types.MERGE_LAYER_SELECT:
+      var layerStack = [...state.operationStack.layerStack];
+      var selectedLayers = state.operationStack.selectedLayers;
+      var bitmap = canvasLike(state.mainDepthCanvas);
+      selectedLayers.forEach(index => {
+        bitmap = mergeBitmap(bitmap, layerStack[index].bitmap);
+        // layerStack.splice(index, 1);
+      });
       return {
         ...state,
         operationStack: {
           ...state.operationStack,
+          layerStack: [
+            ...layerStack,
+            {
+              bitmap: bitmap,
+              toolsParameters: {
+                disparity: 0,
+                scale: 1,
+                aConstant: 1,
+                bConstant: 0
+              }
+            }
+          ],
+          activeIndex: layerStack.length, // no need for -1 since a new layer is added
           isSelectActive: false,
           selectedLayers: new Set()
         }
