@@ -136,7 +136,7 @@ class PointCurve extends Component {
     const { cpS, cp1, cp2, cpE, selectedControl } = this.state;
     let { cacheDepthCanvas, memoryDepthCanvas, parameters, operationStack, addEffect } = this.props;
     return (
-      <PointCurveStyle>
+      <PointCurveStyle {...this.props.pointCurveProps}>
         <canvas
           width="200px"
           height="200px"

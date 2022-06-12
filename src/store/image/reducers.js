@@ -73,7 +73,9 @@ const initialState = {
     rgbStack: [],
     depthStack: [],
     layerStack: [],
-    activeIndex: -1
+    activeIndex: -1,
+    isSelectActive: false,
+    selectedLayers: new Set()
   }
 };
 
@@ -246,7 +248,9 @@ export const imageReducer = (state = initialState, { type, payload }) => {
               }
             }
           ],
-          activeIndex: 0
+          activeIndex: 0,
+          isSelectActive: false,
+          selectedLayers: new Set()
         }
       };
     case types.ADD_LAYER:
@@ -271,12 +275,26 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         }
       };
     case types.UPDATE_LAYER_INDEX:
+      var operationStack = state.operationStack;
+      var update;
+      if (operationStack.isSelectActive) {
+        update = {
+          selectedLayers:
+            payload === 0
+              ? operationStack.selectedLayers
+              : operationStack.selectedLayers.has(payload)
+              ? new Set([...operationStack.selectedLayers].filter(x => x !== payload))
+              : new Set([...operationStack.selectedLayers, payload])
+        };
+      } else {
+        update = { activeIndex: payload };
+      }
       return {
         ...state,
         operationStack: {
           ...state.operationStack,
           layerStack: [...state.operationStack.layerStack],
-          activeIndex: payload
+          ...update
         }
       };
     case types.UPDATE_LAYER:
@@ -331,7 +349,43 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         operationStack: {
           ...state.operationStack,
           layerStack: newLayerStack,
-          activeIndex: 0
+          activeIndex: 0,
+          isSelectActive: false,
+          selectedLayers: new Set()
+        }
+      };
+    case types.TOGGLE_LAYER_SELECT:
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          isSelectActive: !state.operationStack.isSelectActive,
+          selectedLayers: new Set()
+        }
+      };
+    case types.MERGE_LAYER_SELECT:
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          isSelectActive: false,
+          selectedLayers: new Set()
+        }
+      };
+    case types.REMOVE_LAYER_SELECT:
+      var layerStack = [...state.operationStack.layerStack];
+      var selectedLayers = state.operationStack.selectedLayers;
+      selectedLayers.forEach(index => {
+        layerStack.splice(index, 1);
+      });
+      return {
+        ...state,
+        operationStack: {
+          ...state.operationStack,
+          layerStack: layerStack,
+          activeIndex: layerStack.length - 1,
+          isSelectActive: false,
+          selectedLayers: new Set()
         }
       };
     case types.ADD_OPERATION:
@@ -517,7 +571,9 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           rgbStack: [...rgbStack],
           depthStack: [...depthStack],
           layerStack: [...layerStack],
-          activeIndex: 0
+          activeIndex: 0,
+          isSelectActive: false,
+          selectedLayers: new Set()
         }
       };
     case types.REMOVE_ITEM:

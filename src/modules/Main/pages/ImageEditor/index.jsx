@@ -39,7 +39,9 @@ export function ImageEditor({
   clear,
   reset,
   handleChange,
-  updateLayer
+  updateLayer,
+  mergeLayerSelect,
+  removeLayerSelect
 }) {
   const onHandleChange = e => {
     handleChange(e);
@@ -198,6 +200,36 @@ export function ImageEditor({
                     </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>
+
+                <UncontrolledDropdown>
+                  <DropdownToggle>Layer</DropdownToggle>
+                  <DropdownMenu>
+                    <DropdownItem
+                      disabled={
+                        memoryDepthCanvas === null ||
+                        !operationStack.isSelectActive ||
+                        operationStack.selectedLayers.size < 2
+                      }
+                      onClick={() => {
+                        mergeLayerSelect();
+                      }}
+                    >
+                      <label>Merge</label>
+                    </DropdownItem>
+                    <DropdownItem
+                      disabled={
+                        memoryDepthCanvas === null ||
+                        !operationStack.isSelectActive ||
+                        operationStack.selectedLayers.size === 0
+                      }
+                      onClick={() => {
+                        removeLayerSelect();
+                      }}
+                    >
+                      <label>Delete</label>
+                    </DropdownItem>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
               </div>
             </div>
             <div className="nav-button">
@@ -248,6 +280,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   handleChange: imageActions.handleChange,
   updateLayer: imageActions.updateLayer,
+  mergeLayerSelect: imageActions.mergeLayerSelect,
+  removeLayerSelect: imageActions.removeLayerSelect,
   addEffect: imageActions.addEffect,
   zoomIn: imageActions.zoomIn,
   zoomOut: imageActions.zoomOut,

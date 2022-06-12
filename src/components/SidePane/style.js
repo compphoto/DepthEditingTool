@@ -92,10 +92,10 @@ const SidePaneStyle = styled.div`
         }
       }
       .layer-mode-body-content:hover {
-        border: 2px solid rgb(126, 131, 142);
+        border: 4px solid rgb(126, 131, 142);
       }
       .layer-mode-body-content-active {
-        border: 2px solid rgb(126, 131, 142);
+        border: 4px solid rgb(126, 131, 142);
       }
       .layer-mode-body-add {
         width: 100%;

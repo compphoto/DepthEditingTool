@@ -31,7 +31,6 @@ export function SidePane({
   toolExtActions,
   mainDepthCanvas,
   memoryDepthCanvas,
-  cacheDepthCanvas,
   displayRgbCanvas,
   activeDepthTool,
   activeGroundTool,
@@ -52,6 +51,7 @@ export function SidePane({
   duplicateLayer,
   removeLayer,
   removeAllLayers,
+  toggleLayerSelect,
   clear,
   getGround,
   setRectangle
@@ -129,7 +129,8 @@ export function SidePane({
               updateLayerIndex(key);
             }}
             className={
-              operationStack.activeIndex === key
+              (!operationStack.isSelectActive && operationStack.activeIndex === key) ||
+              (operationStack.isSelectActive && operationStack.selectedLayers.has(key))
                 ? "my-2 layer-mode-body-content layer-mode-body-content-active"
                 : "my-2 layer-mode-body-content"
             }
@@ -139,7 +140,7 @@ export function SidePane({
                 <img src={image} />
               </CardBody>
             </Card>
-            {key !== 0 ? (
+            {key !== 0 && !operationStack.isSelectActive ? (
               <div className="top-right-options">
                 <div
                   onClick={e => {
@@ -189,7 +190,7 @@ export function SidePane({
       );
     });
     setLayers(tempLayer);
-  }, [operationStack.layerStack]);
+  }, [operationStack.layerStack, operationStack.isSelectActive]);
   useEffect(() => {
     const { activeIndex, layerStack } = operationStack;
     if (parameters.histogramParams.pixelRange && activeIndex > -1 && layerStack.length) {
@@ -431,12 +432,16 @@ export function SidePane({
             <UncontrolledCollapse toggler="#depth-rotate-toggler">
               <Card className="tool-ext-card">
                 <CardBody className="tool-ext-card-body">
-                  <PointCurve />
+                  <PointCurve
+                    pointCurveProps={{
+                      disabled: !memoryDepthCanvas || !parameters.histogramParams.pixelRange
+                    }}
+                  />
                   <FormGroup className="w-100">
                     <Label for="aConstant">A</Label>
                     <div className="tool-ext-input d-flex justify-content-between w-100">
                       <Input
-                        disabled={!memoryDepthCanvas}
+                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
                         onChange={onHandleChange}
                         onMouseUp={onHandleUpdate}
                         className="tool-ext-input-slider"
@@ -469,7 +474,7 @@ export function SidePane({
                     <Label for="bConstant">B</Label>
                     <div className="tool-ext-input d-flex justify-content-between w-100">
                       <Input
-                        disabled={!memoryDepthCanvas}
+                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
                         onChange={onHandleChange}
                         onMouseUp={onHandleUpdate}
                         className="tool-ext-input-slider"
@@ -506,15 +511,6 @@ export function SidePane({
       </>
     );
   };
-  const effect = () => {
-    return (
-      <>
-        <div className="tool-ext mt-4 w-100">
-          <div className="w-100 mt-3 tool-ext-section"></div>
-        </div>
-      </>
-    );
-  };
   return (
     <SidePaneStyle>
       <div className="layer-mode-pane">
@@ -526,16 +522,22 @@ export function SidePane({
         <div className="layer-mode-body">
           {layers || null}
           {/* if later stack is empty, disable this */}
-          <div disabled={mainDepthCanvas === null} className="my-2 layer-mode-body-add">
+          <div
+            disabled={mainDepthCanvas === null || operationStack.isSelectActive}
+            className="my-2 layer-mode-body-add"
+          >
             <Card className="layer-mode-body-add-card" onClick={addLayer}>
               <AiOutlinePlus />
             </Card>
           </div>
         </div>
-        <div className="layer-mode-footer text-center">
+        <div
+          disabled={mainDepthCanvas === null || operationStack.layerStack.length <= 1}
+          className="layer-mode-footer text-center"
+        >
           <div className="layer-mode-apply-button mx-2">
-            <Button size="sm" color="secondary" onClick={addLayer}>
-              Select/Cancel
+            <Button size="sm" color="secondary" onClick={toggleLayerSelect}>
+              {operationStack.isSelectActive ? `Cancel (${operationStack.selectedLayers.size})` : "Select"}
             </Button>
           </div>
           <div className="layer-mode-apply-button mx-2">
@@ -546,7 +548,10 @@ export function SidePane({
         </div>
       </div>
 
-      <div className={toolExtOpen ? "tools-ext tool-ext-active" : "tools-ext tool-ext-inactive"}>
+      <div
+        disabled={operationStack.isSelectActive}
+        className={toolExtOpen ? "tools-ext tool-ext-active" : "tools-ext tool-ext-inactive"}
+      >
         <div className="tools-ext-header">
           {Tools.map((tool, key) => (
             <div
@@ -580,7 +585,6 @@ const mapStateToProps = state => ({
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
-  cacheDepthCanvas: imageSelectors.cacheDepthCanvas(state),
   rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
   activeDepthTool: imageSelectors.activeDepthTool(state),
   activeGroundTool: imageSelectors.activeGroundTool(state),
@@ -608,6 +612,7 @@ const mapDispatchToProps = {
   duplicateLayer: imageActions.duplicateLayer,
   removeLayer: imageActions.removeLayer,
   removeAllLayers: imageActions.removeAllLayers,
+  toggleLayerSelect: imageActions.toggleLayerSelect,
   storeToolParameters: imageActions.storeToolParameters,
   clear: imageActions.clear
 };
