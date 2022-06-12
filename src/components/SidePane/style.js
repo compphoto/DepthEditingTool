@@ -92,10 +92,10 @@ const SidePaneStyle = styled.div`
         }
       }
       .layer-mode-body-content:hover {
-        border: 2px solid rgb(126, 131, 142);
+        border: 4px solid rgb(126, 131, 142);
       }
       .layer-mode-body-content-active {
-        border: 2px solid rgb(126, 131, 142);
+        border: 4px solid rgb(126, 131, 142);
       }
       .layer-mode-body-add {
         width: 100%;
@@ -117,10 +117,6 @@ const SidePaneStyle = styled.div`
         .layer-mode-body-add-card:hover {
           background: #26272b;
         }
-      }
-      .layer-mode-body-add[disabled] {
-        pointer-events: none;
-        opacity: 0.7;
       }
     }
     .layer-mode-footer {
@@ -172,10 +168,6 @@ const SidePaneStyle = styled.div`
         &:hover {
           color: #fff;
         }
-      }
-      .tool[disabled] {
-        pointer-events: none;
-        opacity: 0.7;
       }
       .active {
         background: #3e4046;
@@ -273,10 +265,6 @@ const SidePaneStyle = styled.div`
                 background: #2e2f34;
                 color: #fff;
               }
-            }
-            .tool-ext-selection-icons[disabled] {
-              pointer-events: none;
-              opacity: 0.7;
             }
           }
         }

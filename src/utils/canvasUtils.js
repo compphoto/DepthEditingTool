@@ -197,6 +197,15 @@ export const drawLayerCanvas = (image, context, canvas) => {
   context.drawImage(canvas, 0, 0);
 };
 
+export const mergeBitmap = (oldCanvas, newCanvas) => {
+  if (oldCanvas && newCanvas) {
+    const oldContext = oldCanvas.getContext("2d");
+    oldContext.globalCompositeOperation = "source-over";
+    oldContext.drawImage(newCanvas, 0, 0);
+    return oldCanvas;
+  }
+};
+
 export const drawBox = (canvas, box) => {
   const [new_x, new_y, new_w, new_h] = box;
   const context = canvas.getContext("2d");
