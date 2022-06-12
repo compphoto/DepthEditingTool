@@ -10,6 +10,10 @@ const GlobalStyles = createGlobalStyle`
         box-sizing: border-box;
         font-size: 0.9rem;
     }
+    *[disabled] {
+      pointer-events: none;
+      opacity: 0.7;
+    }
     ::-webkit-scrollbar {
         width: 8px;
     }
