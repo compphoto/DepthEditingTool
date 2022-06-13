@@ -259,7 +259,10 @@ export function SidePane({
             <div className="d-flex my-2">
               <Button
                 disabled={
-                  (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox") || activeGroundTool !== null
+                  !memoryDepthCanvas ||
+                  !activeDepthTool ||
+                  (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox") ||
+                  activeGroundTool !== null
                 }
                 size="sm"
                 className="mx-2"
@@ -268,16 +271,12 @@ export function SidePane({
                   onModifyBitmap();
                 }}
               >
-                {activeDepthTool === "singleSelection" || activeDepthTool === "addSelection"
-                  ? "Add"
-                  : activeDepthTool === "subtractSelection"
-                  ? "Subtract"
-                  : activeDepthTool === "intersectSelection"
-                  ? "Intersect"
-                  : "Select"}
+                Select
               </Button>
               <Button
-                disabled={activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox"}
+                disabled={
+                  !memoryDepthCanvas || (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox")
+                }
                 size="sm"
                 className="mx-2"
                 color="secondary"
