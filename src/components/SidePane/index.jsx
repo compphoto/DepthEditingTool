@@ -31,6 +31,7 @@ export function SidePane({
   toolExtActions,
   mainDepthCanvas,
   memoryDepthCanvas,
+  mainRgbCanvas,
   displayRgbCanvas,
   activeDepthTool,
   activeGroundTool,
@@ -523,7 +524,7 @@ export function SidePane({
           {layers || null}
           {/* if later stack is empty, disable this */}
           <div
-            disabled={mainDepthCanvas === null || operationStack.isSelectActive}
+            disabled={mainDepthCanvas === null || mainRgbCanvas === null || operationStack.isSelectActive}
             className="my-2 layer-mode-body-add"
           >
             <Card className="layer-mode-body-add-card" onClick={addLayer}>
@@ -583,6 +584,7 @@ export function SidePane({
 const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
+  mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
   displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
