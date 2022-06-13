@@ -115,7 +115,7 @@ export function ImageEditor({
         <Container fluid>
           <div className="nav-bar">
             <div className="nav-intro">
-              <h4>Image Editor</h4>
+              <h4>Depth Editor</h4>
               <div className="nav-intro-tabs">
                 <UncontrolledDropdown>
                   <DropdownToggle>Files</DropdownToggle>
