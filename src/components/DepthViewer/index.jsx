@@ -170,23 +170,8 @@ class DepthViewer extends Component {
     }
     // Listens for mouse movements around the depth canvas and draw bounding box
     if (prevProps.activeDepthTool !== activeDepthTool) {
-      if (activeDepthTool) {
-        if (SelectionBox[activeDepthTool].type === "boundingBox") {
-          depthCanvas.addEventListener("click", this.drawBoundingBox);
-        } else {
-          depthCanvas.style.cursor = "default";
-          depthCanvas.removeEventListener("click", this.drawBoundingBox);
-          storeParameters({
-            croppedCanvasImage: null,
-            croppedArea: null,
-            histogramParams: {
-              pixelRange: [0, 255],
-              domain: [0, 255],
-              values: [0, 255],
-              update: [0, 255]
-            }
-          });
-        }
+      if (activeDepthTool && SelectionBox[activeDepthTool].type === "boundingBox") {
+        depthCanvas.addEventListener("click", this.drawBoundingBox);
       } else {
         depthCanvas.style.cursor = "default";
         depthCanvas.removeEventListener("click", this.drawBoundingBox);
