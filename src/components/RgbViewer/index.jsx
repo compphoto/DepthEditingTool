@@ -169,6 +169,7 @@ class RgbViewer extends Component {
           width={(window.innerWidth / 1500) * 521}
           height={(window.innerHeight / 1200) * 352}
           ref={rgbImageRef}
+          style={{ cursor: activeDepthTool && SelectionBox[activeDepthTool].type === "pan" ? "grab" : "default" }}
           onMouseDown={e => {
             if (activeDepthTool) {
               if (SelectionBox[activeDepthTool].type === "pan") {

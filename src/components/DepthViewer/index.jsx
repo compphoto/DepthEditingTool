@@ -173,7 +173,6 @@ class DepthViewer extends Component {
       if (activeDepthTool && SelectionBox[activeDepthTool].type === "boundingBox") {
         depthCanvas.addEventListener("click", this.drawBoundingBox);
       } else {
-        depthCanvas.style.cursor = "default";
         depthCanvas.removeEventListener("click", this.drawBoundingBox);
         storeParameters({
           croppedCanvasImage: null,
@@ -334,6 +333,7 @@ class DepthViewer extends Component {
           width={(window.innerWidth / 1500) * 521}
           height={(window.innerHeight / 1200) * 352}
           ref={depthImageRef}
+          style={{ cursor: activeDepthTool && SelectionBox[activeDepthTool].type === "pan" ? "grab" : "default" }}
           onMouseDown={e => {
             if (activeDepthTool || activeGroundTool) {
               if (
