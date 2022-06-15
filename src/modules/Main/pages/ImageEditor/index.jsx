@@ -4,8 +4,17 @@ import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import { selectors as djangoSelectors } from "store/django";
 import { Helmet } from "react-helmet";
-import { Container, Button, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
+import {
+  Container,
+  Button,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+  UncontrolledTooltip
+} from "reactstrap";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import { MdOutlinePanTool } from "react-icons/md";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
@@ -32,7 +41,9 @@ export function ImageEditor({
   mainRgbCanvas,
   mainDepthCanvas,
   memoryDepthCanvas,
+  isPanActive,
   operationStack,
+  togglePan,
   zoomIn,
   zoomOut,
   undo,
@@ -234,22 +245,49 @@ export function ImageEditor({
             </div>
             <div className="nav-button">
               <Button
+                disabled={!memoryDepthCanvas}
+                onClick={() => {
+                  if (memoryDepthCanvas) {
+                    togglePan();
+                  }
+                }}
+                size="sm"
+                color="outline"
+                style={isPanActive ? { backgroundColor: "#2e2f34", color: "#fff" } : null}
+                id={`menu-pan-tooltip`}
+              >
+                <MdOutlinePanTool />
+                <UncontrolledTooltip placement="bottom" target={`menu-pan-tooltip`}>
+                  Pan
+                </UncontrolledTooltip>
+              </Button>
+              <Button
+                disabled={!memoryDepthCanvas}
                 onClick={() => {
                   zoomOut();
                 }}
                 size="sm"
                 color="outline"
+                id={`menu-zoomout-tooltip`}
               >
                 <AiOutlineMinus />
+                <UncontrolledTooltip placement="bottom" target={`menu-zoomout-tooltip`}>
+                  Zoom out
+                </UncontrolledTooltip>
               </Button>
               <Button
+                disabled={!memoryDepthCanvas}
                 onClick={() => {
                   zoomIn();
                 }}
                 size="sm"
                 color="outline"
+                id={`menu-zoomin-tooltip`}
               >
                 <AiOutlinePlus />
+                <UncontrolledTooltip placement="bottom" target={`menu-zoomin-tooltip`}>
+                  Zoom in
+                </UncontrolledTooltip>
               </Button>
             </div>
           </div>
@@ -274,6 +312,7 @@ const mapStateToProps = state => ({
   mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
+  isPanActive: imageSelectors.isPanActive(state),
   operationStack: imageSelectors.operationStack(state)
 });
 
@@ -283,6 +322,7 @@ const mapDispatchToProps = {
   mergeLayerSelect: imageActions.mergeLayerSelect,
   removeLayerSelect: imageActions.removeLayerSelect,
   addEffect: imageActions.addEffect,
+  togglePan: imageActions.togglePan,
   zoomIn: imageActions.zoomIn,
   zoomOut: imageActions.zoomOut,
   undo: imageActions.undo,

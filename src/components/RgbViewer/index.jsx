@@ -158,6 +158,7 @@ class RgbViewer extends Component {
       rgbScaleParams,
       depthScaleParams,
       parameters,
+      isPanActive,
       activeDepthTool,
       storeScaleParams,
       storeParameters,
@@ -169,83 +170,80 @@ class RgbViewer extends Component {
           width={(window.innerWidth / 1500) * 521}
           height={(window.innerHeight / 1200) * 352}
           ref={rgbImageRef}
-          style={{ cursor: activeDepthTool && SelectionBox[activeDepthTool].type === "pan" ? "grab" : "default" }}
+          style={{ cursor: isPanActive ? "grab" : "default" }}
           onMouseDown={e => {
             if (activeDepthTool) {
-              if (SelectionBox[activeDepthTool].type === "pan") {
+            }
+            if (isPanActive) {
+              storeScaleParams({
+                name: "rgbScaleParams",
+                value: {
+                  startDragOffset: {
+                    x: e.clientX - rgbScaleParams.translatePos.x,
+                    y: e.clientY - rgbScaleParams.translatePos.y
+                  },
+                  mouseDown: true
+                }
+              });
+              storeScaleParams({
+                name: "depthScaleParams",
+                value: {
+                  startDragOffset: {
+                    x: e.clientX - depthScaleParams.translatePos.x,
+                    y: e.clientY - depthScaleParams.translatePos.y
+                  },
+                  mouseDown: true
+                }
+              });
+            }
+          }}
+          onMouseUp={e => {
+            if (activeDepthTool) {
+            }
+            if (isPanActive) {
+              rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+              depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+            }
+          }}
+          onMouseOver={e => {
+            if (activeDepthTool) {
+            }
+            if (isPanActive) {
+              rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+              depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+            }
+          }}
+          onMouseOut={e => {
+            if (activeDepthTool) {
+            }
+            if (isPanActive) {
+              rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+              depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+            }
+          }}
+          onMouseMove={e => {
+            if (activeDepthTool) {
+            }
+            if (isPanActive) {
+              if (depthScaleParams.mouseDown) {
                 storeScaleParams({
                   name: "rgbScaleParams",
                   value: {
-                    startDragOffset: {
-                      x: e.clientX - rgbScaleParams.translatePos.x,
-                      y: e.clientY - rgbScaleParams.translatePos.y
-                    },
-                    mouseDown: true
+                    translatePos: {
+                      x: e.clientX - rgbScaleParams.startDragOffset.x,
+                      y: e.clientY - rgbScaleParams.startDragOffset.y
+                    }
                   }
                 });
                 storeScaleParams({
                   name: "depthScaleParams",
                   value: {
-                    startDragOffset: {
-                      x: e.clientX - depthScaleParams.translatePos.x,
-                      y: e.clientY - depthScaleParams.translatePos.y
-                    },
-                    mouseDown: true
+                    translatePos: {
+                      x: e.clientX - depthScaleParams.startDragOffset.x,
+                      y: e.clientY - depthScaleParams.startDragOffset.y
+                    }
                   }
                 });
-              }
-            }
-          }}
-          onMouseUp={e => {
-            if (activeDepthTool) {
-              if (SelectionBox[activeDepthTool].type === "pan") {
-                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-                depthScaleParams.mouseDown &&
-                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
-              }
-            }
-          }}
-          onMouseOver={e => {
-            if (activeDepthTool) {
-              if (SelectionBox[activeDepthTool].type === "pan") {
-                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-                depthScaleParams.mouseDown &&
-                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
-              }
-            }
-          }}
-          onMouseOut={e => {
-            if (activeDepthTool) {
-              if (SelectionBox[activeDepthTool].type === "pan") {
-                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-                depthScaleParams.mouseDown &&
-                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
-              }
-            }
-          }}
-          onMouseMove={e => {
-            if (activeDepthTool) {
-              if (SelectionBox[activeDepthTool].type === "pan") {
-                if (depthScaleParams.mouseDown) {
-                  storeScaleParams({
-                    name: "rgbScaleParams",
-                    value: {
-                      translatePos: {
-                        x: e.clientX - rgbScaleParams.startDragOffset.x,
-                        y: e.clientY - rgbScaleParams.startDragOffset.y
-                      }
-                    }
-                  });
-                  storeScaleParams({
-                    name: "depthScaleParams",
-                    value: {
-                      translatePos: {
-                        x: e.clientX - depthScaleParams.startDragOffset.x,
-                        y: e.clientY - depthScaleParams.startDragOffset.y
-                      }
-                    }
-                  });
-                }
               }
             }
           }}
@@ -265,6 +263,7 @@ const mapStateToProps = state => ({
   rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
   depthScaleParams: imageSelectors.depthScaleParams(state),
+  isPanActive: imageSelectors.isPanActive(state),
   activeDepthTool: imageSelectors.activeDepthTool(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),

@@ -47,6 +47,7 @@ const initialState = {
     startDragOffset: {},
     mouseDown: false
   },
+  isPanActive: false,
   activeDepthTool: null,
   activeGroundTool: null,
   groundParams: {
@@ -176,6 +177,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           depthStack: [],
           layerStack: []
         }
+      };
+    case types.TOGGLE_PAN:
+      return {
+        ...state,
+        isPanActive: !state.isPanActive
       };
     case types.SELECT_TOOL:
       var prevTool = state.activeDepthTool;

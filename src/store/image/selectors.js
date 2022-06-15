@@ -16,6 +16,7 @@ export const selectors = {
   scribbleParams: state => state.image.scribbleParams,
   rgbScaleParams: state => state.image.rgbScaleParams,
   depthScaleParams: state => state.image.depthScaleParams,
+  isPanActive: state => state.image.isPanActive,
   activeDepthTool: state => state.image.activeDepthTool,
   activeGroundTool: state => state.image.activeGroundTool,
   toolsParameters: state => state.image.toolsParameters,

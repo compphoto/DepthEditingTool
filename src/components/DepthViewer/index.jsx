@@ -54,6 +54,7 @@ class DepthViewer extends Component {
       scribbleParams,
       groundParams,
       depthScaleParams,
+      isPanActive,
       activeDepthTool,
       activeGroundTool,
       parameters,
@@ -168,10 +169,22 @@ class DepthViewer extends Component {
         });
       }
     }
+    if (prevProps.isPanActive !== isPanActive) {
+      if (isPanActive && activeDepthTool) {
+        depthCanvas.removeEventListener("click", this.drawBoundingBox);
+      }
+      if (!isPanActive && activeDepthTool) {
+        depthCanvas.addEventListener("click", this.drawBoundingBox);
+      }
+    }
     // Listens for mouse movements around the depth canvas and draw bounding box
     if (prevProps.activeDepthTool !== activeDepthTool) {
-      if (activeDepthTool && SelectionBox[activeDepthTool].type === "boundingBox") {
-        depthCanvas.addEventListener("click", this.drawBoundingBox);
+      if (activeDepthTool) {
+        if (!isPanActive) {
+          depthCanvas.addEventListener("click", this.drawBoundingBox);
+        } else {
+          depthCanvas.removeEventListener("click", this.drawBoundingBox);
+        }
       } else {
         depthCanvas.removeEventListener("click", this.drawBoundingBox);
         storeParameters({
@@ -317,6 +330,7 @@ class DepthViewer extends Component {
       rgbScaleParams,
       depthScaleParams,
       parameters,
+      isPanActive,
       activeDepthTool,
       activeGroundTool,
       scribbleParams,
@@ -333,7 +347,7 @@ class DepthViewer extends Component {
           width={(window.innerWidth / 1500) * 521}
           height={(window.innerHeight / 1200) * 352}
           ref={depthImageRef}
-          style={{ cursor: activeDepthTool && SelectionBox[activeDepthTool].type === "pan" ? "grab" : "default" }}
+          style={{ cursor: isPanActive ? "grab" : "default" }}
           onMouseDown={e => {
             if (activeDepthTool || activeGroundTool) {
               if (
@@ -356,28 +370,29 @@ class DepthViewer extends Component {
                 storeScribbleParams({
                   pos: { x, y }
                 });
-              } else if (activeDepthTool && SelectionBox[activeDepthTool].type === "pan") {
-                storeScaleParams({
-                  name: "rgbScaleParams",
-                  value: {
-                    startDragOffset: {
-                      x: e.clientX - rgbScaleParams.translatePos.x,
-                      y: e.clientY - rgbScaleParams.translatePos.y
-                    },
-                    mouseDown: true
-                  }
-                });
-                storeScaleParams({
-                  name: "depthScaleParams",
-                  value: {
-                    startDragOffset: {
-                      x: e.clientX - depthScaleParams.translatePos.x,
-                      y: e.clientY - depthScaleParams.translatePos.y
-                    },
-                    mouseDown: true
-                  }
-                });
               }
+            }
+            if (isPanActive) {
+              storeScaleParams({
+                name: "rgbScaleParams",
+                value: {
+                  startDragOffset: {
+                    x: e.clientX - rgbScaleParams.translatePos.x,
+                    y: e.clientY - rgbScaleParams.translatePos.y
+                  },
+                  mouseDown: true
+                }
+              });
+              storeScaleParams({
+                name: "depthScaleParams",
+                value: {
+                  startDragOffset: {
+                    x: e.clientX - depthScaleParams.translatePos.x,
+                    y: e.clientY - depthScaleParams.translatePos.y
+                  },
+                  mouseDown: true
+                }
+              });
             }
           }}
           onMouseUp={e => {
@@ -400,11 +415,11 @@ class DepthViewer extends Component {
                     storeGroundParams({ path: scribblePathConverter(scribbleParams.path, groundParams.rectangle) });
                   }
                 }
-              } else if (activeDepthTool && SelectionBox[activeDepthTool].type === "pan") {
-                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-                depthScaleParams.mouseDown &&
-                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
               }
+            }
+            if (isPanActive) {
+              rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+              depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
             }
           }}
           onMouseOver={e => {
@@ -413,11 +428,11 @@ class DepthViewer extends Component {
                 (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") ||
                 (activeGroundTool && GroundBox[activeGroundTool].type === "scribble")
               ) {
-              } else if (activeDepthTool && SelectionBox[activeDepthTool].type === "pan") {
-                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-                depthScaleParams.mouseDown &&
-                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
               }
+            }
+            if (isPanActive) {
+              rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+              depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
             }
           }}
           onMouseOut={e => {
@@ -426,11 +441,11 @@ class DepthViewer extends Component {
                 (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") ||
                 (activeGroundTool && GroundBox[activeGroundTool].type === "scribble")
               ) {
-              } else if (activeDepthTool && SelectionBox[activeDepthTool].type === "pan") {
-                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-                depthScaleParams.mouseDown &&
-                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
               }
+            }
+            if (isPanActive) {
+              rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+              depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
             }
           }}
           onMouseEnter={e => {
@@ -455,8 +470,9 @@ class DepthViewer extends Component {
                 storeScribbleParams({
                   pos: { x, y }
                 });
-              } else if (activeDepthTool && SelectionBox[activeDepthTool].type === "pan") {
               }
+            }
+            if (isPanActive) {
             }
           }}
           onMouseMove={e => {
@@ -493,27 +509,28 @@ class DepthViewer extends Component {
                     }
                   ]
                 });
-              } else if (activeDepthTool && SelectionBox[activeDepthTool].type === "pan") {
-                if (depthScaleParams.mouseDown) {
-                  storeScaleParams({
-                    name: "rgbScaleParams",
-                    value: {
-                      translatePos: {
-                        x: e.clientX - rgbScaleParams.startDragOffset.x,
-                        y: e.clientY - rgbScaleParams.startDragOffset.y
-                      }
+              }
+            }
+            if (isPanActive) {
+              if (depthScaleParams.mouseDown) {
+                storeScaleParams({
+                  name: "rgbScaleParams",
+                  value: {
+                    translatePos: {
+                      x: e.clientX - rgbScaleParams.startDragOffset.x,
+                      y: e.clientY - rgbScaleParams.startDragOffset.y
                     }
-                  });
-                  storeScaleParams({
-                    name: "depthScaleParams",
-                    value: {
-                      translatePos: {
-                        x: e.clientX - depthScaleParams.startDragOffset.x,
-                        y: e.clientY - depthScaleParams.startDragOffset.y
-                      }
+                  }
+                });
+                storeScaleParams({
+                  name: "depthScaleParams",
+                  value: {
+                    translatePos: {
+                      x: e.clientX - depthScaleParams.startDragOffset.x,
+                      y: e.clientY - depthScaleParams.startDragOffset.y
                     }
-                  });
-                }
+                  }
+                });
               }
             }
           }}
@@ -534,6 +551,7 @@ const mapStateToProps = state => ({
   groundParams: imageSelectors.groundParams(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
   depthScaleParams: imageSelectors.depthScaleParams(state),
+  isPanActive: imageSelectors.isPanActive(state),
   activeDepthTool: imageSelectors.activeDepthTool(state),
   activeGroundTool: imageSelectors.activeGroundTool(state),
   toolsParameters: imageSelectors.toolsParameters(state),
