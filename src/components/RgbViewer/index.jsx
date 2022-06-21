@@ -48,7 +48,6 @@ class RgbViewer extends Component {
       initImage,
       initRgb,
       storeScaleParams,
-      addOperation,
       addEffect
     } = this.props;
     let rgbCanvas = rgbImageRef.current;
@@ -190,8 +189,7 @@ class RgbViewer extends Component {
       isPanActive,
       activeDepthTool,
       storeScaleParams,
-      storeParameters,
-      addOperation
+      storeParameters
     } = this.props;
     return (
       <RgbViewerStyle>
@@ -303,8 +301,6 @@ const mapDispatchToProps = {
   initImage: imageActions.initImage,
   initRgb: imageActions.initRgb,
   storeScaleParams: imageActions.storeScaleParams,
-  addOperation: imageActions.addOperation,
-  removeOperation: imageActions.removeOperation,
   addEffect: imageActions.addEffect
 };
 

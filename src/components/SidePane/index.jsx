@@ -603,7 +603,6 @@ const mapDispatchToProps = {
   selectTool: imageActions.selectTool,
   selectGroundTool: imageActions.selectGroundTool,
   addEffect: imageActions.addEffect,
-  removeOperation: imageActions.removeOperation,
   storeParameters: imageActions.storeParameters,
   storeGroundParams: imageActions.storeGroundParams,
   storeScribbleParams: imageActions.storeScribbleParams,

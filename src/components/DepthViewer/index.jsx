@@ -64,7 +64,6 @@ class DepthViewer extends Component {
       initLayer,
       storeScaleParams,
       storeParameters,
-      addOperation,
       addEffect
     } = this.props;
     let depthCanvas = depthImageRef.current;
@@ -580,7 +579,6 @@ const mapDispatchToProps = {
   storeScaleParams: imageActions.storeScaleParams,
   storeParameters: imageActions.storeParameters,
   storeGroundParams: imageActions.storeGroundParams,
-  addOperation: imageActions.addOperation,
   addEffect: imageActions.addEffect
 };
 
