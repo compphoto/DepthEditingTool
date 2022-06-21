@@ -32,9 +32,7 @@ export const runDepthOperations = image => {
   let stack = store.getState().image.operationStack["depthStack"];
   stack.forEach(element => {
     element.func(image, displayDepthContext, ...element.params);
-    if (element.type === "effect") {
-      element.func(image, memoryDepthContext, ...element.params);
-    }
+    element.func(image, memoryDepthContext, ...element.params);
   });
   const storeAction = require("store/store");
   let data = {
@@ -52,9 +50,7 @@ export const runCachedDepthOperations = image => {
   let stack = store.getState().image.operationStack["depthStack"];
   const lastOperation = stack[stack.length - 1];
   lastOperation.func(image, displayDepthContext, ...lastOperation.params);
-  if (lastOperation.type === "effect") {
-    lastOperation.func(image, memoryDepthContext, ...lastOperation.params);
-  }
+  lastOperation.func(image, memoryDepthContext, ...lastOperation.params);
   const storeAction = require("store/store");
   let data = {
     memoryDepthCanvas: memoryDepthCanvas,

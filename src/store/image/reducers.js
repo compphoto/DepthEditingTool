@@ -470,7 +470,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         isEffectNew,
         operationStack: {
           ...state.operationStack,
-          [name]: [...state.operationStack[name], { ...value, params: params, type: "effect", id: currentId }]
+          [name]: [...state.operationStack[name], { ...value, params: params, id: currentId }]
         }
       };
     case types.ZOOM_IN:
@@ -498,55 +498,18 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         }
       };
     case types.UNDO:
-      var depthStack = state.operationStack.depthStack;
-      var lastEffect = -1;
-      depthStack.forEach((element, index) => {
-        if (element.type === "effect" && index !== 0) {
-          lastEffect = index;
-        }
-      });
-      var newDepthStack = depthStack.filter((x, index) => {
-        if (index !== lastEffect) {
-          return x;
-        }
-      });
+      var depthStack = [...state.operationStack.depthStack];
+      depthStack.pop();
       return {
         ...state,
         operationStack: {
           ...state.operationStack,
-          depthStack: [...newDepthStack]
+          depthStack: depthStack
         }
       };
     case types.CLEAR:
-      var rgbStack = [state.operationStack.rgbStack[0]];
-      var depthStack = state.operationStack.depthStack.filter(x => {
-        if (x.type === "effect") {
-          return x;
-        }
-      });
       return {
-        ...state,
-        scribbleParams: {
-          pos: { x: 0, y: 0 },
-          offset: {},
-          path: []
-        },
-        parameters: {
-          ...state.parameters,
-          croppedCanvasImage: null,
-          croppedArea: null,
-          histogramParams: {
-            pixelRange: [0, 255],
-            domain: [0, 255],
-            values: [0, 255],
-            update: [0, 255]
-          }
-        },
-        operationStack: {
-          ...state.operationStack,
-          rgbStack: [...rgbStack],
-          depthStack: [...depthStack]
-        }
+        ...state
       };
     case types.RESET:
       var rgbStack = [state.operationStack.rgbStack[0]];
