@@ -215,13 +215,6 @@ export const drawBox = (canvas, box) => {
   context.stroke();
 };
 
-export const getRgbBitmap = (bitmapCanvas, rgbCanvas) => {
-  const bitmapContext = bitmapCanvas.getContext("2d");
-  bitmapContext.globalCompositeOperation = "source-in";
-  bitmapContext.drawImage(rgbCanvas, 0, 0);
-  return bitmapCanvas;
-};
-
 export const highlightPixelArea = (canvas, boundingBox, pixelRange) => {
   if (canvas && boundingBox) {
     const context = canvas.getContext("2d");

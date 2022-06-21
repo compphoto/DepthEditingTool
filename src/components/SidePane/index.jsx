@@ -16,7 +16,6 @@ import {
   addScaleShift,
   cloneCanvas,
   editHighlightPixelArea,
-  getRgbBitmap,
   scaleSelection,
   getBoundingArea,
   canvasToImage,
@@ -106,9 +105,6 @@ export function SidePane({
             histogramParams.pixelRange
           );
           updateLayer({ index: activeIndex, value: { bitmap: newBitmapCanvas, toolsParameters: null } });
-          initImage({
-            rgbBitmapCanvas: getRgbBitmap(cloneCanvas(layerStack[activeIndex].bitmap), cloneCanvas(displayRgbCanvas))
-          });
           clear();
         }
       }
@@ -586,7 +582,6 @@ const mapStateToProps = state => ({
   mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
   displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
-  rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
   activeDepthTool: imageSelectors.activeDepthTool(state),
   activeGroundTool: imageSelectors.activeGroundTool(state),
   toolsParameters: imageSelectors.toolsParameters(state),

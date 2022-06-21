@@ -287,7 +287,6 @@ const mapStateToProps = state => ({
   displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   prevRgbSize: imageSelectors.prevRgbSize(state),
-  rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
   depthScaleParams: imageSelectors.depthScaleParams(state),
   isPanActive: imageSelectors.isPanActive(state),

@@ -12,10 +12,8 @@ export const runRgbOperations = image => {
     element.func(image, displayRgbContext, ...element.params);
   });
   const storeAction = require("store/store");
-  const rgbBitmapCanvas = store.getState().image.rgbBitmapCanvas;
   let data = {
-    displayRgbCanvas: cloneCanvas(displayRgbCanvas),
-    rgbBitmapCanvas: rgbBitmapCanvas === null ? cloneCanvas(displayRgbCanvas) : rgbBitmapCanvas
+    displayRgbCanvas: cloneCanvas(displayRgbCanvas)
   };
   storeAction.default.dispatch(imageActions.initImage(data));
 };

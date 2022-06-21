@@ -12,7 +12,6 @@ export const selectors = {
   isEffectNew: state => state.image.isEffectNew,
   prevRgbSize: state => state.image.prevRgbSize,
   prevDepthSize: state => state.image.prevDepthSize,
-  rgbBitmapCanvas: state => state.image.rgbBitmapCanvas,
   scribbleParams: state => state.image.scribbleParams,
   rgbScaleParams: state => state.image.rgbScaleParams,
   depthScaleParams: state => state.image.depthScaleParams,

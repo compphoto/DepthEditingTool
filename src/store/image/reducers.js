@@ -15,7 +15,6 @@ const initialState = {
   isEffectNew: true,
   prevRgbSize: { width: null, height: null },
   prevDepthSize: { width: null, height: null },
-  rgbBitmapCanvas: null,
   scribbleParams: {
     pos: { x: 0, y: 0 },
     offset: {},
@@ -113,7 +112,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         mainRgbCanvas: payload,
         displayRgbCanvas: null,
         prevRgbSize: { width: null, height: null },
-        rgbBitmapCanvas: null,
         rgbScaleParams: rgbScaleParams,
         operationStack: {
           ...state.operationStack,
@@ -143,7 +141,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         displayDepthCanvas: null,
         cacheDepthCanvas: null,
         prevDepthSize: { width: null, height: null },
-        rgbBitmapCanvas: null,
         scribbleParams: {
           pos: { x: 0, y: 0 },
           offset: {},
