@@ -5,6 +5,7 @@ import { selectors as imageSelectors } from "store/image";
 import RgbViewerStyle from "./style";
 import { getImageUrl } from "utils/generalUtils";
 import {
+  canvasLike,
   canvasResize,
   cloneCanvas,
   downScaleBox,
@@ -90,12 +91,39 @@ class RgbViewer extends Component {
     }
     if (
       prevProps.displayRgbCanvas !== displayRgbCanvas ||
+      prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange ||
       prevProps.rgbScaleParams !== rgbScaleParams ||
       prevProps.parameters.croppedArea !== parameters.croppedArea
     ) {
       if (displayRgbCanvas) {
         const { ratio, centerShift_x, centerShift_y, translatePos, scale } = rgbScaleParams;
         drawScaledCanvasImage(displayRgbCanvas, rgbCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+        if ((parameters.histogramParams.pixelRange || parameters.croppedArea) && memoryDepthCanvas) {
+          const { croppedArea, histogramParams } = parameters;
+          const depthCanvas = canvasLike(rgbCanvas);
+          drawScaledCanvasImage(
+            memoryDepthCanvas,
+            depthCanvas,
+            ratio,
+            centerShift_x,
+            centerShift_y,
+            scale,
+            translatePos
+          );
+          const depthContext = depthCanvas.getContext("2d");
+          let newArea = null;
+          if (croppedArea) {
+            newArea = croppedArea;
+          } else {
+            newArea = getBoundingArea(displayRgbCanvas);
+          }
+          highlightPixelAreaRgb(
+            rgbCanvas,
+            depthContext,
+            downScaleBox(newArea, ratio, centerShift_x, centerShift_y, translatePos, scale),
+            histogramParams.pixelRange
+          );
+        }
         if (parameters.croppedArea) {
           drawBox(
             rgbCanvas,
@@ -107,30 +135,13 @@ class RgbViewer extends Component {
         rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
       }
     }
-    // Highlight pixel range from specified range for either cropped image or initial full image
-    if (prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange) {
-      if ((parameters.histogramParams.pixelRange || parameters.croppedArea) && memoryDepthCanvas) {
-        const { croppedArea, histogramParams } = parameters;
-        const depthContext = memoryDepthCanvas.getContext("2d");
-        let newArea = null;
-        if (croppedArea) {
-          newArea = croppedArea;
-        } else {
-          newArea = getBoundingArea(displayRgbCanvas);
-        }
-        addOperation({
-          name: "rgbStack",
-          value: { func: highlightPixelAreaRgb, params: [depthContext, newArea, histogramParams.pixelRange] }
-        });
-      }
-    }
   }
   componentWillUnmount() {
     window.removeEventListener("resize", this.handleResize);
     URL.revokeObjectURL(objectUrl);
   }
   handleResize = () => {
-    const { displayRgbCanvas, rgbScaleParams, parameters, initImage, storeScaleParams } = this.props;
+    const { displayRgbCanvas, memoryDepthCanvas, rgbScaleParams, parameters, initImage, storeScaleParams } = this.props;
     const { translatePos, scale } = rgbScaleParams;
     const rgbCanvas = this.rgbImageRef.current;
     this.setState({ ...this.state, windowWidth: window.innerWidth });
@@ -143,6 +154,24 @@ class RgbViewer extends Component {
       });
       storeScaleParams({ name: "rgbScaleParams", value: { ratio, centerShift_x, centerShift_y } });
       drawScaledCanvasImage(displayRgbCanvas, rgbCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+      if ((parameters.histogramParams.pixelRange || parameters.croppedArea) && memoryDepthCanvas) {
+        const { croppedArea, histogramParams } = parameters;
+        const depthCanvas = canvasLike(rgbCanvas);
+        drawScaledCanvasImage(memoryDepthCanvas, depthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+        const depthContext = depthCanvas.getContext("2d");
+        let newArea = null;
+        if (croppedArea) {
+          newArea = croppedArea;
+        } else {
+          newArea = getBoundingArea(displayRgbCanvas);
+        }
+        highlightPixelAreaRgb(
+          rgbCanvas,
+          depthContext,
+          downScaleBox(newArea, ratio, centerShift_x, centerShift_y, translatePos, scale),
+          histogramParams.pixelRange
+        );
+      }
       if (parameters.croppedArea) {
         drawBox(
           rgbCanvas,

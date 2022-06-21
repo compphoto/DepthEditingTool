@@ -112,6 +112,7 @@ class DepthViewer extends Component {
     }
     if (
       prevProps.displayDepthCanvas !== displayDepthCanvas ||
+      prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange ||
       prevProps.depthScaleParams !== depthScaleParams ||
       prevProps.parameters.croppedArea !== parameters.croppedArea ||
       prevProps.groundParams.rectangle !== groundParams.rectangle
@@ -127,6 +128,20 @@ class DepthViewer extends Component {
           scale,
           translatePos
         );
+        if (parameters.histogramParams.pixelRange || parameters.croppedArea) {
+          const { croppedArea, histogramParams } = parameters;
+          let newArea = null;
+          if (croppedArea) {
+            newArea = croppedArea;
+          } else {
+            newArea = getBoundingArea(displayDepthCanvas);
+          }
+          highlightPixelArea(
+            depthCanvas,
+            downScaleBox(newArea, ratio, centerShift_x, centerShift_y, translatePos, scale),
+            histogramParams.pixelRange
+          );
+        }
         if (parameters.croppedArea) {
           drawBox(
             depthCanvas,
@@ -151,22 +166,6 @@ class DepthViewer extends Component {
       } else {
         let depthContext = depthCanvas.getContext("2d");
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
-      }
-    }
-    // Highlight pixel range from specified range for either cropped image or initial full image
-    if (prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange) {
-      if (parameters.histogramParams.pixelRange || parameters.croppedArea) {
-        const { croppedArea, histogramParams } = parameters;
-        let newArea = null;
-        if (croppedArea) {
-          newArea = croppedArea;
-        } else {
-          newArea = getBoundingArea(displayDepthCanvas);
-        }
-        addOperation({
-          name: "depthStack",
-          value: { func: highlightPixelArea, params: [newArea, histogramParams.pixelRange] }
-        });
       }
     }
     if (prevProps.isPanActive !== isPanActive) {
@@ -229,6 +228,20 @@ class DepthViewer extends Component {
       });
       storeScaleParams({ name: "depthScaleParams", value: { ratio, centerShift_x, centerShift_y } });
       drawScaledCanvasImage(displayDepthCanvas, depthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+      if (parameters.histogramParams.pixelRange || parameters.croppedArea) {
+        const { croppedArea, histogramParams } = parameters;
+        let newArea = null;
+        if (croppedArea) {
+          newArea = croppedArea;
+        } else {
+          newArea = getBoundingArea(displayDepthCanvas);
+        }
+        highlightPixelArea(
+          depthCanvas,
+          downScaleBox(newArea, ratio, centerShift_x, centerShift_y, translatePos, scale),
+          histogramParams.pixelRange
+        );
+      }
       if (parameters.croppedArea) {
         drawBox(
           depthCanvas,
