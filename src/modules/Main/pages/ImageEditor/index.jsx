@@ -186,7 +186,7 @@ export function ImageEditor({
                   <DropdownToggle>Edit</DropdownToggle>
                   <DropdownMenu>
                     <DropdownItem
-                      disabled={memoryDepthCanvas === null}
+                      disabled={memoryDepthCanvas === null || operationStack.depthStack.length <= 1}
                       onClick={() => {
                         undo();
                       }}

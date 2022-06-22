@@ -8,9 +8,7 @@ const initialState = {
   maskImageUrl: null,
   mainRgbCanvas: null,
   mainDepthCanvas: null,
-  displayRgbCanvas: null,
   memoryDepthCanvas: null,
-  displayDepthCanvas: null,
   cacheDepthCanvas: null,
   isEffectNew: true,
   prevRgbSize: { width: null, height: null },
@@ -110,7 +108,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         mainRgbCanvas: payload,
-        displayRgbCanvas: null,
         prevRgbSize: { width: null, height: null },
         rgbScaleParams: rgbScaleParams,
         operationStack: {
@@ -138,7 +135,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         ...state,
         mainDepthCanvas: payload,
         memoryDepthCanvas: null,
-        displayDepthCanvas: null,
         cacheDepthCanvas: null,
         prevDepthSize: { width: null, height: null },
         scribbleParams: {
@@ -411,36 +407,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           selectedLayers: new Set()
         }
       };
-    case types.ADD_OPERATION:
-      var { name, value } = payload;
-      var array = state.operationStack[name];
-      var newArray = array.filter(x => {
-        if (x.func.toString() !== value.func.toString()) {
-          return x;
-        }
-      });
-      return {
-        ...state,
-        operationStack: {
-          ...state.operationStack,
-          [name]: [...newArray, { ...value, type: "operation" }]
-        }
-      };
-    case types.REMOVE_OPERATION:
-      var { name, value } = payload;
-      var array = state.operationStack[name];
-      var newArray = array.filter(x => {
-        if (x.func.toString() !== value.toString()) {
-          return x;
-        }
-      });
-      return {
-        ...state,
-        operationStack: {
-          ...state.operationStack,
-          [name]: [...newArray]
-        }
-      };
     case types.ADD_EFFECT:
       var { name, value } = payload;
       var params = value.params;
@@ -496,7 +462,9 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       };
     case types.UNDO:
       var depthStack = [...state.operationStack.depthStack];
-      depthStack.pop();
+      if (Array.isArray(depthStack) && depthStack.length > 1) {
+        depthStack.pop();
+      }
       return {
         ...state,
         operationStack: {
