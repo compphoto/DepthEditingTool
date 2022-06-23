@@ -23,7 +23,7 @@ import {
   downloadCanvas
 } from "utils/canvasUtils";
 import PointCurve from "components/PointCurve";
-import { GroundBox, SelectionBox } from "config/toolBox";
+import { SelectionBox } from "config/toolBox";
 
 export function SidePane({
   toolExtOpen,
@@ -32,15 +32,11 @@ export function SidePane({
   memoryDepthCanvas,
   mainRgbCanvas,
   activeDepthTool,
-  activeGroundTool,
   toolsParameters,
   parameters,
-  groundParams,
   operationStack,
   selectTool,
-  selectGroundTool,
   storeToolParameters,
-  storeGroundParams,
   storeScribbleParams,
   addEffect,
   addLayer,
@@ -51,7 +47,6 @@ export function SidePane({
   removeAllLayers,
   toggleLayerSelect,
   clear,
-  getGround,
   setRectangle
 }) {
   const [activeTool, setActiveTool] = useState(0);
@@ -255,8 +250,7 @@ export function SidePane({
                 disabled={
                   !memoryDepthCanvas ||
                   !activeDepthTool ||
-                  (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox") ||
-                  activeGroundTool !== null
+                  (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox")
                 }
                 size="sm"
                 color="secondary"
@@ -265,57 +259,6 @@ export function SidePane({
                 }}
               >
                 Select
-              </Button>
-            </div>
-            <p className="tool-ext-selection-title">Ground Selection</p>
-            <div disabled={operationStack.activeIndex <= 0} className="tool-ext-selection-icons">
-              {Object.keys(GroundBox).map((key, index) => (
-                <div
-                  key={index}
-                  onClick={() => {
-                    if (memoryDepthCanvas) {
-                      selectGroundTool(key);
-                    }
-                  }}
-                  id={`ground-tooltip-${index}`}
-                  className={
-                    activeGroundTool === key && memoryDepthCanvas
-                      ? "selection-tool selection-tool-active"
-                      : "selection-tool"
-                  }
-                >
-                  {GroundBox[key].icon}
-                  <UncontrolledTooltip placement="bottom" target={`ground-tooltip-${index}`}>
-                    {GroundBox[key].tooltip}
-                  </UncontrolledTooltip>
-                </div>
-              ))}
-            </div>
-            <div className="d-flex my-2">
-              <Button
-                disabled={!memoryDepthCanvas || activeDepthTool !== null} // should also be disabled if no ground params
-                size="sm"
-                color="secondary"
-                onClick={() => {
-                  let rectangle = groundParams["rectangle"];
-                  let points = groundParams["path"];
-                  let formData = new FormData();
-                  formData.append("image", canvasToImage(memoryDepthCanvas));
-                  formData.append("rectangle", JSON.stringify(rectangle));
-                  formData.append("points", JSON.stringify(points));
-                  formData.append("z_length", 250);
-                  formData.append("threshold", 1);
-                  storeGroundParams({ rectangle: null, path: null });
-                  storeScribbleParams({
-                    pos: { x: 0, y: 0 },
-                    offset: {},
-                    path: []
-                  });
-                  setRectangle(rectangle);
-                  getGround(formData);
-                }}
-              >
-                Estimate Ground
               </Button>
             </div>
           </div>
@@ -567,21 +510,16 @@ const mapStateToProps = state => ({
   mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   activeDepthTool: imageSelectors.activeDepthTool(state),
-  activeGroundTool: imageSelectors.activeGroundTool(state),
   toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),
-  groundParams: imageSelectors.groundParams(state),
   operationStack: imageSelectors.operationStack(state)
 });
 
 const mapDispatchToProps = {
-  getGround: djangoActions.getGround,
   setRectangle: djangoActions.setRectangle,
   toolExtActions: toolExtActions.toggleToolExt,
   selectTool: imageActions.selectTool,
-  selectGroundTool: imageActions.selectGroundTool,
   addEffect: imageActions.addEffect,
-  storeGroundParams: imageActions.storeGroundParams,
   storeScribbleParams: imageActions.storeScribbleParams,
   addLayer: imageActions.addLayer,
   updateLayerIndex: imageActions.updateLayerIndex,

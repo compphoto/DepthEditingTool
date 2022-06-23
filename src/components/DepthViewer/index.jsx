@@ -24,7 +24,7 @@ import {
   canvasResize
 } from "utils/canvasUtils";
 import { runDepthOperations, runCachedDepthOperations } from "utils/stackOperations";
-import { GroundBox, SelectionBox } from "config/toolBox";
+import { SelectionBox } from "config/toolBox";
 import { getScribbleValues } from "utils/calculation";
 
 let objectUrl = null;
@@ -52,11 +52,9 @@ class DepthViewer extends Component {
       isEffectNew,
       prevDepthSize,
       scribbleParams,
-      groundParams,
       depthScaleParams,
       isPanActive,
       activeDepthTool,
-      activeGroundTool,
       parameters,
       operationStack,
       initImage,
@@ -113,8 +111,7 @@ class DepthViewer extends Component {
       prevProps.memoryDepthCanvas !== memoryDepthCanvas ||
       prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange ||
       prevProps.depthScaleParams !== depthScaleParams ||
-      prevProps.parameters.croppedArea !== parameters.croppedArea ||
-      prevProps.groundParams.rectangle !== groundParams.rectangle
+      prevProps.parameters.croppedArea !== parameters.croppedArea
     ) {
       if (memoryDepthCanvas) {
         const { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
@@ -137,12 +134,6 @@ class DepthViewer extends Component {
           drawBox(
             depthCanvas,
             downScaleBox(parameters.croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
-          );
-        }
-        if (groundParams.rectangle) {
-          drawBox(
-            depthCanvas,
-            downScaleBox(groundParams.rectangle, ratio, centerShift_x, centerShift_y, translatePos, scale)
           );
         }
         if (Array.isArray(scribbleParams.path) || scribbleParams.path.length) {
@@ -187,14 +178,6 @@ class DepthViewer extends Component {
             update: [0, 255]
           }
         });
-      }
-    }
-    if (prevProps.activeGroundTool !== activeGroundTool && activeGroundTool) {
-      if (GroundBox[activeGroundTool].type === "boundingBox") {
-        depthCanvas.addEventListener("click", this.drawBoundingBox);
-      } else {
-        depthCanvas.style.cursor = "default";
-        depthCanvas.removeEventListener("click", this.drawBoundingBox);
       }
     }
   }
@@ -252,8 +235,7 @@ class DepthViewer extends Component {
   drawBoundingBox = event => {
     let depthCanvas = this.depthImageRef.current;
     let { initBoundingBox } = this.state;
-    let { memoryDepthCanvas, depthScaleParams, storeParameters, activeDepthTool, activeGroundTool, storeGroundParams } =
-      this.props;
+    let { memoryDepthCanvas, depthScaleParams, storeParameters, activeDepthTool } = this.props;
     let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
     if (memoryDepthCanvas) {
       let x = event.offsetX;
@@ -299,9 +281,6 @@ class DepthViewer extends Component {
                   croppedArea: croppedArea
                 });
               }
-              if (activeGroundTool) {
-                storeGroundParams({ rectangle: croppedArea });
-              }
             });
           }
         }
@@ -319,9 +298,6 @@ class DepthViewer extends Component {
               }
             });
           }
-          if (activeGroundTool) {
-            storeGroundParams({ rectangle: null });
-          }
         });
       }
     }
@@ -335,13 +311,10 @@ class DepthViewer extends Component {
       parameters,
       isPanActive,
       activeDepthTool,
-      activeGroundTool,
       scribbleParams,
-      groundParams,
       storeScribbleParams,
       storeScaleParams,
-      storeParameters,
-      storeGroundParams
+      storeParameters
     } = this.props;
     const depthCanvas = depthImageRef.current;
     return (
@@ -352,11 +325,8 @@ class DepthViewer extends Component {
           ref={depthImageRef}
           style={{ cursor: isPanActive ? "grab" : "default" }}
           onMouseDown={e => {
-            if (activeDepthTool || activeGroundTool) {
-              if (
-                (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") ||
-                (activeGroundTool && GroundBox[activeGroundTool].type === "scribble")
-              ) {
+            if (activeDepthTool) {
+              if (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") {
                 const { croppedArea } = parameters;
                 let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
                 let dimension = null;
@@ -399,11 +369,8 @@ class DepthViewer extends Component {
             }
           }}
           onMouseUp={e => {
-            if (activeDepthTool || activeGroundTool) {
-              if (
-                (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") ||
-                (activeGroundTool && GroundBox[activeGroundTool].type === "scribble")
-              ) {
+            if (activeDepthTool) {
+              if (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") {
                 if (Array.isArray(scribbleParams.path) || scribbleParams.path.length) {
                   if (activeDepthTool) {
                     let range = getScribbleRange(memoryDepthCanvas, scribbleParams.path);
@@ -414,9 +381,6 @@ class DepthViewer extends Component {
                       }
                     });
                   }
-                  if (activeGroundTool) {
-                    storeGroundParams({ path: scribblePathConverter(scribbleParams.path, groundParams.rectangle) });
-                  }
                 }
               }
             }
@@ -426,11 +390,8 @@ class DepthViewer extends Component {
             }
           }}
           onMouseOver={e => {
-            if (activeDepthTool || activeGroundTool) {
-              if (
-                (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") ||
-                (activeGroundTool && GroundBox[activeGroundTool].type === "scribble")
-              ) {
+            if (activeDepthTool) {
+              if (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") {
               }
             }
             if (isPanActive) {
@@ -439,11 +400,8 @@ class DepthViewer extends Component {
             }
           }}
           onMouseOut={e => {
-            if (activeDepthTool || activeGroundTool) {
-              if (
-                (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") ||
-                (activeGroundTool && GroundBox[activeGroundTool].type === "scribble")
-              ) {
+            if (activeDepthTool) {
+              if (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") {
               }
             }
             if (isPanActive) {
@@ -452,11 +410,8 @@ class DepthViewer extends Component {
             }
           }}
           onMouseEnter={e => {
-            if (activeDepthTool || activeGroundTool) {
-              if (
-                (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") ||
-                (activeGroundTool && GroundBox[activeGroundTool].type === "scribble")
-              ) {
+            if (activeDepthTool) {
+              if (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") {
                 const { croppedArea } = parameters;
                 let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
                 let dimension = null;
@@ -479,11 +434,8 @@ class DepthViewer extends Component {
             }
           }}
           onMouseMove={e => {
-            if (activeDepthTool || activeGroundTool) {
-              if (
-                (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") ||
-                (activeGroundTool && GroundBox[activeGroundTool].type === "scribble")
-              ) {
+            if (activeDepthTool) {
+              if (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") {
                 if (e.buttons !== 1) return;
                 const { croppedArea } = parameters;
                 let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
@@ -550,12 +502,10 @@ const mapStateToProps = state => ({
   isEffectNew: imageSelectors.isEffectNew(state),
   prevDepthSize: imageSelectors.prevDepthSize(state),
   scribbleParams: imageSelectors.scribbleParams(state),
-  groundParams: imageSelectors.groundParams(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
   depthScaleParams: imageSelectors.depthScaleParams(state),
   isPanActive: imageSelectors.isPanActive(state),
   activeDepthTool: imageSelectors.activeDepthTool(state),
-  activeGroundTool: imageSelectors.activeGroundTool(state),
   parameters: imageSelectors.parameters(state),
   operationStack: imageSelectors.operationStack(state)
 });
@@ -567,7 +517,6 @@ const mapDispatchToProps = {
   storeScribbleParams: imageActions.storeScribbleParams,
   storeScaleParams: imageActions.storeScaleParams,
   storeParameters: imageActions.storeParameters,
-  storeGroundParams: imageActions.storeGroundParams,
   addEffect: imageActions.addEffect
 };
 

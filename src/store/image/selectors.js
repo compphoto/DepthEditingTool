@@ -16,9 +16,7 @@ export const selectors = {
   depthScaleParams: state => state.image.depthScaleParams,
   isPanActive: state => state.image.isPanActive,
   activeDepthTool: state => state.image.activeDepthTool,
-  activeGroundTool: state => state.image.activeGroundTool,
   toolsParameters: state => state.image.toolsParameters,
   parameters: state => state.image.parameters,
-  groundParams: state => state.image.groundParams,
   operationStack: state => state.image.operationStack
 };

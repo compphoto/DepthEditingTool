@@ -47,11 +47,6 @@ const initialState = {
   },
   isPanActive: false,
   activeDepthTool: null,
-  activeGroundTool: null,
-  groundParams: {
-    rectangle: null,
-    path: null
-  },
   toolsParameters: {
     disparity: 0,
     scale: 1,
@@ -146,11 +141,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         },
         depthScaleParams: depthScaleParams,
         activeDepthTool: null,
-        activeGroundTool: null,
-        groundParams: {
-          rectangle: null,
-          path: null
-        },
         toolsParameters: {
           disparity: 0,
           scale: 1,
@@ -182,15 +172,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       var prevTool = state.activeDepthTool;
       return {
         ...state,
-        activeDepthTool: prevTool === payload ? null : payload,
-        activeGroundTool: null
-      };
-    case types.SELECT_GROUND_TOOL:
-      var prevTool = state.activeGroundTool;
-      return {
-        ...state,
-        activeGroundTool: prevTool === payload ? null : payload,
-        activeDepthTool: null
+        activeDepthTool: prevTool === payload ? null : payload
       };
     case types.STORE_SCRIBBLE_PARAMS:
       return {
@@ -207,14 +189,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         [name]: {
           ...state[name],
           ...value
-        }
-      };
-    case types.STORE_GROUND_PARAMS:
-      return {
-        ...state,
-        groundParams: {
-          ...state.groundParams,
-          ...payload
         }
       };
     case types.STORE_TOOL_PARAMETERS:
@@ -503,10 +477,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           pos: { x: 0, y: 0 },
           offset: {},
           path: []
-        },
-        groundParams: {
-          rectangle: null,
-          path: null
         },
         parameters: {
           ...state.parameters,

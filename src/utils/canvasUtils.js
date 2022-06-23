@@ -480,31 +480,3 @@ export const maskToImage = (maskCanvas, depthCanvas) => {
     return bitmapCanvas;
   }
 };
-
-export const getGroundMask = (groundMaskImage, depthCanvas, rectangle) => {
-  const groundCanvas = document.createElement("canvas");
-  groundCanvas.width = groundMaskImage.width;
-  groundCanvas.height = groundMaskImage.height;
-  const groundContext = groundCanvas.getContext("2d");
-  groundContext.drawImage(groundMaskImage, 0, 0);
-
-  const [x, y, w, h] = rectangle;
-  const bitmapCanvas = document.createElement("canvas");
-  const bitmapContext = bitmapCanvas.getContext("2d");
-  bitmapCanvas.width = depthCanvas.width;
-  bitmapCanvas.height = depthCanvas.height;
-  const bitmapData = bitmapContext.getImageData(x, y, w, h);
-  const bitmapSrc = bitmapData.data;
-  const groundSrc = groundContext.getImageData(0, 0, w, h).data;
-  const depthSrc = depthCanvas.getContext("2d").getImageData(x, y, w, h).data;
-
-  for (let i = 0; i < bitmapSrc.length; i += 4) {
-    bitmapSrc[i] = depthSrc[i];
-    bitmapSrc[i + 1] = depthSrc[i + 1];
-    bitmapSrc[i + 2] = depthSrc[i + 2];
-    bitmapSrc[i + 3] = groundSrc[i];
-  }
-  bitmapContext.putImageData(bitmapData, x, y);
-
-  return bitmapCanvas;
-};

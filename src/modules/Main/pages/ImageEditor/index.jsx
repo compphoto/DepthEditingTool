@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
-import { selectors as djangoSelectors } from "store/django";
 import { Helmet } from "react-helmet";
 import {
   Container,
@@ -18,24 +17,12 @@ import { MdOutlinePanTool } from "react-icons/md";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
-import { cloneCanvas, downloadCanvas, getGroundMask, maskToImage } from "utils/canvasUtils";
+import { cloneCanvas, downloadCanvas, maskToImage } from "utils/canvasUtils";
 import { getImageUrl } from "utils/generalUtils";
 
 let objectUrl = null;
 
-function arrayBufferToBase64(buffer) {
-  var binary = "";
-  var bytes = new Uint8Array(buffer);
-  var len = bytes.byteLength;
-  for (var i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return window.btoa(binary);
-}
-
 export function ImageEditor({
-  groundImage,
-  rectangle,
   selectionImageUrl,
   maskImageUrl,
   mainRgbCanvas,
@@ -85,16 +72,6 @@ export function ImageEditor({
       };
     }
   }, [maskImageUrl]);
-  useEffect(() => {
-    if (groundImage) {
-      let groundMaskImage = new Image();
-      groundMaskImage.src = "data:image/png;base64," + arrayBufferToBase64(groundImage);
-      groundMaskImage.onload = () => {
-        let groundMaskBitmap = getGroundMask(groundMaskImage, mainDepthCanvas, rectangle);
-        updateLayer({ index: operationStack.activeIndex, value: { bitmap: groundMaskBitmap, toolsParameters: null } });
-      };
-    }
-  }, [groundImage]);
   return (
     <ImageEditorStyle>
       <Helmet>
@@ -305,8 +282,6 @@ export function ImageEditor({
 }
 
 const mapStateToProps = state => ({
-  groundImage: djangoSelectors.groundImage(state),
-  rectangle: djangoSelectors.rectangle(state),
   selectionImageUrl: imageSelectors.selectionImageUrl(state),
   maskImageUrl: imageSelectors.maskImageUrl(state),
   mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
