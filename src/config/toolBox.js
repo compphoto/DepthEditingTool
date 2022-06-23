@@ -1,5 +1,5 @@
 import React from "react";
-import { MdOutlinePanTool, MdCropDin } from "react-icons/md";
+import { MdCropDin } from "react-icons/md";
 import { RiCheckboxMultipleBlankLine } from "react-icons/ri";
 import { BiIntersect } from "react-icons/bi";
 import { BsSubtract } from "react-icons/bs";
@@ -39,21 +39,14 @@ export const SelectionBox = {
     tooltip: "intersection",
     type: "boundingBox",
     func: modifyIntersectSelection
-  },
-  panTool: {
-    name: "Pan",
-    icon: <MdOutlinePanTool />,
-    tooltip: "pan",
-    type: "pan",
-    func: null
-  },
-  scribbleTool: {
-    name: "Scribble",
-    icon: <ImPencil />,
-    tooltip: "scribble",
-    type: "scribble",
-    func: null
   }
+  // scribbleTool: {
+  //   name: "Scribble",
+  //   icon: <ImPencil />,
+  //   tooltip: "scribble",
+  //   type: "scribble",
+  //   func: null
+  // }
 };
 
 export const GroundBox = {

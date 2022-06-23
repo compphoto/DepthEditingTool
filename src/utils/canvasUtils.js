@@ -215,15 +215,9 @@ export const drawBox = (canvas, box) => {
   context.stroke();
 };
 
-export const getRgbBitmap = (bitmapCanvas, rgbCanvas) => {
-  const bitmapContext = bitmapCanvas.getContext("2d");
-  bitmapContext.globalCompositeOperation = "source-in";
-  bitmapContext.drawImage(rgbCanvas, 0, 0);
-  return bitmapCanvas;
-};
-
-export const highlightPixelArea = (image, context, boundingBox, pixelRange) => {
-  if (context && boundingBox) {
+export const highlightPixelArea = (canvas, boundingBox, pixelRange) => {
+  if (canvas && boundingBox) {
+    const context = canvas.getContext("2d");
     const imageData = context.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
@@ -237,8 +231,9 @@ export const highlightPixelArea = (image, context, boundingBox, pixelRange) => {
   }
 };
 
-export const highlightPixelAreaRgb = (image, rgbContext, depthContext, boundingBox, pixelRange) => {
-  if (rgbContext && depthContext && boundingBox) {
+export const highlightPixelAreaRgb = (rgbCanvas, depthContext, boundingBox, pixelRange) => {
+  if (rgbCanvas && depthContext && boundingBox) {
+    const rgbContext = rgbCanvas.getContext("2d");
     const imageData = rgbContext.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]);
     const rgbSrc = imageData.data;
     const depthSrc = depthContext.getImageData(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3]).data;

@@ -16,7 +16,6 @@ import {
   addScaleShift,
   cloneCanvas,
   editHighlightPixelArea,
-  getRgbBitmap,
   scaleSelection,
   getBoundingArea,
   canvasToImage,
@@ -31,7 +30,7 @@ export function SidePane({
   toolExtActions,
   mainDepthCanvas,
   memoryDepthCanvas,
-  displayRgbCanvas,
+  mainRgbCanvas,
   activeDepthTool,
   activeGroundTool,
   toolsParameters,
@@ -40,7 +39,6 @@ export function SidePane({
   operationStack,
   selectTool,
   selectGroundTool,
-  initImage,
   storeToolParameters,
   storeGroundParams,
   storeScribbleParams,
@@ -105,9 +103,6 @@ export function SidePane({
             histogramParams.pixelRange
           );
           updateLayer({ index: activeIndex, value: { bitmap: newBitmapCanvas, toolsParameters: null } });
-          initImage({
-            rgbBitmapCanvas: getRgbBitmap(cloneCanvas(layerStack[activeIndex].bitmap), cloneCanvas(displayRgbCanvas))
-          });
           clear();
         }
       }
@@ -258,31 +253,18 @@ export function SidePane({
             <div className="d-flex my-2">
               <Button
                 disabled={
-                  (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox") || activeGroundTool !== null
+                  !memoryDepthCanvas ||
+                  !activeDepthTool ||
+                  (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox") ||
+                  activeGroundTool !== null
                 }
                 size="sm"
-                className="mx-2"
                 color="secondary"
                 onClick={() => {
                   onModifyBitmap();
                 }}
               >
-                {activeDepthTool === "singleSelection" || activeDepthTool === "addSelection"
-                  ? "Add"
-                  : activeDepthTool === "subtractSelection"
-                  ? "Subtract"
-                  : activeDepthTool === "intersectSelection"
-                  ? "Intersect"
-                  : "Select"}
-              </Button>
-              <Button
-                disabled={activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox"}
-                size="sm"
-                className="mx-2"
-                color="secondary"
-                onClick={() => {}}
-              >
-                Clear
+                Select
               </Button>
             </div>
             <p className="tool-ext-selection-title">Ground Selection</p>
@@ -313,7 +295,6 @@ export function SidePane({
               <Button
                 disabled={!memoryDepthCanvas || activeDepthTool !== null} // should also be disabled if no ground params
                 size="sm"
-                className="mx-2"
                 color="secondary"
                 onClick={() => {
                   let rectangle = groundParams["rectangle"];
@@ -523,7 +504,7 @@ export function SidePane({
           {layers || null}
           {/* if later stack is empty, disable this */}
           <div
-            disabled={mainDepthCanvas === null || operationStack.isSelectActive}
+            disabled={mainDepthCanvas === null || mainRgbCanvas === null || operationStack.isSelectActive}
             className="my-2 layer-mode-body-add"
           >
             <Card className="layer-mode-body-add-card" onClick={addLayer}>
@@ -583,9 +564,8 @@ export function SidePane({
 const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
+  mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
-  rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
   activeDepthTool: imageSelectors.activeDepthTool(state),
   activeGroundTool: imageSelectors.activeGroundTool(state),
   toolsParameters: imageSelectors.toolsParameters(state),
@@ -598,12 +578,9 @@ const mapDispatchToProps = {
   getGround: djangoActions.getGround,
   setRectangle: djangoActions.setRectangle,
   toolExtActions: toolExtActions.toggleToolExt,
-  initImage: imageActions.initImage,
   selectTool: imageActions.selectTool,
   selectGroundTool: imageActions.selectGroundTool,
   addEffect: imageActions.addEffect,
-  removeOperation: imageActions.removeOperation,
-  storeParameters: imageActions.storeParameters,
   storeGroundParams: imageActions.storeGroundParams,
   storeScribbleParams: imageActions.storeScribbleParams,
   addLayer: imageActions.addLayer,

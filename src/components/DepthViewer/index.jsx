@@ -48,12 +48,13 @@ class DepthViewer extends Component {
     let {
       depthImageUrl,
       mainDepthCanvas,
-      displayDepthCanvas,
+      memoryDepthCanvas,
       isEffectNew,
       prevDepthSize,
       scribbleParams,
       groundParams,
       depthScaleParams,
+      isPanActive,
       activeDepthTool,
       activeGroundTool,
       parameters,
@@ -63,7 +64,6 @@ class DepthViewer extends Component {
       initLayer,
       storeScaleParams,
       storeParameters,
-      addOperation,
       addEffect
     } = this.props;
     let depthCanvas = depthImageRef.current;
@@ -110,22 +110,29 @@ class DepthViewer extends Component {
       }
     }
     if (
-      prevProps.displayDepthCanvas !== displayDepthCanvas ||
+      prevProps.memoryDepthCanvas !== memoryDepthCanvas ||
+      prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange ||
       prevProps.depthScaleParams !== depthScaleParams ||
       prevProps.parameters.croppedArea !== parameters.croppedArea ||
       prevProps.groundParams.rectangle !== groundParams.rectangle
     ) {
-      if (displayDepthCanvas) {
+      if (memoryDepthCanvas) {
         const { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
-        drawScaledCanvasImage(
-          displayDepthCanvas,
-          depthCanvas,
-          ratio,
-          centerShift_x,
-          centerShift_y,
-          scale,
-          translatePos
-        );
+        drawScaledCanvasImage(memoryDepthCanvas, depthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+        if (parameters.histogramParams.pixelRange || parameters.croppedArea) {
+          const { croppedArea, histogramParams } = parameters;
+          let newArea = null;
+          if (croppedArea) {
+            newArea = croppedArea;
+          } else {
+            newArea = getBoundingArea(memoryDepthCanvas);
+          }
+          highlightPixelArea(
+            depthCanvas,
+            downScaleBox(newArea, ratio, centerShift_x, centerShift_y, translatePos, scale),
+            histogramParams.pixelRange
+          );
+        }
         if (parameters.croppedArea) {
           drawBox(
             depthCanvas,
@@ -152,28 +159,23 @@ class DepthViewer extends Component {
         depthContext.clearRect(0, 0, depthCanvas.width, depthCanvas.height);
       }
     }
-    // Highlight pixel range from specified range for either cropped image or initial full image
-    if (prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange) {
-      if (parameters.histogramParams.pixelRange || parameters.croppedArea) {
-        const { croppedArea, histogramParams } = parameters;
-        let newArea = null;
-        if (croppedArea) {
-          newArea = croppedArea;
-        } else {
-          newArea = getBoundingArea(displayDepthCanvas);
-        }
-        addOperation({
-          name: "depthStack",
-          value: { func: highlightPixelArea, params: [newArea, histogramParams.pixelRange] }
-        });
+    if (prevProps.isPanActive !== isPanActive) {
+      if (isPanActive && activeDepthTool) {
+        depthCanvas.removeEventListener("click", this.drawBoundingBox);
+      }
+      if (!isPanActive && activeDepthTool) {
+        depthCanvas.addEventListener("click", this.drawBoundingBox);
       }
     }
     // Listens for mouse movements around the depth canvas and draw bounding box
-    if (prevProps.activeDepthTool !== activeDepthTool && activeDepthTool) {
-      if (SelectionBox[activeDepthTool].type === "boundingBox") {
-        depthCanvas.addEventListener("click", this.drawBoundingBox);
+    if (prevProps.activeDepthTool !== activeDepthTool) {
+      if (activeDepthTool) {
+        if (!isPanActive) {
+          depthCanvas.addEventListener("click", this.drawBoundingBox);
+        } else {
+          depthCanvas.removeEventListener("click", this.drawBoundingBox);
+        }
       } else {
-        depthCanvas.style.cursor = "default";
         depthCanvas.removeEventListener("click", this.drawBoundingBox);
         storeParameters({
           croppedCanvasImage: null,
@@ -203,20 +205,33 @@ class DepthViewer extends Component {
     URL.revokeObjectURL(objectUrl);
   }
   handleResize = () => {
-    const { displayDepthCanvas, scribbleParams, depthScaleParams, parameters, initImage, storeScaleParams } =
-      this.props;
+    const { memoryDepthCanvas, scribbleParams, depthScaleParams, parameters, initImage, storeScaleParams } = this.props;
     const { translatePos, scale } = depthScaleParams;
     const depthCanvas = this.depthImageRef.current;
     this.setState({ ...this.state, windowWidth: window.innerWidth });
-    if (depthCanvas && displayDepthCanvas) {
+    if (depthCanvas && memoryDepthCanvas) {
       depthCanvas.width = (window.innerWidth / 1500) * 521;
       depthCanvas.height = (window.innerHeight / 1200) * 352;
-      const { ratio, centerShift_x, centerShift_y } = getRatio(displayDepthCanvas, depthCanvas);
+      const { ratio, centerShift_x, centerShift_y } = getRatio(memoryDepthCanvas, depthCanvas);
       initImage({
         prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height }
       });
       storeScaleParams({ name: "depthScaleParams", value: { ratio, centerShift_x, centerShift_y } });
-      drawScaledCanvasImage(displayDepthCanvas, depthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+      drawScaledCanvasImage(memoryDepthCanvas, depthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+      if (parameters.histogramParams.pixelRange || parameters.croppedArea) {
+        const { croppedArea, histogramParams } = parameters;
+        let newArea = null;
+        if (croppedArea) {
+          newArea = croppedArea;
+        } else {
+          newArea = getBoundingArea(memoryDepthCanvas);
+        }
+        highlightPixelArea(
+          depthCanvas,
+          downScaleBox(newArea, ratio, centerShift_x, centerShift_y, translatePos, scale),
+          histogramParams.pixelRange
+        );
+      }
       if (parameters.croppedArea) {
         drawBox(
           depthCanvas,
@@ -318,6 +333,7 @@ class DepthViewer extends Component {
       rgbScaleParams,
       depthScaleParams,
       parameters,
+      isPanActive,
       activeDepthTool,
       activeGroundTool,
       scribbleParams,
@@ -334,6 +350,7 @@ class DepthViewer extends Component {
           width={(window.innerWidth / 1500) * 521}
           height={(window.innerHeight / 1200) * 352}
           ref={depthImageRef}
+          style={{ cursor: isPanActive ? "grab" : "default" }}
           onMouseDown={e => {
             if (activeDepthTool || activeGroundTool) {
               if (
@@ -356,28 +373,29 @@ class DepthViewer extends Component {
                 storeScribbleParams({
                   pos: { x, y }
                 });
-              } else if (activeDepthTool && SelectionBox[activeDepthTool].type === "pan") {
-                storeScaleParams({
-                  name: "rgbScaleParams",
-                  value: {
-                    startDragOffset: {
-                      x: e.clientX - rgbScaleParams.translatePos.x,
-                      y: e.clientY - rgbScaleParams.translatePos.y
-                    },
-                    mouseDown: true
-                  }
-                });
-                storeScaleParams({
-                  name: "depthScaleParams",
-                  value: {
-                    startDragOffset: {
-                      x: e.clientX - depthScaleParams.translatePos.x,
-                      y: e.clientY - depthScaleParams.translatePos.y
-                    },
-                    mouseDown: true
-                  }
-                });
               }
+            }
+            if (isPanActive) {
+              storeScaleParams({
+                name: "rgbScaleParams",
+                value: {
+                  startDragOffset: {
+                    x: e.clientX - rgbScaleParams.translatePos.x,
+                    y: e.clientY - rgbScaleParams.translatePos.y
+                  },
+                  mouseDown: true
+                }
+              });
+              storeScaleParams({
+                name: "depthScaleParams",
+                value: {
+                  startDragOffset: {
+                    x: e.clientX - depthScaleParams.translatePos.x,
+                    y: e.clientY - depthScaleParams.translatePos.y
+                  },
+                  mouseDown: true
+                }
+              });
             }
           }}
           onMouseUp={e => {
@@ -400,11 +418,11 @@ class DepthViewer extends Component {
                     storeGroundParams({ path: scribblePathConverter(scribbleParams.path, groundParams.rectangle) });
                   }
                 }
-              } else if (activeDepthTool && SelectionBox[activeDepthTool].type === "pan") {
-                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-                depthScaleParams.mouseDown &&
-                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
               }
+            }
+            if (isPanActive) {
+              rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+              depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
             }
           }}
           onMouseOver={e => {
@@ -413,11 +431,11 @@ class DepthViewer extends Component {
                 (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") ||
                 (activeGroundTool && GroundBox[activeGroundTool].type === "scribble")
               ) {
-              } else if (activeDepthTool && SelectionBox[activeDepthTool].type === "pan") {
-                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-                depthScaleParams.mouseDown &&
-                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
               }
+            }
+            if (isPanActive) {
+              rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+              depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
             }
           }}
           onMouseOut={e => {
@@ -426,11 +444,11 @@ class DepthViewer extends Component {
                 (activeDepthTool && SelectionBox[activeDepthTool].type === "scribble") ||
                 (activeGroundTool && GroundBox[activeGroundTool].type === "scribble")
               ) {
-              } else if (activeDepthTool && SelectionBox[activeDepthTool].type === "pan") {
-                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-                depthScaleParams.mouseDown &&
-                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
               }
+            }
+            if (isPanActive) {
+              rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+              depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
             }
           }}
           onMouseEnter={e => {
@@ -455,8 +473,9 @@ class DepthViewer extends Component {
                 storeScribbleParams({
                   pos: { x, y }
                 });
-              } else if (activeDepthTool && SelectionBox[activeDepthTool].type === "pan") {
               }
+            }
+            if (isPanActive) {
             }
           }}
           onMouseMove={e => {
@@ -493,27 +512,28 @@ class DepthViewer extends Component {
                     }
                   ]
                 });
-              } else if (activeDepthTool && SelectionBox[activeDepthTool].type === "pan") {
-                if (depthScaleParams.mouseDown) {
-                  storeScaleParams({
-                    name: "rgbScaleParams",
-                    value: {
-                      translatePos: {
-                        x: e.clientX - rgbScaleParams.startDragOffset.x,
-                        y: e.clientY - rgbScaleParams.startDragOffset.y
-                      }
+              }
+            }
+            if (isPanActive) {
+              if (depthScaleParams.mouseDown) {
+                storeScaleParams({
+                  name: "rgbScaleParams",
+                  value: {
+                    translatePos: {
+                      x: e.clientX - rgbScaleParams.startDragOffset.x,
+                      y: e.clientY - rgbScaleParams.startDragOffset.y
                     }
-                  });
-                  storeScaleParams({
-                    name: "depthScaleParams",
-                    value: {
-                      translatePos: {
-                        x: e.clientX - depthScaleParams.startDragOffset.x,
-                        y: e.clientY - depthScaleParams.startDragOffset.y
-                      }
+                  }
+                });
+                storeScaleParams({
+                  name: "depthScaleParams",
+                  value: {
+                    translatePos: {
+                      x: e.clientX - depthScaleParams.startDragOffset.x,
+                      y: e.clientY - depthScaleParams.startDragOffset.y
                     }
-                  });
-                }
+                  }
+                });
               }
             }
           }}
@@ -526,7 +546,6 @@ class DepthViewer extends Component {
 const mapStateToProps = state => ({
   depthImageUrl: imageSelectors.depthImageUrl(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  displayDepthCanvas: imageSelectors.displayDepthCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   isEffectNew: imageSelectors.isEffectNew(state),
   prevDepthSize: imageSelectors.prevDepthSize(state),
@@ -534,9 +553,9 @@ const mapStateToProps = state => ({
   groundParams: imageSelectors.groundParams(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
   depthScaleParams: imageSelectors.depthScaleParams(state),
+  isPanActive: imageSelectors.isPanActive(state),
   activeDepthTool: imageSelectors.activeDepthTool(state),
   activeGroundTool: imageSelectors.activeGroundTool(state),
-  toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),
   operationStack: imageSelectors.operationStack(state)
 });
@@ -549,7 +568,6 @@ const mapDispatchToProps = {
   storeScaleParams: imageActions.storeScaleParams,
   storeParameters: imageActions.storeParameters,
   storeGroundParams: imageActions.storeGroundParams,
-  addOperation: imageActions.addOperation,
   addEffect: imageActions.addEffect
 };
 

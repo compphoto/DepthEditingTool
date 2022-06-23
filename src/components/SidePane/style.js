@@ -47,9 +47,11 @@ const SidePaneStyle = styled.div`
       font-size: 0.9rem;
       .layer-mode-body-content {
         position: relative;
+        border: 4px solid transparent;
         width: 100%;
         .layer-mode-body-content-image-card {
           background: #2e2f34;
+          border: none;
           width: 100%;
           .layer-mode-body-content-image {
             display: flex;

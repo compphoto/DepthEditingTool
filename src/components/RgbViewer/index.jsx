@@ -5,6 +5,7 @@ import { selectors as imageSelectors } from "store/image";
 import RgbViewerStyle from "./style";
 import { getImageUrl } from "utils/generalUtils";
 import {
+  canvasLike,
   canvasResize,
   cloneCanvas,
   downScaleBox,
@@ -16,7 +17,6 @@ import {
   highlightPixelAreaRgb
 } from "utils/canvasUtils";
 import { runRgbOperations } from "utils/stackOperations";
-import { SelectionBox } from "config/toolBox";
 
 let objectUrl = null;
 
@@ -33,12 +33,12 @@ class RgbViewer extends Component {
     this.handleResize();
     window.addEventListener("resize", this.handleResize);
   }
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     let { rgbImageRef } = this;
     let {
       rgbImageUrl,
       mainRgbCanvas,
-      displayRgbCanvas,
+      memoryRgbCanvas,
       memoryDepthCanvas,
       rgbScaleParams,
       prevRgbSize,
@@ -47,7 +47,6 @@ class RgbViewer extends Component {
       initImage,
       initRgb,
       storeScaleParams,
-      addOperation,
       addEffect
     } = this.props;
     let rgbCanvas = rgbImageRef.current;
@@ -89,13 +88,40 @@ class RgbViewer extends Component {
       }
     }
     if (
-      prevProps.displayRgbCanvas !== displayRgbCanvas ||
+      prevProps.memoryRgbCanvas !== memoryRgbCanvas ||
+      prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange ||
       prevProps.rgbScaleParams !== rgbScaleParams ||
       prevProps.parameters.croppedArea !== parameters.croppedArea
     ) {
-      if (displayRgbCanvas) {
+      if (memoryRgbCanvas) {
         const { ratio, centerShift_x, centerShift_y, translatePos, scale } = rgbScaleParams;
-        drawScaledCanvasImage(displayRgbCanvas, rgbCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+        drawScaledCanvasImage(memoryRgbCanvas, rgbCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+        if ((parameters.histogramParams.pixelRange || parameters.croppedArea) && memoryDepthCanvas) {
+          const { croppedArea, histogramParams } = parameters;
+          const depthCanvas = canvasLike(rgbCanvas);
+          drawScaledCanvasImage(
+            memoryDepthCanvas,
+            depthCanvas,
+            ratio,
+            centerShift_x,
+            centerShift_y,
+            scale,
+            translatePos
+          );
+          const depthContext = depthCanvas.getContext("2d");
+          let newArea = null;
+          if (croppedArea) {
+            newArea = croppedArea;
+          } else {
+            newArea = getBoundingArea(memoryRgbCanvas);
+          }
+          highlightPixelAreaRgb(
+            rgbCanvas,
+            depthContext,
+            downScaleBox(newArea, ratio, centerShift_x, centerShift_y, translatePos, scale),
+            histogramParams.pixelRange
+          );
+        }
         if (parameters.croppedArea) {
           drawBox(
             rgbCanvas,
@@ -107,42 +133,43 @@ class RgbViewer extends Component {
         rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
       }
     }
-    // Highlight pixel range from specified range for either cropped image or initial full image
-    if (prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange) {
-      if ((parameters.histogramParams.pixelRange || parameters.croppedArea) && memoryDepthCanvas) {
-        const { croppedArea, histogramParams } = parameters;
-        const depthContext = memoryDepthCanvas.getContext("2d");
-        let newArea = null;
-        if (croppedArea) {
-          newArea = croppedArea;
-        } else {
-          newArea = getBoundingArea(displayRgbCanvas);
-        }
-        addOperation({
-          name: "rgbStack",
-          value: { func: highlightPixelAreaRgb, params: [depthContext, newArea, histogramParams.pixelRange] }
-        });
-      }
-    }
   }
   componentWillUnmount() {
     window.removeEventListener("resize", this.handleResize);
     URL.revokeObjectURL(objectUrl);
   }
   handleResize = () => {
-    const { displayRgbCanvas, rgbScaleParams, parameters, initImage, storeScaleParams } = this.props;
+    const { memoryRgbCanvas, memoryDepthCanvas, rgbScaleParams, parameters, initImage, storeScaleParams } = this.props;
     const { translatePos, scale } = rgbScaleParams;
     const rgbCanvas = this.rgbImageRef.current;
     this.setState({ ...this.state, windowWidth: window.innerWidth });
-    if (rgbCanvas && displayRgbCanvas) {
+    if (rgbCanvas && memoryRgbCanvas) {
       rgbCanvas.width = (window.innerWidth / 1500) * 521;
       rgbCanvas.height = (window.innerHeight / 1200) * 352;
-      const { ratio, centerShift_x, centerShift_y } = getRatio(displayRgbCanvas, rgbCanvas);
+      const { ratio, centerShift_x, centerShift_y } = getRatio(memoryRgbCanvas, rgbCanvas);
       initImage({
         prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height }
       });
       storeScaleParams({ name: "rgbScaleParams", value: { ratio, centerShift_x, centerShift_y } });
-      drawScaledCanvasImage(displayRgbCanvas, rgbCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+      drawScaledCanvasImage(memoryRgbCanvas, rgbCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+      if ((parameters.histogramParams.pixelRange || parameters.croppedArea) && memoryDepthCanvas) {
+        const { croppedArea, histogramParams } = parameters;
+        const depthCanvas = canvasLike(rgbCanvas);
+        drawScaledCanvasImage(memoryDepthCanvas, depthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+        const depthContext = depthCanvas.getContext("2d");
+        let newArea = null;
+        if (croppedArea) {
+          newArea = croppedArea;
+        } else {
+          newArea = getBoundingArea(memoryRgbCanvas);
+        }
+        highlightPixelAreaRgb(
+          rgbCanvas,
+          depthContext,
+          downScaleBox(newArea, ratio, centerShift_x, centerShift_y, translatePos, scale),
+          histogramParams.pixelRange
+        );
+      }
       if (parameters.croppedArea) {
         drawBox(
           rgbCanvas,
@@ -153,98 +180,87 @@ class RgbViewer extends Component {
   };
   render() {
     const { rgbImageRef } = this;
-    const {
-      mainDepthCanvas,
-      rgbScaleParams,
-      depthScaleParams,
-      parameters,
-      activeDepthTool,
-      storeScaleParams,
-      storeParameters,
-      addOperation
-    } = this.props;
+    const { rgbScaleParams, depthScaleParams, isPanActive, activeDepthTool, storeScaleParams } = this.props;
     return (
       <RgbViewerStyle>
         <canvas
           width={(window.innerWidth / 1500) * 521}
           height={(window.innerHeight / 1200) * 352}
           ref={rgbImageRef}
+          style={{ cursor: isPanActive ? "grab" : "default" }}
           onMouseDown={e => {
             if (activeDepthTool) {
-              if (SelectionBox[activeDepthTool].type === "pan") {
+            }
+            if (isPanActive) {
+              storeScaleParams({
+                name: "rgbScaleParams",
+                value: {
+                  startDragOffset: {
+                    x: e.clientX - rgbScaleParams.translatePos.x,
+                    y: e.clientY - rgbScaleParams.translatePos.y
+                  },
+                  mouseDown: true
+                }
+              });
+              storeScaleParams({
+                name: "depthScaleParams",
+                value: {
+                  startDragOffset: {
+                    x: e.clientX - depthScaleParams.translatePos.x,
+                    y: e.clientY - depthScaleParams.translatePos.y
+                  },
+                  mouseDown: true
+                }
+              });
+            }
+          }}
+          onMouseUp={e => {
+            if (activeDepthTool) {
+            }
+            if (isPanActive) {
+              rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+              depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+            }
+          }}
+          onMouseOver={e => {
+            if (activeDepthTool) {
+            }
+            if (isPanActive) {
+              rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+              depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+            }
+          }}
+          onMouseOut={e => {
+            if (activeDepthTool) {
+            }
+            if (isPanActive) {
+              rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
+              depthScaleParams.mouseDown && storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
+            }
+          }}
+          onMouseMove={e => {
+            if (activeDepthTool) {
+            }
+            if (isPanActive) {
+              if (depthScaleParams.mouseDown) {
                 storeScaleParams({
                   name: "rgbScaleParams",
                   value: {
-                    startDragOffset: {
-                      x: e.clientX - rgbScaleParams.translatePos.x,
-                      y: e.clientY - rgbScaleParams.translatePos.y
-                    },
-                    mouseDown: true
+                    translatePos: {
+                      x: e.clientX - rgbScaleParams.startDragOffset.x,
+                      y: e.clientY - rgbScaleParams.startDragOffset.y
+                    }
                   }
                 });
                 storeScaleParams({
                   name: "depthScaleParams",
                   value: {
-                    startDragOffset: {
-                      x: e.clientX - depthScaleParams.translatePos.x,
-                      y: e.clientY - depthScaleParams.translatePos.y
-                    },
-                    mouseDown: true
+                    translatePos: {
+                      x: e.clientX - depthScaleParams.startDragOffset.x,
+                      y: e.clientY - depthScaleParams.startDragOffset.y
+                    }
                   }
                 });
-              }
-            }
-          }}
-          onMouseUp={e => {
-            if (activeDepthTool) {
-              if (SelectionBox[activeDepthTool].type === "pan") {
-                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-                depthScaleParams.mouseDown &&
-                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
-              }
-            }
-          }}
-          onMouseOver={e => {
-            if (activeDepthTool) {
-              if (SelectionBox[activeDepthTool].type === "pan") {
-                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-                depthScaleParams.mouseDown &&
-                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
-              }
-            }
-          }}
-          onMouseOut={e => {
-            if (activeDepthTool) {
-              if (SelectionBox[activeDepthTool].type === "pan") {
-                rgbScaleParams.mouseDown && storeScaleParams({ name: "rgbScaleParams", value: { mouseDown: false } });
-                depthScaleParams.mouseDown &&
-                  storeScaleParams({ name: "depthScaleParams", value: { mouseDown: false } });
-              }
-            }
-          }}
-          onMouseMove={e => {
-            if (activeDepthTool) {
-              if (SelectionBox[activeDepthTool].type === "pan") {
-                if (depthScaleParams.mouseDown) {
-                  storeScaleParams({
-                    name: "rgbScaleParams",
-                    value: {
-                      translatePos: {
-                        x: e.clientX - rgbScaleParams.startDragOffset.x,
-                        y: e.clientY - rgbScaleParams.startDragOffset.y
-                      }
-                    }
-                  });
-                  storeScaleParams({
-                    name: "depthScaleParams",
-                    value: {
-                      translatePos: {
-                        x: e.clientX - depthScaleParams.startDragOffset.x,
-                        y: e.clientY - depthScaleParams.startDragOffset.y
-                      }
-                    }
-                  });
-                }
               }
             }
           }}
@@ -257,15 +273,13 @@ class RgbViewer extends Component {
 const mapStateToProps = state => ({
   rgbImageUrl: imageSelectors.rgbImageUrl(state),
   mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
-  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
+  memoryRgbCanvas: imageSelectors.memoryRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   prevRgbSize: imageSelectors.prevRgbSize(state),
-  rgbBitmapCanvas: imageSelectors.rgbBitmapCanvas(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
   depthScaleParams: imageSelectors.depthScaleParams(state),
+  isPanActive: imageSelectors.isPanActive(state),
   activeDepthTool: imageSelectors.activeDepthTool(state),
-  toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),
   operationStack: imageSelectors.operationStack(state)
 });
@@ -274,8 +288,6 @@ const mapDispatchToProps = {
   initImage: imageActions.initImage,
   initRgb: imageActions.initRgb,
   storeScaleParams: imageActions.storeScaleParams,
-  addOperation: imageActions.addOperation,
-  removeOperation: imageActions.removeOperation,
   addEffect: imageActions.addEffect
 };
 

@@ -8,14 +8,12 @@ const initialState = {
   maskImageUrl: null,
   mainRgbCanvas: null,
   mainDepthCanvas: null,
-  displayRgbCanvas: null,
+  memoryRgbCanvas: null,
   memoryDepthCanvas: null,
-  displayDepthCanvas: null,
   cacheDepthCanvas: null,
   isEffectNew: true,
   prevRgbSize: { width: null, height: null },
   prevDepthSize: { width: null, height: null },
-  rgbBitmapCanvas: null,
   scribbleParams: {
     pos: { x: 0, y: 0 },
     offset: {},
@@ -47,6 +45,7 @@ const initialState = {
     startDragOffset: {},
     mouseDown: false
   },
+  isPanActive: false,
   activeDepthTool: null,
   activeGroundTool: null,
   groundParams: {
@@ -110,9 +109,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         mainRgbCanvas: payload,
-        displayRgbCanvas: null,
+        memoryRgbCanvas: null,
         prevRgbSize: { width: null, height: null },
-        rgbBitmapCanvas: null,
         rgbScaleParams: rgbScaleParams,
         operationStack: {
           ...state.operationStack,
@@ -139,10 +137,8 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         ...state,
         mainDepthCanvas: payload,
         memoryDepthCanvas: null,
-        displayDepthCanvas: null,
         cacheDepthCanvas: null,
         prevDepthSize: { width: null, height: null },
-        rgbBitmapCanvas: null,
         scribbleParams: {
           pos: { x: 0, y: 0 },
           offset: {},
@@ -176,6 +172,11 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           depthStack: [],
           layerStack: []
         }
+      };
+    case types.TOGGLE_PAN:
+      return {
+        ...state,
+        isPanActive: !state.isPanActive
       };
     case types.SELECT_TOOL:
       var prevTool = state.activeDepthTool;
@@ -408,36 +409,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           selectedLayers: new Set()
         }
       };
-    case types.ADD_OPERATION:
-      var { name, value } = payload;
-      var array = state.operationStack[name];
-      var newArray = array.filter(x => {
-        if (x.func.toString() !== value.func.toString()) {
-          return x;
-        }
-      });
-      return {
-        ...state,
-        operationStack: {
-          ...state.operationStack,
-          [name]: [...newArray, { ...value, type: "operation" }]
-        }
-      };
-    case types.REMOVE_OPERATION:
-      var { name, value } = payload;
-      var array = state.operationStack[name];
-      var newArray = array.filter(x => {
-        if (x.func.toString() !== value.toString()) {
-          return x;
-        }
-      });
-      return {
-        ...state,
-        operationStack: {
-          ...state.operationStack,
-          [name]: [...newArray]
-        }
-      };
     case types.ADD_EFFECT:
       var { name, value } = payload;
       var params = value.params;
@@ -464,7 +435,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         isEffectNew,
         operationStack: {
           ...state.operationStack,
-          [name]: [...state.operationStack[name], { ...value, params: params, type: "effect", id: currentId }]
+          [name]: [...state.operationStack[name], { ...value, params: params, id: currentId }]
         }
       };
     case types.ZOOM_IN:
@@ -492,38 +463,50 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         }
       };
     case types.UNDO:
-      var depthStack = state.operationStack.depthStack;
-      var lastEffect = -1;
-      depthStack.forEach((element, index) => {
-        if (element.type === "effect" && index !== 0) {
-          lastEffect = index;
-        }
-      });
-      var newDepthStack = depthStack.filter((x, index) => {
-        if (index !== lastEffect) {
-          return x;
-        }
-      });
+      var depthStack = [...state.operationStack.depthStack];
+      if (Array.isArray(depthStack) && depthStack.length > 1) {
+        depthStack.pop();
+      }
       return {
         ...state,
         operationStack: {
           ...state.operationStack,
-          depthStack: [...newDepthStack]
+          depthStack: depthStack
         }
       };
     case types.CLEAR:
-      var rgbStack = [state.operationStack.rgbStack[0]];
-      var depthStack = state.operationStack.depthStack.filter(x => {
-        if (x.type === "effect") {
-          return x;
-        }
-      });
       return {
         ...state,
+        rgbScaleParams: {
+          ...state.rgbScaleParams,
+          translatePos: {
+            x: 0,
+            y: 0
+          },
+          scale: 1.0,
+          scaleMultiplier: 0.8,
+          startDragOffset: {},
+          mouseDown: false
+        },
+        depthScaleParams: {
+          ...state.depthScaleParams,
+          translatePos: {
+            x: 0,
+            y: 0
+          },
+          scale: 1.0,
+          scaleMultiplier: 0.8,
+          startDragOffset: {},
+          mouseDown: false
+        },
         scribbleParams: {
           pos: { x: 0, y: 0 },
           offset: {},
           path: []
+        },
+        groundParams: {
+          rectangle: null,
+          path: null
         },
         parameters: {
           ...state.parameters,
@@ -535,11 +518,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
             values: [0, 255],
             update: [0, 255]
           }
-        },
-        operationStack: {
-          ...state.operationStack,
-          rgbStack: [...rgbStack],
-          depthStack: [...depthStack]
         }
       };
     case types.RESET:

@@ -1,6 +1,5 @@
 import React, { Suspense, useEffect, useState, useRef } from "react";
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import { TextureLoader } from "three/src/loaders/TextureLoader";
 import { DoubleSide } from "three";
 import { Input } from "reactstrap";
