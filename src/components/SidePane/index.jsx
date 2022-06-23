@@ -1,6 +1,5 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { connect } from "react-redux";
-import { djangoActions } from "store/django";
 import { toolExtActions } from "store/toolext";
 import { imageActions } from "store/image";
 import { selectors as toolExtSelectors } from "store/toolext";
@@ -37,7 +36,6 @@ export function SidePane({
   operationStack,
   selectTool,
   storeToolParameters,
-  storeScribbleParams,
   addEffect,
   addLayer,
   updateLayerIndex,
@@ -46,8 +44,7 @@ export function SidePane({
   removeLayer,
   removeAllLayers,
   toggleLayerSelect,
-  clear,
-  setRectangle
+  clear
 }) {
   const [activeTool, setActiveTool] = useState(0);
   const [layers, setLayers] = useState(null);
@@ -516,7 +513,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  setRectangle: djangoActions.setRectangle,
   toolExtActions: toolExtActions.toggleToolExt,
   selectTool: imageActions.selectTool,
   addEffect: imageActions.addEffect,
