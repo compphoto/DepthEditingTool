@@ -31,7 +31,6 @@ export function SidePane({
   mainDepthCanvas,
   memoryDepthCanvas,
   mainRgbCanvas,
-  displayRgbCanvas,
   activeDepthTool,
   activeGroundTool,
   toolsParameters,
@@ -40,7 +39,6 @@ export function SidePane({
   operationStack,
   selectTool,
   selectGroundTool,
-  initImage,
   storeToolParameters,
   storeGroundParams,
   storeScribbleParams,
@@ -261,24 +259,12 @@ export function SidePane({
                   activeGroundTool !== null
                 }
                 size="sm"
-                className="mx-2"
                 color="secondary"
                 onClick={() => {
                   onModifyBitmap();
                 }}
               >
                 Select
-              </Button>
-              <Button
-                disabled={
-                  !memoryDepthCanvas || (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox")
-                }
-                size="sm"
-                className="mx-2"
-                color="secondary"
-                onClick={() => {}}
-              >
-                Clear
               </Button>
             </div>
             <p className="tool-ext-selection-title">Ground Selection</p>
@@ -309,7 +295,6 @@ export function SidePane({
               <Button
                 disabled={!memoryDepthCanvas || activeDepthTool !== null} // should also be disabled if no ground params
                 size="sm"
-                className="mx-2"
                 color="secondary"
                 onClick={() => {
                   let rectangle = groundParams["rectangle"];
@@ -580,7 +565,6 @@ const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
-  displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   activeDepthTool: imageSelectors.activeDepthTool(state),
   activeGroundTool: imageSelectors.activeGroundTool(state),
@@ -594,11 +578,9 @@ const mapDispatchToProps = {
   getGround: djangoActions.getGround,
   setRectangle: djangoActions.setRectangle,
   toolExtActions: toolExtActions.toggleToolExt,
-  initImage: imageActions.initImage,
   selectTool: imageActions.selectTool,
   selectGroundTool: imageActions.selectGroundTool,
   addEffect: imageActions.addEffect,
-  storeParameters: imageActions.storeParameters,
   storeGroundParams: imageActions.storeGroundParams,
   storeScribbleParams: imageActions.storeScribbleParams,
   addLayer: imageActions.addLayer,

@@ -1,6 +1,5 @@
-import React, { Component, createRef } from "react";
+import React, { Component } from "react";
 import { connect } from "react-redux";
-import { imageActions } from "store/image";
 import { selectors as toolExtSelectors } from "store/toolext";
 import { selectors as imageSelectors } from "store/image";
 import DepthViewer from "components/DepthViewer";
@@ -8,25 +7,11 @@ import RgbViewer from "components/RgbViewer";
 import HistViewer from "components/HistViewer";
 import ThreeDViewer from "components/ThreeDViewer";
 import MainPaneStyle from "./style";
-import { canvasToImage, cropCanvas } from "utils/canvasUtils";
+import { canvasToImage } from "utils/canvasUtils";
 
 class MainPane extends Component {
-  onHandleChange = e => {
-    this.props.handleChange(e);
-    e.target.value = null;
-  };
   render() {
-    const { onHandleChange } = this;
-    const {
-      toolExtOpen,
-      rgbImageUrl,
-      depthImageUrl,
-      displayRgbCanvas,
-      memoryDepthCanvas,
-      operationStack,
-      removeItem,
-      removeAllItem
-    } = this.props;
+    const { toolExtOpen, memoryRgbCanvas, memoryDepthCanvas } = this.props;
     return (
       <MainPaneStyle>
         <div className={toolExtOpen ? "main main-shrink" : "main main-expand"}>
@@ -42,7 +27,7 @@ class MainPane extends Component {
             <div className="main-column main-column-3d">
               <div className="box threeD-box">
                 <ThreeDViewer
-                  rgbImageCanvas={canvasToImage(displayRgbCanvas)}
+                  rgbImageCanvas={canvasToImage(memoryRgbCanvas)}
                   depthImageCanvas={canvasToImage(memoryDepthCanvas)}
                 />
               </div>
@@ -59,17 +44,8 @@ class MainPane extends Component {
 
 const mapStateToProps = state => ({
   toolExtOpen: toolExtSelectors.toolExtOpen(state),
-  rgbImageUrl: imageSelectors.rgbImageUrl(state),
-  depthImageUrl: imageSelectors.depthImageUrl(state),
-  displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
-  memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
-  operationStack: imageSelectors.operationStack(state)
+  memoryRgbCanvas: imageSelectors.memoryRgbCanvas(state),
+  memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state)
 });
 
-const mapDispatchToProps = {
-  handleChange: imageActions.handleChange,
-  removeItem: imageActions.removeItem,
-  removeAllItem: imageActions.removeAllItem
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(MainPane);
+export default connect(mapStateToProps, null)(MainPane);

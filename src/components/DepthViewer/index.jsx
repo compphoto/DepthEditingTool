@@ -48,7 +48,7 @@ class DepthViewer extends Component {
     let {
       depthImageUrl,
       mainDepthCanvas,
-      displayDepthCanvas,
+      memoryDepthCanvas,
       isEffectNew,
       prevDepthSize,
       scribbleParams,
@@ -110,30 +110,22 @@ class DepthViewer extends Component {
       }
     }
     if (
-      prevProps.displayDepthCanvas !== displayDepthCanvas ||
+      prevProps.memoryDepthCanvas !== memoryDepthCanvas ||
       prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange ||
       prevProps.depthScaleParams !== depthScaleParams ||
       prevProps.parameters.croppedArea !== parameters.croppedArea ||
       prevProps.groundParams.rectangle !== groundParams.rectangle
     ) {
-      if (displayDepthCanvas) {
+      if (memoryDepthCanvas) {
         const { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
-        drawScaledCanvasImage(
-          displayDepthCanvas,
-          depthCanvas,
-          ratio,
-          centerShift_x,
-          centerShift_y,
-          scale,
-          translatePos
-        );
+        drawScaledCanvasImage(memoryDepthCanvas, depthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
         if (parameters.histogramParams.pixelRange || parameters.croppedArea) {
           const { croppedArea, histogramParams } = parameters;
           let newArea = null;
           if (croppedArea) {
             newArea = croppedArea;
           } else {
-            newArea = getBoundingArea(displayDepthCanvas);
+            newArea = getBoundingArea(memoryDepthCanvas);
           }
           highlightPixelArea(
             depthCanvas,
@@ -213,27 +205,26 @@ class DepthViewer extends Component {
     URL.revokeObjectURL(objectUrl);
   }
   handleResize = () => {
-    const { displayDepthCanvas, scribbleParams, depthScaleParams, parameters, initImage, storeScaleParams } =
-      this.props;
+    const { memoryDepthCanvas, scribbleParams, depthScaleParams, parameters, initImage, storeScaleParams } = this.props;
     const { translatePos, scale } = depthScaleParams;
     const depthCanvas = this.depthImageRef.current;
     this.setState({ ...this.state, windowWidth: window.innerWidth });
-    if (depthCanvas && displayDepthCanvas) {
+    if (depthCanvas && memoryDepthCanvas) {
       depthCanvas.width = (window.innerWidth / 1500) * 521;
       depthCanvas.height = (window.innerHeight / 1200) * 352;
-      const { ratio, centerShift_x, centerShift_y } = getRatio(displayDepthCanvas, depthCanvas);
+      const { ratio, centerShift_x, centerShift_y } = getRatio(memoryDepthCanvas, depthCanvas);
       initImage({
         prevDepthSize: { width: depthCanvas.width, height: depthCanvas.height }
       });
       storeScaleParams({ name: "depthScaleParams", value: { ratio, centerShift_x, centerShift_y } });
-      drawScaledCanvasImage(displayDepthCanvas, depthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+      drawScaledCanvasImage(memoryDepthCanvas, depthCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
       if (parameters.histogramParams.pixelRange || parameters.croppedArea) {
         const { croppedArea, histogramParams } = parameters;
         let newArea = null;
         if (croppedArea) {
           newArea = croppedArea;
         } else {
-          newArea = getBoundingArea(displayDepthCanvas);
+          newArea = getBoundingArea(memoryDepthCanvas);
         }
         highlightPixelArea(
           depthCanvas,
@@ -555,7 +546,6 @@ class DepthViewer extends Component {
 const mapStateToProps = state => ({
   depthImageUrl: imageSelectors.depthImageUrl(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  displayDepthCanvas: imageSelectors.displayDepthCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   isEffectNew: imageSelectors.isEffectNew(state),
   prevDepthSize: imageSelectors.prevDepthSize(state),
@@ -566,7 +556,6 @@ const mapStateToProps = state => ({
   isPanActive: imageSelectors.isPanActive(state),
   activeDepthTool: imageSelectors.activeDepthTool(state),
   activeGroundTool: imageSelectors.activeGroundTool(state),
-  toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),
   operationStack: imageSelectors.operationStack(state)
 });

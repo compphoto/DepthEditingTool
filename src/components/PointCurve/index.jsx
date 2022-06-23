@@ -3,9 +3,8 @@ import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import PointCurveStyle from "./style";
-import { dimensionToBox, adjustTone, getBoundingArea, cloneCanvas } from "utils/canvasUtils";
+import { adjustTone, cloneCanvas } from "utils/canvasUtils";
 
-let objectUrl = null;
 let circle1 = new Path2D();
 let circle2 = new Path2D();
 

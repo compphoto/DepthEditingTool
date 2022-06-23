@@ -17,7 +17,6 @@ import {
   highlightPixelAreaRgb
 } from "utils/canvasUtils";
 import { runRgbOperations } from "utils/stackOperations";
-import { SelectionBox } from "config/toolBox";
 
 let objectUrl = null;
 
@@ -34,12 +33,12 @@ class RgbViewer extends Component {
     this.handleResize();
     window.addEventListener("resize", this.handleResize);
   }
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     let { rgbImageRef } = this;
     let {
       rgbImageUrl,
       mainRgbCanvas,
-      displayRgbCanvas,
+      memoryRgbCanvas,
       memoryDepthCanvas,
       rgbScaleParams,
       prevRgbSize,
@@ -89,14 +88,14 @@ class RgbViewer extends Component {
       }
     }
     if (
-      prevProps.displayRgbCanvas !== displayRgbCanvas ||
+      prevProps.memoryRgbCanvas !== memoryRgbCanvas ||
       prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange ||
       prevProps.rgbScaleParams !== rgbScaleParams ||
       prevProps.parameters.croppedArea !== parameters.croppedArea
     ) {
-      if (displayRgbCanvas) {
+      if (memoryRgbCanvas) {
         const { ratio, centerShift_x, centerShift_y, translatePos, scale } = rgbScaleParams;
-        drawScaledCanvasImage(displayRgbCanvas, rgbCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+        drawScaledCanvasImage(memoryRgbCanvas, rgbCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
         if ((parameters.histogramParams.pixelRange || parameters.croppedArea) && memoryDepthCanvas) {
           const { croppedArea, histogramParams } = parameters;
           const depthCanvas = canvasLike(rgbCanvas);
@@ -114,7 +113,7 @@ class RgbViewer extends Component {
           if (croppedArea) {
             newArea = croppedArea;
           } else {
-            newArea = getBoundingArea(displayRgbCanvas);
+            newArea = getBoundingArea(memoryRgbCanvas);
           }
           highlightPixelAreaRgb(
             rgbCanvas,
@@ -140,19 +139,19 @@ class RgbViewer extends Component {
     URL.revokeObjectURL(objectUrl);
   }
   handleResize = () => {
-    const { displayRgbCanvas, memoryDepthCanvas, rgbScaleParams, parameters, initImage, storeScaleParams } = this.props;
+    const { memoryRgbCanvas, memoryDepthCanvas, rgbScaleParams, parameters, initImage, storeScaleParams } = this.props;
     const { translatePos, scale } = rgbScaleParams;
     const rgbCanvas = this.rgbImageRef.current;
     this.setState({ ...this.state, windowWidth: window.innerWidth });
-    if (rgbCanvas && displayRgbCanvas) {
+    if (rgbCanvas && memoryRgbCanvas) {
       rgbCanvas.width = (window.innerWidth / 1500) * 521;
       rgbCanvas.height = (window.innerHeight / 1200) * 352;
-      const { ratio, centerShift_x, centerShift_y } = getRatio(displayRgbCanvas, rgbCanvas);
+      const { ratio, centerShift_x, centerShift_y } = getRatio(memoryRgbCanvas, rgbCanvas);
       initImage({
         prevRgbSize: { width: rgbCanvas.width, height: rgbCanvas.height }
       });
       storeScaleParams({ name: "rgbScaleParams", value: { ratio, centerShift_x, centerShift_y } });
-      drawScaledCanvasImage(displayRgbCanvas, rgbCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
+      drawScaledCanvasImage(memoryRgbCanvas, rgbCanvas, ratio, centerShift_x, centerShift_y, scale, translatePos);
       if ((parameters.histogramParams.pixelRange || parameters.croppedArea) && memoryDepthCanvas) {
         const { croppedArea, histogramParams } = parameters;
         const depthCanvas = canvasLike(rgbCanvas);
@@ -162,7 +161,7 @@ class RgbViewer extends Component {
         if (croppedArea) {
           newArea = croppedArea;
         } else {
-          newArea = getBoundingArea(displayRgbCanvas);
+          newArea = getBoundingArea(memoryRgbCanvas);
         }
         highlightPixelAreaRgb(
           rgbCanvas,
@@ -181,16 +180,7 @@ class RgbViewer extends Component {
   };
   render() {
     const { rgbImageRef } = this;
-    const {
-      mainDepthCanvas,
-      rgbScaleParams,
-      depthScaleParams,
-      parameters,
-      isPanActive,
-      activeDepthTool,
-      storeScaleParams,
-      storeParameters
-    } = this.props;
+    const { rgbScaleParams, depthScaleParams, isPanActive, activeDepthTool, storeScaleParams } = this.props;
     return (
       <RgbViewerStyle>
         <canvas
@@ -283,15 +273,13 @@ class RgbViewer extends Component {
 const mapStateToProps = state => ({
   rgbImageUrl: imageSelectors.rgbImageUrl(state),
   mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
-  mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
-  displayRgbCanvas: imageSelectors.displayRgbCanvas(state),
+  memoryRgbCanvas: imageSelectors.memoryRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   prevRgbSize: imageSelectors.prevRgbSize(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
   depthScaleParams: imageSelectors.depthScaleParams(state),
   isPanActive: imageSelectors.isPanActive(state),
   activeDepthTool: imageSelectors.activeDepthTool(state),
-  toolsParameters: imageSelectors.toolsParameters(state),
   parameters: imageSelectors.parameters(state),
   operationStack: imageSelectors.operationStack(state)
 });

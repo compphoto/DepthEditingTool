@@ -8,6 +8,7 @@ const initialState = {
   maskImageUrl: null,
   mainRgbCanvas: null,
   mainDepthCanvas: null,
+  memoryRgbCanvas: null,
   memoryDepthCanvas: null,
   cacheDepthCanvas: null,
   isEffectNew: true,
@@ -108,6 +109,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         mainRgbCanvas: payload,
+        memoryRgbCanvas: null,
         prevRgbSize: { width: null, height: null },
         rgbScaleParams: rgbScaleParams,
         operationStack: {
@@ -474,7 +476,49 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       };
     case types.CLEAR:
       return {
-        ...state
+        ...state,
+        rgbScaleParams: {
+          ...state.rgbScaleParams,
+          translatePos: {
+            x: 0,
+            y: 0
+          },
+          scale: 1.0,
+          scaleMultiplier: 0.8,
+          startDragOffset: {},
+          mouseDown: false
+        },
+        depthScaleParams: {
+          ...state.depthScaleParams,
+          translatePos: {
+            x: 0,
+            y: 0
+          },
+          scale: 1.0,
+          scaleMultiplier: 0.8,
+          startDragOffset: {},
+          mouseDown: false
+        },
+        scribbleParams: {
+          pos: { x: 0, y: 0 },
+          offset: {},
+          path: []
+        },
+        groundParams: {
+          rectangle: null,
+          path: null
+        },
+        parameters: {
+          ...state.parameters,
+          croppedCanvasImage: null,
+          croppedArea: null,
+          histogramParams: {
+            pixelRange: [0, 255],
+            domain: [0, 255],
+            values: [0, 255],
+            update: [0, 255]
+          }
+        }
       };
     case types.RESET:
       var rgbStack = [state.operationStack.rgbStack[0]];

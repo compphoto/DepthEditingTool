@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
@@ -321,7 +321,6 @@ const mapDispatchToProps = {
   updateLayer: imageActions.updateLayer,
   mergeLayerSelect: imageActions.mergeLayerSelect,
   removeLayerSelect: imageActions.removeLayerSelect,
-  addEffect: imageActions.addEffect,
   togglePan: imageActions.togglePan,
   zoomIn: imageActions.zoomIn,
   zoomOut: imageActions.zoomOut,
