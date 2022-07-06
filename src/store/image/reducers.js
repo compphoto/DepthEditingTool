@@ -451,28 +451,6 @@ export const imageReducer = (state = initialState, { type, payload }) => {
     case types.CLEAR:
       return {
         ...state,
-        rgbScaleParams: {
-          ...state.rgbScaleParams,
-          translatePos: {
-            x: 0,
-            y: 0
-          },
-          scale: 1.0,
-          scaleMultiplier: 0.8,
-          startDragOffset: {},
-          mouseDown: false
-        },
-        depthScaleParams: {
-          ...state.depthScaleParams,
-          translatePos: {
-            x: 0,
-            y: 0
-          },
-          scale: 1.0,
-          scaleMultiplier: 0.8,
-          startDragOffset: {},
-          mouseDown: false
-        },
         scribbleParams: {
           pos: { x: 0, y: 0 },
           offset: {},
