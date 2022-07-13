@@ -24,6 +24,9 @@ const ImageEditorStyle = styled.div`
         display: flex;
         h4 {
           margin: 0;
+          img {
+            height: 100%;
+          }
         }
         .nav-intro-tabs {
           margin: 0 2rem;

@@ -19,6 +19,7 @@ import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
 import { cloneCanvas, downloadCanvas, maskToImage } from "utils/canvasUtils";
 import { getImageUrl } from "utils/generalUtils";
+import Logo from "assets/images/png/logo.png";
 
 let objectUrl = null;
 
@@ -100,10 +101,12 @@ export function ImageEditor({
           accept="image/png"
         />
         <input id="upload-mask-image" type="file" name="maskImageUrl" onChange={onHandleChange} accept="image/png" />
-        <Container fluid>
-          <div className="nav-bar">
-            <div className="nav-intro">
-              <h4>Depth Editor</h4>
+        <Container className="h-100" fluid>
+          <div className="nav-bar h-100">
+            <div className="nav-intro h-100">
+              <h4>
+                <img src={Logo} />
+              </h4>
               <div className="nav-intro-tabs">
                 <UncontrolledDropdown>
                   <DropdownToggle>Files</DropdownToggle>
