@@ -75,7 +75,7 @@ export function ImageEditor({
   return (
     <ImageEditorStyle>
       <Helmet>
-        <title>Image Editor</title>
+        <title>CP Lab Depth Editing Application</title>
       </Helmet>
       <header>
         <input
