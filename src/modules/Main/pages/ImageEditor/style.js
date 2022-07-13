@@ -8,8 +8,8 @@ const ImageEditorStyle = styled.div`
   flex-direction: column;
   header {
     height: 56px;
-    background-color: #1e1f22;
-    color: #fff;
+    background-color: #fff;
+    color: #000;
     padding: 10px 15px;
     display: flex;
     align-items: center;
@@ -39,10 +39,10 @@ const ImageEditorStyle = styled.div`
               border: none;
               box-shadow: none;
               &:hover {
-                color: #fff;
+                color: #212529;
               }
               &:focus {
-                color: #fff;
+                color: #212529;
               }
             }
             .dropdown-menu {
@@ -61,7 +61,7 @@ const ImageEditorStyle = styled.div`
         svg {
           color: #7e838e;
           &:hover {
-            color: #fff;
+            color: #212529;
           }
         }
       }
@@ -73,7 +73,7 @@ const ImageEditorStyle = styled.div`
   }
   footer {
     height: 34px;
-    background-color: #1e1f22;
+    background-color: #4d4dff;
     color: #fff;
     display: flex;
     justify-content: center;

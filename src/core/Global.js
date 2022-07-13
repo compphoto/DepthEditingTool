@@ -21,10 +21,7 @@ const GlobalStyles = createGlobalStyle`
     background: transparent;
     }
     ::-webkit-scrollbar-thumb {
-    /* border-right: 4px solid rgba(0, 0, 0, 0);
-    border-left: 4px solid rgba(0, 0, 0, 0); */
     background: #404144;
-    /* border-radius: 5px; */
     background-clip: padding-box;
     }
     ::-webkit-scrollbar-thumb:hover {
