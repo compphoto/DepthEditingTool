@@ -172,7 +172,7 @@ export function SidePane({
               </div>
             ) : null}
           </div>
-          {key === 0 ? <hr style={{ borderTop: "1px solid #7e838e", width: "100%", marginBottom: "20px" }} /> : null}
+          {key === 0 ? <hr style={{ borderTop: "1px solid #97c2f0", width: "100%", marginBottom: "20px" }} /> : null}
         </Fragment>
       );
     });

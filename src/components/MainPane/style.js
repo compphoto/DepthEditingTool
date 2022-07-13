@@ -4,7 +4,7 @@ const MainPaneStyle = styled.div`
   height: 100%;
   width: calc(100% - 250px);
   .main {
-    background: #f0f1f2;
+    background: #f0f6fd;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -24,7 +24,7 @@ const MainPaneStyle = styled.div`
         padding: 10px;
         width: 50%;
         .box {
-          background-color: #d9dadd;
+          background-color: #fff;
           margin: 10px;
           display: flex;
           justify-content: center;

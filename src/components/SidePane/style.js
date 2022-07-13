@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import Grid from "assets/images/png/mask-grid.png";
-// #2e2f34
+// #06192d
 
 const SidePaneStyle = styled.div`
   display: flex;
@@ -8,8 +8,8 @@ const SidePaneStyle = styled.div`
   width: 250px;
   .layer-mode-pane {
     width: 100%;
-    background: #1e1f22;
-    color: #7e838e;
+    background: #0b294a;
+    color: #97c2f0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -19,7 +19,7 @@ const SidePaneStyle = styled.div`
       align-items: center;
       justify-content: center;
       height: 50px;
-      background-color: #2e2f34;
+      background-color: #06192d;
       padding: 0.5rem 0.75rem;
       font-size: 0.9rem;
       .layer-mode-header-title {
@@ -30,7 +30,7 @@ const SidePaneStyle = styled.div`
           margin: 0;
         }
         button {
-          color: #7e838e;
+          color: #97c2f0;
         }
       }
       .layer-mode-header-content {
@@ -50,7 +50,7 @@ const SidePaneStyle = styled.div`
         border: 4px solid transparent;
         width: 100%;
         .layer-mode-body-content-image-card {
-          background: #2e2f34;
+          background: #134a86;
           border: none;
           width: 100%;
           .layer-mode-body-content-image {
@@ -62,10 +62,6 @@ const SidePaneStyle = styled.div`
             height: 120px;
             padding: 0;
             img {
-              background-image: url(${Grid});
-              background-repeat: no-repeat;
-              background-attachment: fixed;
-              background-size: contain;
               max-width: 100%;
               max-height: 100%;
             }
@@ -79,13 +75,13 @@ const SidePaneStyle = styled.div`
           flex-direction: column;
           .top-right-option {
             margin-bottom: 0.5rem;
-            color: #6d727d;
+            color: #3e8de3;
             svg {
               height: 1.2rem;
               width: 1.2rem;
             }
             &:hover {
-              color: #999da6;
+              color: #1e73d0;
             }
           }
         }
@@ -94,10 +90,10 @@ const SidePaneStyle = styled.div`
         }
       }
       .layer-mode-body-content:hover {
-        border: 4px solid rgb(126, 131, 142);
+        border: 4px solid #3e8de3;
       }
       .layer-mode-body-content-active {
-        border: 4px solid rgb(126, 131, 142);
+        border: 4px solid #3e8de3;
       }
       .layer-mode-body-add {
         width: 100%;
@@ -105,7 +101,7 @@ const SidePaneStyle = styled.div`
         justify-content: center;
         .layer-mode-body-add-card {
           cursor: pointer;
-          background: #2e2f34;
+          background: #06192d;
           width: 70%;
           height: 50px;
           display: flex;
@@ -117,12 +113,12 @@ const SidePaneStyle = styled.div`
           }
         }
         .layer-mode-body-add-card:hover {
-          background: #26272b;
+          background: #04111e;
         }
       }
     }
     .layer-mode-footer {
-      background-color: #2e2f34;
+      background-color: #06192d;
       height: 60px;
       padding: 0.1rem 0;
       display: flex;
@@ -140,18 +136,18 @@ const SidePaneStyle = styled.div`
     position: absolute;
     height: 100%;
     width: 250px;
-    background: #3e4046;
-    color: #7e838e;
+    background: #0f3a68;
+    color: #97c2f0;
     .tools-ext-header {
       height: 50px;
-      background: #2e2f34;
+      background: #06192d;
       display: flex;
       align-items: center;
       justify-content: space-evenly;
       .tool {
         flex: 1;
         height: 100%;
-        color: #7e838e;
+        color: #97c2f0;
         line-height: 1rem;
         display: flex;
         flex-direction: column;
@@ -172,7 +168,7 @@ const SidePaneStyle = styled.div`
         }
       }
       .active {
-        background: #3e4046;
+        background: #0f3a68;
         color: #fff;
       }
     }
@@ -245,7 +241,7 @@ const SidePaneStyle = styled.div`
                 flex-shrink: 0;
                 width: 50px;
                 height: 50px;
-                color: #7e838e;
+                color: #97c2f0;
                 font-size: 12px;
                 line-height: 1rem;
                 display: flex;
@@ -264,7 +260,7 @@ const SidePaneStyle = styled.div`
                 }
               }
               .selection-tool-active {
-                background: #2e2f34;
+                background: #06192d;
                 color: #fff;
               }
             }
@@ -278,7 +274,7 @@ const SidePaneStyle = styled.div`
           position: absolute;
           bottom: 50%;
           left: 100%;
-          background: #2e2f34;
+          background: #06192d;
           color: #fff;
           border: none;
           border-radius: 0 20px 20px 0;
@@ -286,7 +282,7 @@ const SidePaneStyle = styled.div`
             margin-left: -10px;
           }
           &:hover {
-            color: #7e838e;
+            color: #97c2f0;
           }
           &:focus {
             outline: none;
