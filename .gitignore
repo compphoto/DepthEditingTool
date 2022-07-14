@@ -130,3 +130,5 @@ yarn.lock
 # Nginx
 nginx-access.log
 nginx-error.log
+# Local Netlify folder
+.netlify
