@@ -34,7 +34,7 @@ const ImageEditorStyle = styled.div`
           align-items: end;
           .dropdown {
             .btn-secondary {
-              color: #0b294a;
+              color: #124276;
               background: none;
               border: none;
               box-shadow: none;
@@ -48,7 +48,7 @@ const ImageEditorStyle = styled.div`
             .dropdown-menu {
               z-index: 1200;
               .dropdown-item {
-                color: #0b294a;
+                color: #124276;
                 padding: 0.75rem 1rem;
                 p {
                   margin: 0;
@@ -60,7 +60,7 @@ const ImageEditorStyle = styled.div`
       }
       .nav-button {
         svg {
-          color: #0b294a;
+          color: #124276;
           &:hover {
             color: #06192d;
           }
@@ -74,7 +74,7 @@ const ImageEditorStyle = styled.div`
   }
   footer {
     height: 34px;
-    background-color: #0b294a;
+    background-color: #124276;
     color: #fff;
     display: flex;
     justify-content: center;

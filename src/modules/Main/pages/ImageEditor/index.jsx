@@ -233,7 +233,7 @@ export function ImageEditor({
                 }}
                 size="sm"
                 color="outline"
-                style={isPanActive ? { backgroundColor: "#2e2f34", color: "#fff" } : null}
+                style={isPanActive ? { backgroundColor: "#97c2f0", color: "#fff" } : null}
                 id={`menu-pan-tooltip`}
               >
                 <MdOutlinePanTool />

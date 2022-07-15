@@ -6,6 +6,28 @@ const SidePaneStyle = styled.div`
   display: flex;
   position: relative;
   width: 250px;
+  .custom-primary-button {
+    background-color: #3e8de3;
+    border: none;
+    color: #fff;
+    &:hover {
+      opacity: 0.9;
+    }
+    &:focus {
+      box-shadow: none;
+    }
+  }
+  .custom-secondary-button {
+    background-color: #c3dcf6;
+    border: none;
+    color: #3e8de3;
+    &:hover {
+      opacity: 0.9;
+    }
+    &:focus {
+      box-shadow: none;
+    }
+  }
   .layer-mode-pane {
     width: 100%;
     background: #0b294a;

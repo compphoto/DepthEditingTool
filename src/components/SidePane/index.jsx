@@ -244,13 +244,13 @@ export function SidePane({
             </div>
             <div className="d-flex my-2">
               <Button
+                className="custom-primary-button"
                 disabled={
                   !memoryDepthCanvas ||
                   !activeDepthTool ||
                   (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox")
                 }
                 size="sm"
-                color="secondary"
                 onClick={() => {
                   onModifyBitmap();
                 }}
@@ -269,7 +269,12 @@ export function SidePane({
         <div className="tool-ext w-100">
           <div className="w-100 mt-3 tool-ext-section">
             <p className="mb-1">Depth Selection</p>
-            <Button className="mt-4 mb-2 dropdown-button" size="sm" color="secondary" id="depth-adjust-toggler">
+            <Button
+              className="custom-primary-button mt-4 mb-2 dropdown-button"
+              size="sm"
+              color="secondary"
+              id="depth-adjust-toggler"
+            >
               Adjust Selection
             </Button>
             <UncontrolledCollapse style={{ width: "100%" }} toggler="#depth-adjust-toggler">
@@ -347,7 +352,12 @@ export function SidePane({
           </div>
           <div className="w-100 mt-3 tool-ext-section">
             <p className="mb-1">Non-linearity</p>
-            <Button className="mt-3 mb-3 dropdown-button" size="sm" color="secondary" id="depth-rotate-toggler">
+            <Button
+              className="custom-primary-button mt-3 mb-3 dropdown-button"
+              size="sm"
+              color="secondary"
+              id="depth-rotate-toggler"
+            >
               Point Curve
             </Button>
             <UncontrolledCollapse toggler="#depth-rotate-toggler">
@@ -457,12 +467,12 @@ export function SidePane({
           className="layer-mode-footer text-center"
         >
           <div className="layer-mode-apply-button mx-2">
-            <Button size="sm" color="secondary" onClick={toggleLayerSelect}>
+            <Button className="custom-primary-button" size="sm" onClick={toggleLayerSelect}>
               {operationStack.isSelectActive ? `Cancel (${operationStack.selectedLayers.size})` : "Select"}
             </Button>
           </div>
           <div className="layer-mode-apply-button mx-2">
-            <Button size="sm" color="secondary" onClick={removeAllLayers}>
+            <Button className="custom-secondary-button" size="sm" onClick={removeAllLayers}>
               Remove all
             </Button>
           </div>
