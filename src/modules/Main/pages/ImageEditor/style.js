@@ -34,21 +34,21 @@ const ImageEditorStyle = styled.div`
           align-items: end;
           .dropdown {
             .btn-secondary {
-              color: #3e8de3;
+              color: #0b294a;
               background: none;
               border: none;
               box-shadow: none;
               &:hover {
-                color: #114277;
+                color: #06192d;
               }
               &:focus {
-                color: #114277;
+                color: #06192d;
               }
             }
             .dropdown-menu {
               z-index: 1200;
               .dropdown-item {
-                color: #3e8de3;
+                color: #0b294a;
                 padding: 0.75rem 1rem;
                 p {
                   margin: 0;
@@ -60,9 +60,9 @@ const ImageEditorStyle = styled.div`
       }
       .nav-button {
         svg {
-          color: #3e8de3;
+          color: #0b294a;
           &:hover {
-            color: #114277;
+            color: #06192d;
           }
         }
       }
