@@ -17,7 +17,7 @@ import { MdOutlinePanTool } from "react-icons/md";
 import ImageEditorStyle from "./style";
 import SidePane from "components/SidePane";
 import MainPane from "components/MainPane";
-import { cloneCanvas, downloadCanvas, maskToImage } from "utils/canvasUtils";
+import { canvasResize, cloneCanvas, downloadCanvas, maskToImage } from "utils/canvasUtils";
 import { getImageUrl } from "utils/generalUtils";
 import Logo from "assets/images/png/logo.png";
 
@@ -26,6 +26,7 @@ let objectUrl = null;
 export function ImageEditor({
   selectionImageUrl,
   maskImageUrl,
+  depthImageSize,
   mainRgbCanvas,
   mainDepthCanvas,
   memoryDepthCanvas,
@@ -145,17 +146,9 @@ export function ImageEditor({
                     </DropdownItem>
                     <DropdownItem divider />
                     <DropdownItem
-                      disabled={mainRgbCanvas === null}
-                      onClick={() => {
-                        downloadCanvas(mainRgbCanvas, "modified-rgb.png");
-                      }}
-                    >
-                      <label>Export RGB Image</label>
-                    </DropdownItem>
-                    <DropdownItem
                       disabled={memoryDepthCanvas === null}
                       onClick={() => {
-                        downloadCanvas(memoryDepthCanvas, "modified-depth.png");
+                        downloadCanvas(canvasResize(memoryDepthCanvas, depthImageSize), "modified-depth.png");
                       }}
                     >
                       <label>Export Depth Image</label>
@@ -287,6 +280,7 @@ export function ImageEditor({
 const mapStateToProps = state => ({
   selectionImageUrl: imageSelectors.selectionImageUrl(state),
   maskImageUrl: imageSelectors.maskImageUrl(state),
+  depthImageSize: imageSelectors.depthImageSize(state),
   mainRgbCanvas: imageSelectors.mainRgbCanvas(state),
   mainDepthCanvas: imageSelectors.mainDepthCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),

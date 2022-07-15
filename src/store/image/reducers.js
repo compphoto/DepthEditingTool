@@ -6,6 +6,7 @@ const initialState = {
   depthImageUrl: null,
   selectionImageUrl: null,
   maskImageUrl: null,
+  depthImageSize: null,
   mainRgbCanvas: null,
   mainDepthCanvas: null,
   memoryRgbCanvas: null,

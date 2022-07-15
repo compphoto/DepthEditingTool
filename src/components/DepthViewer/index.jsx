@@ -73,9 +73,13 @@ class DepthViewer extends Component {
       objectUrl = getImageUrl(depthImageUrl);
       depthImage.src = objectUrl;
       depthImage.onload = () => {
-        if (Math.max(depthImage.height, depthImage.width) > 1000) {
+        let maxi = Math.max(depthImage.height, depthImage.width);
+        if (maxi > 1000) {
           depthImage = canvasResize(depthImage);
+        } else {
+          maxi = null;
         }
+        initImage({ depthImageSize: maxi });
         initDepth(cloneCanvas(depthImage));
       };
     }

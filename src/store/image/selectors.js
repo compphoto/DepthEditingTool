@@ -3,6 +3,7 @@ export const selectors = {
   depthImageUrl: state => state.image.depthImageUrl,
   selectionImageUrl: state => state.image.selectionImageUrl,
   maskImageUrl: state => state.image.maskImageUrl,
+  depthImageSize: state => state.image.depthImageSize,
   mainRgbCanvas: state => state.image.mainRgbCanvas,
   mainDepthCanvas: state => state.image.mainDepthCanvas,
   memoryRgbCanvas: state => state.image.memoryRgbCanvas,
