@@ -2,7 +2,6 @@ import React, { Fragment } from "react";
 import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
-import { Grid, Button, TextField } from "@material-ui/core";
 import { Slider, Rail, Handles, Tracks, Ticks } from "react-compound-slider";
 import { MuiRail, MuiHandle, MuiTrack, MuiTick } from "./components";
 import BarChart from "./barchart";
@@ -13,7 +12,7 @@ class RangeSlider extends React.Component {
   }
   render() {
     const { parameters, storeParameters } = this.props;
-    const { pixelRange, domain, values, update } = parameters.histogramParams;
+    const { domain, values, update } = parameters.histogramParams;
     return (
       <Fragment>
         <BarChart data={this.props.data} highlight={update} />
@@ -73,76 +72,6 @@ class RangeSlider extends React.Component {
             )}
           </Ticks>
         </Slider>
-        <Grid container alignItems="center" justifyContent="space-around" style={{ marginTop: "88px" }}>
-          <Grid item xs={4} style={{ textAlign: "right" }}>
-            <TextField
-              variant="outlined"
-              label="min disparity"
-              value={pixelRange[0]}
-              onChange={evt => {
-                const value = evt.target.value;
-                const newState = [value, pixelRange[1]];
-                storeParameters({
-                  histogramParams: {
-                    ...parameters.histogramParams,
-                    pixelRange: newState
-                  }
-                });
-                if (value && value >= domain[0]) {
-                  storeParameters({
-                    histogramParams: {
-                      ...parameters.histogramParams,
-                      values: newState
-                    }
-                  });
-                }
-              }}
-            />
-          </Grid>
-          <Grid item xs={4} style={{ textAlign: "center" }}>
-            —
-          </Grid>
-          <Grid item xs={4} style={{ textAlign: "left" }}>
-            <TextField
-              variant="outlined"
-              label="max disparity"
-              value={pixelRange[1]}
-              onChange={evt => {
-                const value = evt.target.value;
-                const newState = [pixelRange[0], value];
-                storeParameters({
-                  histogramParams: {
-                    ...parameters.histogramParams,
-                    pixelRange: newState
-                  }
-                });
-                if (value && value <= domain[1] && value >= values[0]) {
-                  storeParameters({
-                    histogramParams: {
-                      ...parameters.histogramParams,
-                      values: newState
-                    }
-                  });
-                }
-              }}
-            />
-          </Grid>
-        </Grid>
-        <Button
-          style={{ marginTop: "3%", marginBottom: "3%" }}
-          onClick={() => {
-            storeParameters({
-              histogramParams: {
-                ...parameters.histogramParams,
-                pixelRange: domain,
-                values: domain,
-                update: domain
-              }
-            });
-          }}
-        >
-          Reset
-        </Button>
       </Fragment>
     );
   }
