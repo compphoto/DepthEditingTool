@@ -20,6 +20,7 @@ import MainPane from "components/MainPane";
 import { canvasResize, cloneCanvas, downloadCanvas, maskToImage } from "utils/canvasUtils";
 import { getImageUrl } from "utils/generalUtils";
 import Logo from "assets/images/png/logo.png";
+import SFULogo from "assets/images/png/sfu-logo.png";
 
 let objectUrl = null;
 
@@ -271,7 +272,10 @@ export function ImageEditor({
         <MainPane />
       </section>
       <footer>
-        <div>Computational Photography Labs SFU</div>
+        <div className="footer-text">Computational Photography Labs</div>
+        <div className="footer-logo">
+          <img src={SFULogo} />
+        </div>
       </footer>
     </ImageEditorStyle>
   );

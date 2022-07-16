@@ -77,8 +77,17 @@ const ImageEditorStyle = styled.div`
     background-color: #124276;
     color: #fff;
     display: flex;
-    justify-content: center;
+    justify-content: right;
     align-items: center;
+    .footer-text {
+      margin: 0 10px;
+    }
+    .footer-logo {
+      height: 100%;
+      img {
+        height: 100%;
+      }
+    }
   }
 `;
 
