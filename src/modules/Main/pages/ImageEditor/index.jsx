@@ -272,7 +272,7 @@ export function ImageEditor({
         <MainPane />
       </section>
       <footer>
-        <div className="footer-text">Computational Photography Labs</div>
+        <div className="footer-text">Computational Photography Lab</div>
         <div className="footer-logo">
           <img src={SFULogo} />
         </div>
