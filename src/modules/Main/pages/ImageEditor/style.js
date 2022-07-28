@@ -73,6 +73,7 @@ const ImageEditorStyle = styled.div`
     display: flex;
   }
   footer {
+    padding: 3px;
     height: 34px;
     background-color: #124276;
     color: #fff;
@@ -80,7 +81,12 @@ const ImageEditorStyle = styled.div`
     justify-content: right;
     align-items: center;
     .footer-text {
+      height: 100%;
       margin: 0 10px;
+      padding: 2px 0;
+      img {
+        height: 100%;
+      }
     }
     .footer-logo {
       height: 100%;

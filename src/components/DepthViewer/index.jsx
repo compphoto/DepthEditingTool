@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
 import DepthViewerStyle from "./style";
-import { getImageUrl, scribblePathConverter } from "utils/generalUtils";
+import { getImageUrl } from "utils/generalUtils";
 import {
   cloneCanvas,
   drawCanvasImage,
