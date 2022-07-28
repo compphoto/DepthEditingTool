@@ -1,6 +1,4 @@
 import styled from "styled-components";
-import Grid from "assets/images/png/mask-grid.png";
-// #06192d
 
 const SidePaneStyle = styled.div`
   display: flex;
