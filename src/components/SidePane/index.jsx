@@ -64,11 +64,25 @@ export function SidePane({
   };
   const onHandleUpdate = e => {
     let { name } = e.target;
+    const { activeIndex } = operationStack;
+    updateLayer({
+      index: activeIndex,
+      value: {
+        toolsParameters: tempToolsParams
+      }
+    });
     storeToolParameters({ [name]: tempToolsParams[name] });
   };
   const onHandleEnter = e => {
     let { name } = e.target;
+    const { activeIndex } = operationStack;
     if (e.key === "Enter") {
+      updateLayer({
+        index: activeIndex,
+        value: {
+          toolsParameters: tempToolsParams
+        }
+      });
       storeToolParameters({ [name]: tempToolsParams[name] });
     }
   };
@@ -94,16 +108,30 @@ export function SidePane({
             newArea,
             histogramParams.pixelRange
           );
-          updateLayer({ index: activeIndex, value: { bitmap: newBitmapCanvas, toolsParameters: null } });
+          updateLayer({
+            index: activeIndex,
+            value: {
+              bitmap: newBitmapCanvas,
+              toolsParameters: {
+                disparity: 0,
+                scale: 1,
+                aConstant: 1,
+                bConstant: 0
+              }
+            }
+          });
           clear();
         }
       }
     }
   };
   useEffect(() => {
-    const { activeIndex } = operationStack;
+    const { activeIndex, layerStack } = operationStack;
     if (activeIndex === 0) {
       toggleTool(1);
+    }
+    if (layerStack[activeIndex]) {
+      setTempToolsParams({ ...layerStack[activeIndex].toolsParameters });
     }
   }, [operationStack.activeIndex]);
   useEffect(() => {
