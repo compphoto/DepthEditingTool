@@ -272,7 +272,7 @@ class DepthViewer extends Component {
           new_y + new_h <= image_y2 &&
           new_y + new_h >= image_y1
         ) {
-          if (new_w !== 0 || new_w !== 0) {
+          if (new_w !== 0 && new_h !== 0) {
             let croppedArea = upScaleBox(
               [new_x, new_y, new_w, new_h],
               ratio,
