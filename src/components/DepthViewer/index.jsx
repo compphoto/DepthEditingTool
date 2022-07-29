@@ -70,8 +70,12 @@ class DepthViewer extends Component {
     if (prevProps.depthImageUrl !== depthImageUrl) {
       depthContext.clearRect(0, 0, prevDepthSize.width, prevDepthSize.height);
       let depthImage = new Image();
-      objectUrl = getImageUrl(depthImageUrl);
-      depthImage.src = objectUrl;
+      if (typeof depthImageUrl === "object") {
+        objectUrl = getImageUrl(depthImageUrl);
+        depthImage.src = objectUrl;
+      } else {
+        depthImage.src = depthImageUrl;
+      }
       depthImage.onload = () => {
         let maxi = Math.max(depthImage.height, depthImage.width);
         if (maxi > 1000) {

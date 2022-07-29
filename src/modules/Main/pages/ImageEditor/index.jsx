@@ -22,6 +22,8 @@ import { getImageUrl } from "utils/generalUtils";
 import Logo from "assets/images/png/logo.png";
 import LogoLong from "assets/images/png/logo-long.png";
 import SFULogo from "assets/images/png/sfu-logo.png";
+import SampleRgb from "assets/images/rgb/rgb.jpg";
+import SampleDepth from "assets/images/depth/depth.png";
 
 let objectUrl = null;
 
@@ -40,6 +42,7 @@ export function ImageEditor({
   undo,
   clear,
   reset,
+  initImage,
   handleChange,
   updateLayer,
   mergeLayerSelect,
@@ -51,6 +54,12 @@ export function ImageEditor({
   };
   const openAttachment = id => {
     document.getElementById(id).click();
+  };
+  const loadSample = () => {
+    initImage({
+      rgbImageUrl: SampleRgb,
+      depthImageUrl: SampleDepth
+    });
   };
   useEffect(() => {
     if (selectionImageUrl) {
@@ -135,6 +144,9 @@ export function ImageEditor({
                       }}
                     >
                       <label htmlFor="upload-depth-image">Open Depth Image</label>
+                    </DropdownItem>
+                    <DropdownItem onClick={loadSample}>
+                      <label>Load Sample Images</label>
                     </DropdownItem>
                     <DropdownItem divider />
                     <DropdownItem
@@ -304,6 +316,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   handleChange: imageActions.handleChange,
+  initImage: imageActions.initImage,
   updateLayer: imageActions.updateLayer,
   mergeLayerSelect: imageActions.mergeLayerSelect,
   removeLayerSelect: imageActions.removeLayerSelect,

@@ -55,8 +55,12 @@ class RgbViewer extends Component {
     if (prevProps.rgbImageUrl !== rgbImageUrl) {
       rgbContext.clearRect(0, 0, prevRgbSize.width, prevRgbSize.height);
       let rgbImage = new Image();
-      objectUrl = getImageUrl(rgbImageUrl);
-      rgbImage.src = objectUrl;
+      if (typeof rgbImageUrl === "object") {
+        objectUrl = getImageUrl(rgbImageUrl);
+        rgbImage.src = objectUrl;
+      } else {
+        rgbImage.src = rgbImageUrl;
+      }
       rgbImage.onload = () => {
         if (Math.max(rgbImage.height, rgbImage.width) > 1000) {
           rgbImage = canvasResize(rgbImage);
