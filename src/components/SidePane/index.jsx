@@ -164,7 +164,18 @@ export function SidePane({
                       cloneCanvas(memoryDepthCanvas),
                       cloneCanvas(operationStack.layerStack[key].bitmap)
                     );
-                    updateLayer({ index: key, value: { bitmap: newBitmapCanvas, toolsParameters: null } });
+                    updateLayer({
+                      index: key,
+                      value: {
+                        bitmap: newBitmapCanvas,
+                        toolsParameters: {
+                          disparity: 0,
+                          scale: 1,
+                          aConstant: 1,
+                          bConstant: 0
+                        }
+                      }
+                    });
                   }}
                   className="top-right-option"
                 >

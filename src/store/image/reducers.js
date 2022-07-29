@@ -292,7 +292,13 @@ export const imageReducer = (state = initialState, { type, payload }) => {
       var layerStack = [...state.operationStack.layerStack];
       var index = payload;
       var layer = {
-        ...layerStack[index]
+        bitmap: cloneCanvas(layerStack[index].bitmap),
+        toolsParameters: {
+          disparity: 0,
+          scale: 1,
+          aConstant: 1,
+          bConstant: 0
+        }
       };
       layerStack.splice(index + 1, 0, layer);
       return {
