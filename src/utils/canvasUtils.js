@@ -222,7 +222,7 @@ export const highlightPixelArea = (canvas, boundingBox, pixelRange) => {
     const src = imageData.data;
     for (let i = 0; i < src.length; i += 4) {
       if (src[i] < pixelRange[0] || src[i] > pixelRange[1]) {
-        src[i] -= 150;
+        src[i] += 150;
         src[i + 1] -= 150;
         src[i + 2] -= 150;
       }
