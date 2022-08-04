@@ -6,6 +6,12 @@ const ImageEditorStyle = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
+  .external-link {
+    text-decoration: none;
+    img {
+      height: 100%;
+    }
+  }
   header {
     height: 56px;
     background-color: #fff;
@@ -24,9 +30,6 @@ const ImageEditorStyle = styled.div`
         display: flex;
         h4 {
           margin: 0;
-          img {
-            height: 100%;
-          }
         }
         .nav-intro-tabs {
           margin: 0 2rem;
@@ -84,15 +87,9 @@ const ImageEditorStyle = styled.div`
       height: 100%;
       margin: 0 10px;
       padding: 2px 0;
-      img {
-        height: 100%;
-      }
     }
     .footer-logo {
       height: 100%;
-      img {
-        height: 100%;
-      }
     }
   }
 `;

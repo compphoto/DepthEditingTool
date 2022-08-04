@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { imageActions } from "store/image";
 import { selectors as imageSelectors } from "store/image";
@@ -125,7 +126,9 @@ export function ImageEditor({
           <div className="nav-bar h-100">
             <div className="nav-intro h-100">
               <h4>
-                <img src={Logo} />
+                <Link className="external-link" to={{ pathname: "http://yaksoy.github.io/group" }} target="_blank">
+                  <img src={Logo} />
+                </Link>
               </h4>
               <div className="nav-intro-tabs">
                 <UncontrolledDropdown>
@@ -294,10 +297,14 @@ export function ImageEditor({
       </section>
       <footer>
         <div className="footer-text">
-          <img src={LogoLong} />
+          <Link className="external-link" to={{ pathname: "http://yaksoy.github.io/group" }} target="_blank">
+            <img src={LogoLong} />
+          </Link>
         </div>
         <div className="footer-logo">
-          <img src={SFULogo} />
+          <Link className="external-link" to={{ pathname: "https://www.sfu.ca" }} target="_blank">
+            <img src={SFULogo} />
+          </Link>
         </div>
       </footer>
     </ImageEditorStyle>
