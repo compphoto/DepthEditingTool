@@ -209,7 +209,6 @@ export function ImageEditor({
                     </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>
-
                 <UncontrolledDropdown>
                   <DropdownToggle>Layer</DropdownToggle>
                   <DropdownMenu>
@@ -236,6 +235,17 @@ export function ImageEditor({
                       }}
                     >
                       <label>Delete</label>
+                    </DropdownItem>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+                <UncontrolledDropdown>
+                  <DropdownToggle>About</DropdownToggle>
+                  <DropdownMenu>
+                    <DropdownItem tag={Link} to={{ pathname: "http://yaksoy.github.io/group" }} target="_blank">
+                      <label>Project Webpage</label>
+                    </DropdownItem>
+                    <DropdownItem tag={Link} to={{ pathname: "http://yaksoy.github.io/group" }} target="_blank">
+                      <label>Video Tutorial</label>
                     </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>
