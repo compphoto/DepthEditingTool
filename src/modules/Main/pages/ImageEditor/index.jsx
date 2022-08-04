@@ -23,7 +23,7 @@ import Logo from "assets/images/png/logo.png";
 import LogoLong from "assets/images/png/logo-long.png";
 import SFULogo from "assets/images/png/sfu-logo.png";
 import SampleRgb from "assets/images/rgb/rgb.jpg";
-import SampleDepth from "assets/images/depth/depth.png";
+import SampleDepth from "assets/images/depth/depth.jpg";
 
 let objectUrl = null;
 
@@ -61,6 +61,7 @@ export function ImageEditor({
       depthImageUrl: SampleDepth
     });
   };
+  useEffect(loadSample, []);
   useEffect(() => {
     if (selectionImageUrl) {
       let selectionImage = new Image();
