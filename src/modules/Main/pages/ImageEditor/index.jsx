@@ -24,7 +24,7 @@ import Logo from "assets/images/png/logo.png";
 import LogoLong from "assets/images/png/logo-long.png";
 import SFULogo from "assets/images/png/sfu-logo.png";
 import SampleRgb from "assets/images/rgb/rgb.jpg";
-import SampleDepth from "assets/images/depth/depth.jpg";
+import SampleDepth from "assets/images/depth/depth.png";
 
 let objectUrl = null;
 
