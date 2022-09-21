@@ -60,6 +60,7 @@ class DepthViewer extends Component {
       initImage,
       initDepth,
       initLayer,
+      addLayer,
       storeScaleParams,
       storeParameters,
       addEffect
@@ -103,6 +104,7 @@ class DepthViewer extends Component {
           }
         });
         initLayer();
+        addLayer();
       }
     }
     // If operation is added to the stack, rerun all operations in operation stack
@@ -522,6 +524,7 @@ const mapDispatchToProps = {
   initImage: imageActions.initImage,
   initDepth: imageActions.initDepth,
   initLayer: imageActions.initLayer,
+  addLayer: imageActions.addLayer,
   storeScribbleParams: imageActions.storeScribbleParams,
   storeScaleParams: imageActions.storeScaleParams,
   storeParameters: imageActions.storeParameters,
