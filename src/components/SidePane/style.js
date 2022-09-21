@@ -158,40 +158,6 @@ const SidePaneStyle = styled.div`
     width: 250px;
     background: #0f3a68;
     color: #97c2f0;
-    .tools-ext-header {
-      height: 50px;
-      background: #06192d;
-      display: flex;
-      align-items: center;
-      justify-content: space-evenly;
-      .tool {
-        flex: 1;
-        height: 100%;
-        color: #97c2f0;
-        line-height: 1rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        padding: 2px;
-        svg {
-          margin-bottom: 0.25rem;
-          width: 1.2rem;
-          height: 1.2rem;
-        }
-        span {
-          font-size: 0.7rem;
-        }
-        &:hover {
-          color: #fff;
-        }
-      }
-      .active {
-        background: #0f3a68;
-        color: #fff;
-      }
-    }
     .tools-ext-body {
       height: calc(100% - 50px);
       .tools-ext-elements {
@@ -257,10 +223,11 @@ const SidePaneStyle = styled.div`
               width: 100%;
               display: flex;
               flex-wrap: wrap;
+              justify-content: center;
               .selection-tool {
                 flex-shrink: 0;
-                width: 50px;
-                height: 50px;
+                width: 45px;
+                height: 45px;
                 color: #97c2f0;
                 font-size: 12px;
                 line-height: 1rem;

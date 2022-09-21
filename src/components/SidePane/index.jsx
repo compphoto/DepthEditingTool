@@ -46,7 +46,6 @@ export function SidePane({
   toggleLayerSelect,
   clear
 }) {
-  const [activeTool, setActiveTool] = useState(0);
   const [layers, setLayers] = useState(null);
   const [tempToolsParams, setTempToolsParams] = useState({
     disparity: 0,
@@ -55,9 +54,6 @@ export function SidePane({
     bConstant: 0
   });
 
-  const toggleTool = index => {
-    setActiveTool(index);
-  };
   const onHandleChange = e => {
     let { name, value } = e.target;
     setTempToolsParams({ ...tempToolsParams, [name]: +value });
@@ -127,9 +123,6 @@ export function SidePane({
   };
   useEffect(() => {
     const { activeIndex, layerStack } = operationStack;
-    if (activeIndex === 0) {
-      toggleTool(1);
-    }
     if (layerStack[activeIndex]) {
       setTempToolsParams({ ...layerStack[activeIndex].toolsParameters });
     }
@@ -257,8 +250,9 @@ export function SidePane({
     return (
       <>
         <div className="tool-ext w-100">
-          <div className="tool-ext-selection">
-            <div disabled={operationStack.activeIndex <= 0} className="tool-ext-selection-icons">
+          <div className="w-100 mt-3 tool-ext-selection">
+            <p className="mb-1">Select</p>
+            <div disabled={operationStack.activeIndex <= 0} className="mt-4 tool-ext-selection-icons">
               {Object.keys(SelectionBox).map((key, index) => (
                 <div
                   key={index}
@@ -298,184 +292,156 @@ export function SidePane({
               </Button>
             </div>
           </div>
-        </div>
-      </>
-    );
-  };
-  const adjust = () => {
-    return (
-      <>
-        <div className="tool-ext w-100">
-          <div className="w-100 mt-3 tool-ext-section">
-            <p className="mb-1">Depth Selection</p>
-            <Button
-              className="custom-primary-button mt-4 mb-2 dropdown-button"
-              size="sm"
-              color="secondary"
-              id="depth-adjust-toggler"
-            >
-              Adjust Selection
-            </Button>
-            <UncontrolledCollapse style={{ width: "100%" }} toggler="#depth-adjust-toggler">
-              <Card className="tool-ext-card">
-                <CardBody className="tool-ext-card-body">
-                  <FormGroup className="w-100">
-                    <Label for="disparity">Depth Intensity</Label>
-                    <div className="tool-ext-input d-flex justify-content-between w-100">
-                      <Input
-                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
-                        onChange={onHandleChange}
-                        onMouseUp={onHandleUpdate}
-                        className="tool-ext-input-slider"
-                        id="disparity"
-                        name="disparity"
-                        min="-1"
-                        max="1"
-                        step={0.01}
-                        type="range"
-                        value={tempToolsParams.disparity}
-                      />
-                      <Input
-                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
-                        onChange={onHandleChange}
-                        onMouseLeave={onHandleUpdate}
-                        onKeyDown={onHandleEnter}
-                        bsSize="sm"
-                        className="tool-ext-input-number"
-                        id="disparity"
-                        name="disparity"
-                        type="number"
-                        min="-1"
-                        max="1"
-                        step={0.01}
-                        value={tempToolsParams.disparity}
-                      />
-                    </div>
-                  </FormGroup>
-                  <FormGroup className="w-100">
-                    <Label for="scale">Depth Detail</Label>
-                    <div className="tool-ext-input d-flex justify-content-between w-100">
-                      <Input
-                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
-                        onChange={onHandleChange}
-                        onMouseUp={onHandleUpdate}
-                        className="tool-ext-input-slider"
-                        id="scale"
-                        name="scale"
-                        min="0"
-                        max="1"
-                        step={0.01}
-                        type="range"
-                        value={tempToolsParams.scale}
-                      />
-                      <Input
-                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
-                        onChange={onHandleChange}
-                        onMouseLeave={onHandleUpdate}
-                        onKeyDown={onHandleEnter}
-                        bsSize="sm"
-                        className="tool-ext-input-number"
-                        id="scale"
-                        name="scale"
-                        type="number"
-                        min="0"
-                        max="1"
-                        step={0.01}
-                        value={tempToolsParams.scale}
-                      />
-                    </div>
-                  </FormGroup>
-                </CardBody>
-              </Card>
-            </UncontrolledCollapse>
+          <div className="w-100 mt-4 tool-ext-section">
+            <p className="mb-1">Local Adjustment</p>
+            <Card className="tool-ext-card">
+              <CardBody className="tool-ext-card-body">
+                <FormGroup className="w-100">
+                  <Label for="disparity">Depth Intensity</Label>
+                  <div className="tool-ext-input d-flex justify-content-between w-100">
+                    <Input
+                      disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
+                      onChange={onHandleChange}
+                      onMouseUp={onHandleUpdate}
+                      className="tool-ext-input-slider"
+                      id="disparity"
+                      name="disparity"
+                      min="-1"
+                      max="1"
+                      step={0.01}
+                      type="range"
+                      value={tempToolsParams.disparity}
+                    />
+                    <Input
+                      disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
+                      onChange={onHandleChange}
+                      onMouseLeave={onHandleUpdate}
+                      onKeyDown={onHandleEnter}
+                      bsSize="sm"
+                      className="tool-ext-input-number"
+                      id="disparity"
+                      name="disparity"
+                      type="number"
+                      min="-1"
+                      max="1"
+                      step={0.01}
+                      value={tempToolsParams.disparity}
+                    />
+                  </div>
+                </FormGroup>
+                <FormGroup className="w-100">
+                  <Label for="scale">Depth Detail</Label>
+                  <div className="tool-ext-input d-flex justify-content-between w-100">
+                    <Input
+                      disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
+                      onChange={onHandleChange}
+                      onMouseUp={onHandleUpdate}
+                      className="tool-ext-input-slider"
+                      id="scale"
+                      name="scale"
+                      min="0"
+                      max="1"
+                      step={0.01}
+                      type="range"
+                      value={tempToolsParams.scale}
+                    />
+                    <Input
+                      disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
+                      onChange={onHandleChange}
+                      onMouseLeave={onHandleUpdate}
+                      onKeyDown={onHandleEnter}
+                      bsSize="sm"
+                      className="tool-ext-input-number"
+                      id="scale"
+                      name="scale"
+                      type="number"
+                      min="0"
+                      max="1"
+                      step={0.01}
+                      value={tempToolsParams.scale}
+                    />
+                  </div>
+                </FormGroup>
+              </CardBody>
+            </Card>
           </div>
-          <div className="w-100 mt-3 tool-ext-section">
-            <p className="mb-1">Non-linearity</p>
-            <Button
-              className="custom-primary-button mt-3 mb-3 dropdown-button"
-              size="sm"
-              color="secondary"
-              id="depth-rotate-toggler"
-            >
-              Point Curve
-            </Button>
-            <UncontrolledCollapse toggler="#depth-rotate-toggler">
-              <Card className="tool-ext-card">
-                <CardBody className="tool-ext-card-body">
-                  <PointCurve
-                    pointCurveProps={{
-                      disabled: !memoryDepthCanvas || !parameters.histogramParams.pixelRange
-                    }}
-                  />
-                  <FormGroup className="w-100">
-                    <Label for="aConstant">A</Label>
-                    <div className="tool-ext-input d-flex justify-content-between w-100">
-                      <Input
-                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
-                        onChange={onHandleChange}
-                        onMouseUp={onHandleUpdate}
-                        className="tool-ext-input-slider"
-                        id="aConstant"
-                        name="aConstant"
-                        min="0"
-                        max="2"
-                        step={0.01}
-                        type="range"
-                        value={tempToolsParams.aConstant}
-                      />
-                      <Input
-                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
-                        onChange={onHandleChange}
-                        onMouseLeave={onHandleUpdate}
-                        onKeyDown={onHandleEnter}
-                        bsSize="sm"
-                        className="tool-ext-input-number"
-                        id="aConstant"
-                        name="aConstant"
-                        type="number"
-                        min="0"
-                        max="2"
-                        step={0.01}
-                        value={tempToolsParams.aConstant}
-                      />
-                    </div>
-                  </FormGroup>
-                  <FormGroup className="w-100">
-                    <Label for="bConstant">B</Label>
-                    <div className="tool-ext-input d-flex justify-content-between w-100">
-                      <Input
-                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
-                        onChange={onHandleChange}
-                        onMouseUp={onHandleUpdate}
-                        className="tool-ext-input-slider"
-                        id="bConstant"
-                        name="bConstant"
-                        min="0"
-                        max="2"
-                        step={0.01}
-                        type="range"
-                        value={tempToolsParams.bConstant}
-                      />
-                      <Input
-                        disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
-                        onChange={onHandleChange}
-                        onMouseLeave={onHandleUpdate}
-                        onKeyDown={onHandleEnter}
-                        bsSize="sm"
-                        className="tool-ext-input-number"
-                        id="bConstant"
-                        name="bConstant"
-                        type="number"
-                        min="0"
-                        max="2"
-                        step={0.01}
-                        value={tempToolsParams.bConstant}
-                      />
-                    </div>
-                  </FormGroup>
-                </CardBody>
-              </Card>
-            </UncontrolledCollapse>
+          <div className="w-100 mt-4 tool-ext-section">
+            <p className="mb-1">Global Adjustment</p>
+            <Card className="tool-ext-card">
+              <CardBody className="tool-ext-card-body">
+                <PointCurve
+                  pointCurveProps={{
+                    disabled: !memoryDepthCanvas || !parameters.histogramParams.pixelRange
+                  }}
+                />
+                <FormGroup className="w-100">
+                  <Label for="aConstant">A</Label>
+                  <div className="tool-ext-input d-flex justify-content-between w-100">
+                    <Input
+                      disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
+                      onChange={onHandleChange}
+                      onMouseUp={onHandleUpdate}
+                      className="tool-ext-input-slider"
+                      id="aConstant"
+                      name="aConstant"
+                      min="0"
+                      max="2"
+                      step={0.01}
+                      type="range"
+                      value={tempToolsParams.aConstant}
+                    />
+                    <Input
+                      disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
+                      onChange={onHandleChange}
+                      onMouseLeave={onHandleUpdate}
+                      onKeyDown={onHandleEnter}
+                      bsSize="sm"
+                      className="tool-ext-input-number"
+                      id="aConstant"
+                      name="aConstant"
+                      type="number"
+                      min="0"
+                      max="2"
+                      step={0.01}
+                      value={tempToolsParams.aConstant}
+                    />
+                  </div>
+                </FormGroup>
+                <FormGroup className="w-100">
+                  <Label for="bConstant">B</Label>
+                  <div className="tool-ext-input d-flex justify-content-between w-100">
+                    <Input
+                      disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
+                      onChange={onHandleChange}
+                      onMouseUp={onHandleUpdate}
+                      className="tool-ext-input-slider"
+                      id="bConstant"
+                      name="bConstant"
+                      min="0"
+                      max="2"
+                      step={0.01}
+                      type="range"
+                      value={tempToolsParams.bConstant}
+                    />
+                    <Input
+                      disabled={!memoryDepthCanvas || !parameters.histogramParams.pixelRange}
+                      onChange={onHandleChange}
+                      onMouseLeave={onHandleUpdate}
+                      onKeyDown={onHandleEnter}
+                      bsSize="sm"
+                      className="tool-ext-input-number"
+                      id="bConstant"
+                      name="bConstant"
+                      type="number"
+                      min="0"
+                      max="2"
+                      step={0.01}
+                      value={tempToolsParams.bConstant}
+                    />
+                  </div>
+                </FormGroup>
+              </CardBody>
+            </Card>
           </div>
         </div>
       </>
@@ -522,24 +488,9 @@ export function SidePane({
         disabled={operationStack.isSelectActive}
         className={toolExtOpen ? "tools-ext tool-ext-active" : "tools-ext tool-ext-inactive"}
       >
-        <div className="tools-ext-header">
-          {Tools.map((tool, key) => (
-            <div
-              key={key}
-              onClick={() => {
-                toggleTool(key);
-              }}
-              disabled={key === 0 && operationStack.activeIndex === 0}
-              className={key === activeTool ? "active tool" : "tool"}
-            >
-              {tool.icon}
-              <span>{tool.name}</span>
-            </div>
-          ))}
-        </div>
         <div className="tools-ext-body">
           <div className="tools-ext-elements">
-            {activeTool === 0 && operationStack.activeIndex !== 0 ? toolBox() : activeTool === 1 ? adjust() : null}
+            {toolBox()}
             <Button onClick={toolExtActions} className="toggle-button">
               {toolExtOpen ? <MdKeyboardArrowLeft /> : <MdKeyboardArrowRight />}
             </Button>
