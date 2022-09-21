@@ -141,7 +141,7 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           path: []
         },
         depthScaleParams: depthScaleParams,
-        activeDepthTool: null,
+        activeDepthTool: "singleSelection",
         toolsParameters: {
           disparity: 0,
           scale: 1,
