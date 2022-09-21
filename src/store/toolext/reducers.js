@@ -1,7 +1,7 @@
 import { types } from "./constants";
 
 const initialState = {
-  toolExtOpen: false
+  toolExtOpen: true
 };
 
 export const toolExtReducer = (state = initialState, { type }) => {
