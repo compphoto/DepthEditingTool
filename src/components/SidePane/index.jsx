@@ -124,6 +124,9 @@ export function SidePane({
   };
   useEffect(() => {
     const { activeIndex, layerStack } = operationStack;
+    if (memoryDepthCanvas && activeIndex === 0) {
+      selectTool(null);
+    }
     if (layerStack[activeIndex]) {
       setTempToolsParams({ ...layerStack[activeIndex].toolsParameters });
     }
