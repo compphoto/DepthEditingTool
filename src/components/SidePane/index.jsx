@@ -283,7 +283,8 @@ export function SidePane({
                   disabled={
                     !memoryDepthCanvas ||
                     !activeDepthTool ||
-                    (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox")
+                    (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox") ||
+                    operationStack.activeIndex <= 0
                   }
                   size="sm"
                   onClick={() => {
