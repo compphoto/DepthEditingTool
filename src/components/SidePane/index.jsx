@@ -4,9 +4,8 @@ import { toolExtActions } from "store/toolext";
 import { imageActions } from "store/image";
 import { selectors as toolExtSelectors } from "store/toolext";
 import { selectors as imageSelectors } from "store/image";
-import { Button, UncontrolledCollapse, CardBody, Card, FormGroup, Label, Input, UncontrolledTooltip } from "reactstrap";
+import { Button, CardBody, Card, FormGroup, Label, Input, UncontrolledTooltip } from "reactstrap";
 import SidePaneStyle from "./style";
-import Tools from "config/tools";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdDownload, MdDelete, MdContentCopy } from "react-icons/md";
 import { AiOutlinePlus } from "react-icons/ai";
 import { RiArrowUpDownLine } from "react-icons/ri";
@@ -275,22 +274,24 @@ export function SidePane({
                 </div>
               ))}
             </div>
-            <div className="d-flex my-2">
-              <Button
-                className="custom-primary-button"
-                disabled={
-                  !memoryDepthCanvas ||
-                  !activeDepthTool ||
-                  (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox")
-                }
-                size="sm"
-                onClick={() => {
-                  onModifyBitmap();
-                }}
-              >
-                Select
-              </Button>
-            </div>
+            {activeDepthTool ? (
+              <div className="d-flex my-2">
+                <Button
+                  className="custom-primary-button"
+                  disabled={
+                    !memoryDepthCanvas ||
+                    !activeDepthTool ||
+                    (activeDepthTool && SelectionBox[activeDepthTool].type !== "boundingBox")
+                  }
+                  size="sm"
+                  onClick={() => {
+                    onModifyBitmap();
+                  }}
+                >
+                  {SelectionBox[activeDepthTool].text}
+                </Button>
+              </div>
+            ) : null}
           </div>
           <div className="w-100 mt-4 tool-ext-section">
             <p className="mb-1">Local Adjustment</p>

@@ -17,6 +17,7 @@ export const SelectionBox = {
     icon: <MdCropDin />,
     tooltip: "single",
     type: "boundingBox",
+    text: "Select",
     func: modifySingleSelection
   },
   addSelection: {
@@ -24,6 +25,7 @@ export const SelectionBox = {
     icon: <RiCheckboxMultipleBlankLine />,
     tooltip: "multiple",
     type: "boundingBox",
+    text: "Add",
     func: modifyAddSelection
   },
   subtractSelection: {
@@ -31,6 +33,7 @@ export const SelectionBox = {
     icon: <BsSubtract />,
     tooltip: "subtract",
     type: "boundingBox",
+    text: "Subtract",
     func: modifySubtractSelection
   },
   intersectSelection: {
@@ -38,6 +41,7 @@ export const SelectionBox = {
     icon: <BiIntersect />,
     tooltip: "intersection",
     type: "boundingBox",
+    text: "Intersect",
     func: modifyIntersectSelection
   }
   // scribbleTool: {
@@ -45,6 +49,7 @@ export const SelectionBox = {
   //   icon: <ImPencil />,
   //   tooltip: "scribble",
   //   type: "scribble",
+  //   text: "Scribble",
   //   func: null
   // }
 };
