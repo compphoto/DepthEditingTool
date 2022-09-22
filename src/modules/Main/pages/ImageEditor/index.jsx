@@ -45,9 +45,7 @@ export function ImageEditor({
   reset,
   initImage,
   handleChange,
-  updateLayer,
-  mergeLayerSelect,
-  removeLayerSelect
+  updateLayer
 }) {
   const onHandleChange = e => {
     handleChange(e);
@@ -210,35 +208,6 @@ export function ImageEditor({
                   </DropdownMenu>
                 </UncontrolledDropdown>
                 <UncontrolledDropdown>
-                  <DropdownToggle>Layer</DropdownToggle>
-                  <DropdownMenu>
-                    <DropdownItem
-                      disabled={
-                        memoryDepthCanvas === null ||
-                        !operationStack.isSelectActive ||
-                        operationStack.selectedLayers.size < 2
-                      }
-                      onClick={() => {
-                        mergeLayerSelect();
-                      }}
-                    >
-                      <label>Merge</label>
-                    </DropdownItem>
-                    <DropdownItem
-                      disabled={
-                        memoryDepthCanvas === null ||
-                        !operationStack.isSelectActive ||
-                        operationStack.selectedLayers.size === 0
-                      }
-                      onClick={() => {
-                        removeLayerSelect();
-                      }}
-                    >
-                      <label>Delete</label>
-                    </DropdownItem>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-                <UncontrolledDropdown>
                   <DropdownToggle>About</DropdownToggle>
                   <DropdownMenu>
                     <DropdownItem tag={Link} to={{ pathname: "http://yaksoy.github.io/group" }} target="_blank">
@@ -336,8 +305,6 @@ const mapDispatchToProps = {
   handleChange: imageActions.handleChange,
   initImage: imageActions.initImage,
   updateLayer: imageActions.updateLayer,
-  mergeLayerSelect: imageActions.mergeLayerSelect,
-  removeLayerSelect: imageActions.removeLayerSelect,
   togglePan: imageActions.togglePan,
   zoomIn: imageActions.zoomIn,
   zoomOut: imageActions.zoomOut,

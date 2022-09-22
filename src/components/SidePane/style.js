@@ -139,15 +139,20 @@ const SidePaneStyle = styled.div`
     }
     .layer-mode-footer {
       background-color: #06192d;
-      height: 60px;
-      padding: 0.1rem 0;
+      height: 100px;
+      padding: 1rem 0;
       display: flex;
-      justify-content: space-around;
-      align-items: center;
-      .layer-mode-apply-button {
-        width: 40%;
-        button {
-          width: 100%;
+      flex-direction: column;
+      justify-content: space-between;
+      .layer-mode-footer-row {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        .layer-mode-apply-button {
+          width: 40%;
+          button {
+            width: 100%;
+          }
         }
       }
     }

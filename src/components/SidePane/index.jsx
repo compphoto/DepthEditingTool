@@ -43,6 +43,8 @@ export function SidePane({
   removeLayer,
   removeAllLayers,
   toggleLayerSelect,
+  mergeLayerSelect,
+  removeLayerSelect,
   clear
 }) {
   const [layers, setLayers] = useState(null);
@@ -468,19 +470,50 @@ export function SidePane({
             </Card>
           </div>
         </div>
-        <div
-          disabled={mainDepthCanvas === null || operationStack.layerStack.length <= 1}
-          className="layer-mode-footer text-center"
-        >
-          <div className="layer-mode-apply-button mx-2">
-            <Button className="custom-primary-button" size="sm" onClick={toggleLayerSelect}>
-              {operationStack.isSelectActive ? `Cancel (${operationStack.selectedLayers.size})` : "Select"}
-            </Button>
+        <div disabled={mainDepthCanvas === null || operationStack.layerStack.length <= 1} className="layer-mode-footer">
+          <div className="layer-mode-footer-row text-center">
+            <div className="layer-mode-apply-button mx-2">
+              <Button className="custom-primary-button" size="sm" onClick={toggleLayerSelect}>
+                {operationStack.isSelectActive ? `Cancel (${operationStack.selectedLayers.size})` : "Select"}
+              </Button>
+            </div>
+            <div className="layer-mode-apply-button mx-2">
+              <Button className="custom-secondary-button" size="sm" onClick={removeAllLayers}>
+                Remove all
+              </Button>
+            </div>
           </div>
-          <div className="layer-mode-apply-button mx-2">
-            <Button className="custom-secondary-button" size="sm" onClick={removeAllLayers}>
-              Remove all
-            </Button>
+          <div className="layer-mode-footer-row text-center">
+            <div className="layer-mode-apply-button mx-2">
+              <Button
+                className="custom-primary-button"
+                size="sm"
+                disabled={
+                  memoryDepthCanvas === null || !operationStack.isSelectActive || operationStack.selectedLayers.size < 2
+                }
+                onClick={() => {
+                  mergeLayerSelect();
+                }}
+              >
+                Merge
+              </Button>
+            </div>
+            <div className="layer-mode-apply-button mx-2">
+              <Button
+                className="custom-secondary-button"
+                size="sm"
+                disabled={
+                  memoryDepthCanvas === null ||
+                  !operationStack.isSelectActive ||
+                  operationStack.selectedLayers.size === 0
+                }
+                onClick={() => {
+                  removeLayerSelect();
+                }}
+              >
+                Delete
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -525,6 +558,8 @@ const mapDispatchToProps = {
   removeLayer: imageActions.removeLayer,
   removeAllLayers: imageActions.removeAllLayers,
   toggleLayerSelect: imageActions.toggleLayerSelect,
+  mergeLayerSelect: imageActions.mergeLayerSelect,
+  removeLayerSelect: imageActions.removeLayerSelect,
   storeToolParameters: imageActions.storeToolParameters,
   clear: imageActions.clear
 };
