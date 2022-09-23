@@ -22,8 +22,7 @@ import {
   downScalePoint,
   getScribbleRange,
   boxToDimension,
-  canvasResize,
-  downloadCanvas
+  canvasResize
 } from "utils/canvasUtils";
 import { runDepthOperations, runCachedDepthOperations } from "utils/stackOperations";
 import { SelectionBox } from "config/toolBox";

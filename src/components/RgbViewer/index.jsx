@@ -8,11 +8,14 @@ import {
   canvasLike,
   canvasResize,
   cloneCanvas,
+  cropCanvas,
   downScaleBox,
   drawBox,
   drawCanvasImage,
   drawScaledCanvasImage,
   getBoundingArea,
+  getBoundingBox,
+  upScaleBox,
   getRatio,
   highlightPixelAreaRgb
 } from "utils/canvasUtils";
@@ -40,13 +43,17 @@ class RgbViewer extends Component {
       mainRgbCanvas,
       memoryRgbCanvas,
       memoryDepthCanvas,
+      boxParams,
       rgbScaleParams,
       prevRgbSize,
+      isPanActive,
+      activeDepthTool,
       parameters,
       operationStack,
       initImage,
       initRgb,
       storeScaleParams,
+      storeParameters,
       addEffect
     } = this.props;
     let rgbCanvas = rgbImageRef.current;
@@ -95,7 +102,7 @@ class RgbViewer extends Component {
       prevProps.memoryRgbCanvas !== memoryRgbCanvas ||
       prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange ||
       prevProps.rgbScaleParams !== rgbScaleParams ||
-      prevProps.parameters.croppedArea !== parameters.croppedArea
+      prevProps.boxParams.end !== boxParams.end
     ) {
       if (memoryRgbCanvas) {
         const { ratio, centerShift_x, centerShift_y, translatePos, scale } = rgbScaleParams;
@@ -132,18 +139,81 @@ class RgbViewer extends Component {
             downScaleBox(parameters.croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
           );
         }
+        if (boxParams.end) {
+          let { x1, y1 } = boxParams.start;
+          let { x2, y2 } = boxParams.end;
+          let croppedArea = getBoundingBox(x1, y1, x2, y2, memoryRgbCanvas, rgbScaleParams);
+          if (croppedArea) drawBox(rgbCanvas, croppedArea);
+        }
       } else {
         let rgbContext = rgbCanvas.getContext("2d");
         rgbContext.clearRect(0, 0, rgbCanvas.width, rgbCanvas.height);
       }
     }
+    if (prevProps.isPanActive !== isPanActive) {
+      if (isPanActive && activeDepthTool) {
+        rgbCanvas.removeEventListener("mousedown", this.handleMouseDown);
+        rgbCanvas.removeEventListener("mouseup", this.handleMouseUp);
+        rgbCanvas.removeEventListener("mouseout", this.handleMouseUp);
+        rgbCanvas.removeEventListener("mouseover", this.handleMouseUp);
+        rgbCanvas.removeEventListener("mousemove", this.handleMouseMove);
+      }
+      if (!isPanActive && activeDepthTool) {
+        rgbCanvas.addEventListener("mousedown", this.handleMouseDown);
+        rgbCanvas.addEventListener("mouseup", this.handleMouseUp);
+        rgbCanvas.addEventListener("mouseout", this.handleMouseUp);
+        rgbCanvas.addEventListener("mouseover", this.handleMouseUp);
+        rgbCanvas.addEventListener("mousemove", this.handleMouseMove);
+      }
+    }
+    // Listens for mouse movements around the depth canvas and draw bounding box
+    if (prevProps.activeDepthTool !== activeDepthTool) {
+      if (activeDepthTool) {
+        if (!isPanActive) {
+          rgbCanvas.addEventListener("mousedown", this.handleMouseDown);
+          rgbCanvas.addEventListener("mouseup", this.handleMouseUp);
+          rgbCanvas.addEventListener("mouseout", this.handleMouseUp);
+          rgbCanvas.addEventListener("mouseover", this.handleMouseUp);
+          rgbCanvas.addEventListener("mousemove", this.handleMouseMove);
+        } else {
+          rgbCanvas.removeEventListener("mousedown", this.handleMouseDown);
+          rgbCanvas.removeEventListener("mouseup", this.handleMouseUp);
+          rgbCanvas.removeEventListener("mouseout", this.handleMouseUp);
+          rgbCanvas.removeEventListener("mouseover", this.handleMouseUp);
+          rgbCanvas.removeEventListener("mousemove", this.handleMouseMove);
+        }
+      } else {
+        rgbCanvas.removeEventListener("mousedown", this.handleMouseDown);
+        rgbCanvas.removeEventListener("mouseup", this.handleMouseUp);
+        rgbCanvas.removeEventListener("mouseout", this.handleMouseUp);
+        rgbCanvas.removeEventListener("mouseover", this.handleMouseUp);
+        rgbCanvas.removeEventListener("mousemove", this.handleMouseMove);
+        storeParameters({
+          croppedCanvasImage: null,
+          croppedArea: null,
+          histogramParams: {
+            pixelRange: [0, 255],
+            domain: [0, 255],
+            values: [0, 255],
+            update: [0, 255]
+          }
+        });
+      }
+    }
   }
   componentWillUnmount() {
+    let rgbCanvas = this.rgbImageRef.current;
     window.removeEventListener("resize", this.handleResize);
+    rgbCanvas.removeEventListener("mousedown", this.handleMouseDown);
+    rgbCanvas.removeEventListener("mouseup", this.handleMouseUp);
+    rgbCanvas.removeEventListener("mouseout", this.handleMouseUp);
+    rgbCanvas.removeEventListener("mouseover", this.handleMouseUp);
+    rgbCanvas.removeEventListener("mousemove", this.handleMouseMove);
     URL.revokeObjectURL(objectUrl);
   }
   handleResize = () => {
-    const { memoryRgbCanvas, memoryDepthCanvas, rgbScaleParams, parameters, initImage, storeScaleParams } = this.props;
+    const { memoryRgbCanvas, memoryDepthCanvas, rgbScaleParams, boxParams, parameters, initImage, storeScaleParams } =
+      this.props;
     const { translatePos, scale } = rgbScaleParams;
     const rgbCanvas = this.rgbImageRef.current;
     this.setState({ ...this.state, windowWidth: window.innerWidth });
@@ -180,7 +250,69 @@ class RgbViewer extends Component {
           downScaleBox(parameters.croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
         );
       }
+      if (boxParams.end) {
+        let { x1, y1 } = boxParams.start;
+        let { x2, y2 } = boxParams.end;
+        let croppedArea = getBoundingBox(x1, y1, x2, y2, memoryRgbCanvas, rgbScaleParams);
+        if (croppedArea) drawBox(rgbCanvas, croppedArea);
+      }
     }
+  };
+  handleMouseDown = event => {
+    let { memoryRgbCanvas, storeParameters, storeBoxParams } = this.props;
+    if (memoryRgbCanvas) {
+      const rgbCanvas = this.rgbImageRef.current;
+      rgbCanvas.style.cursor = "crosshair";
+      let x = event.offsetX;
+      let y = event.offsetY;
+      storeBoxParams({
+        start: { x1: x, y1: y },
+        end: null
+      });
+      storeParameters({
+        croppedCanvasImage: null,
+        croppedArea: null,
+        histogramParams: {
+          pixelRange: [0, 255],
+          domain: [0, 255],
+          values: [0, 255],
+          update: [0, 255]
+        }
+      });
+    }
+  };
+  handleMouseMove = event => {
+    let { memoryRgbCanvas, boxParams, storeBoxParams } = this.props;
+    if (event.buttons !== 1 || !boxParams.start) return;
+    if (memoryRgbCanvas) {
+      let x = event.offsetX;
+      let y = event.offsetY;
+      storeBoxParams({
+        end: { x2: x, y2: y }
+      });
+    }
+  };
+  handleMouseUp = () => {
+    let { memoryRgbCanvas, boxParams, rgbScaleParams, storeBoxParams, storeParameters } = this.props;
+    if (memoryRgbCanvas && boxParams.end) {
+      let { x1, y1 } = boxParams.start;
+      let { x2, y2 } = boxParams.end;
+      let croppedArea = getBoundingBox(x1, y1, x2, y2, memoryRgbCanvas, rgbScaleParams);
+      if (croppedArea) {
+        const { ratio, centerShift_x, centerShift_y, translatePos, scale } = rgbScaleParams;
+        croppedArea = upScaleBox(croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale);
+        storeParameters({
+          croppedCanvasImage: cropCanvas(memoryRgbCanvas, croppedArea),
+          croppedArea: croppedArea
+        });
+      }
+    }
+    const rgbCanvas = this.rgbImageRef.current;
+    rgbCanvas.style.cursor = "default";
+    storeBoxParams({
+      start: null,
+      end: null
+    });
   };
   render() {
     const { rgbImageRef } = this;
@@ -280,6 +412,7 @@ const mapStateToProps = state => ({
   memoryRgbCanvas: imageSelectors.memoryRgbCanvas(state),
   memoryDepthCanvas: imageSelectors.memoryDepthCanvas(state),
   prevRgbSize: imageSelectors.prevRgbSize(state),
+  boxParams: imageSelectors.boxParams(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
   depthScaleParams: imageSelectors.depthScaleParams(state),
   isPanActive: imageSelectors.isPanActive(state),
@@ -291,7 +424,9 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   initImage: imageActions.initImage,
   initRgb: imageActions.initRgb,
+  storeBoxParams: imageActions.storeBoxParams,
   storeScaleParams: imageActions.storeScaleParams,
+  storeParameters: imageActions.storeParameters,
   addEffect: imageActions.addEffect
 };
 
