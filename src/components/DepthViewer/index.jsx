@@ -14,6 +14,7 @@ import {
   drawBox,
   drawScaledCanvasImage,
   getBoundingArea,
+  getBoundingBox,
   upScaleBox,
   downScaleBox,
   drawScribble,
@@ -53,6 +54,7 @@ class DepthViewer extends Component {
       prevDepthSize,
       scribbleParams,
       depthScaleParams,
+      boxParams,
       isPanActive,
       activeDepthTool,
       parameters,
@@ -121,7 +123,7 @@ class DepthViewer extends Component {
       prevProps.memoryDepthCanvas !== memoryDepthCanvas ||
       prevProps.parameters.histogramParams.pixelRange !== parameters.histogramParams.pixelRange ||
       prevProps.depthScaleParams !== depthScaleParams ||
-      prevProps.parameters.croppedArea !== parameters.croppedArea
+      prevProps.boxParams.end !== boxParams.end
     ) {
       if (memoryDepthCanvas) {
         const { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
@@ -146,6 +148,12 @@ class DepthViewer extends Component {
             downScaleBox(parameters.croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
           );
         }
+        // if (boxParams.end) {
+        //   let { x1, y1 } = boxParams.start;
+        //   let { x2, y2 } = boxParams.end;
+        //   let croppedArea = getBoundingBox(x1, y1, x2, y2, memoryDepthCanvas, depthScaleParams);
+        //   if (croppedArea) drawBox(depthCanvas, croppedArea);
+        // }
         if (Array.isArray(scribbleParams.path) || scribbleParams.path.length) {
           for (let i = 0; i < scribbleParams.path.length; i++) {
             drawScribble(
@@ -162,22 +170,32 @@ class DepthViewer extends Component {
     }
     if (prevProps.isPanActive !== isPanActive) {
       if (isPanActive && activeDepthTool) {
-        depthCanvas.removeEventListener("click", this.drawBoundingBox);
+        depthCanvas.removeEventListener("mousedown", this.handleMouseDown);
+        depthCanvas.removeEventListener("mouseup", this.handleMouseUp);
+        depthCanvas.removeEventListener("mousemove", this.handleMouseMove);
       }
       if (!isPanActive && activeDepthTool) {
-        depthCanvas.addEventListener("click", this.drawBoundingBox);
+        depthCanvas.addEventListener("mousedown", this.handleMouseDown);
+        depthCanvas.addEventListener("mouseup", this.handleMouseUp);
+        depthCanvas.addEventListener("mousemove", this.handleMouseMove);
       }
     }
     // Listens for mouse movements around the depth canvas and draw bounding box
     if (prevProps.activeDepthTool !== activeDepthTool) {
       if (activeDepthTool) {
         if (!isPanActive) {
-          depthCanvas.addEventListener("click", this.drawBoundingBox);
+          depthCanvas.addEventListener("mousedown", this.handleMouseDown);
+          depthCanvas.addEventListener("mouseup", this.handleMouseUp);
+          depthCanvas.addEventListener("mousemove", this.handleMouseMove);
         } else {
-          depthCanvas.removeEventListener("click", this.drawBoundingBox);
+          depthCanvas.removeEventListener("mousedown", this.handleMouseDown);
+          depthCanvas.removeEventListener("mouseup", this.handleMouseUp);
+          depthCanvas.removeEventListener("mousemove", this.handleMouseMove);
         }
       } else {
-        depthCanvas.removeEventListener("click", this.drawBoundingBox);
+        depthCanvas.removeEventListener("mousedown", this.handleMouseDown);
+        depthCanvas.removeEventListener("mouseup", this.handleMouseUp);
+        depthCanvas.removeEventListener("mousemove", this.handleMouseMove);
         storeParameters({
           croppedCanvasImage: null,
           croppedArea: null,
@@ -194,11 +212,14 @@ class DepthViewer extends Component {
   componentWillUnmount() {
     let depthCanvas = this.depthImageRef.current;
     window.removeEventListener("resize", this.handleResize);
-    depthCanvas.removeEventListener("click", this.drawBoundingBox);
+    depthCanvas.removeEventListener("mousedown", this.handleMouseDown);
+    depthCanvas.removeEventListener("mouseup", this.handleMouseUp);
+    depthCanvas.removeEventListener("mousemove", this.handleMouseMove);
     URL.revokeObjectURL(objectUrl);
   }
   handleResize = () => {
-    const { memoryDepthCanvas, scribbleParams, depthScaleParams, parameters, initImage, storeScaleParams } = this.props;
+    const { memoryDepthCanvas, scribbleParams, depthScaleParams, parameters, boxParams, initImage, storeScaleParams } =
+      this.props;
     const { translatePos, scale } = depthScaleParams;
     const depthCanvas = this.depthImageRef.current;
     this.setState({ ...this.state, windowWidth: window.innerWidth });
@@ -231,6 +252,12 @@ class DepthViewer extends Component {
           downScaleBox(parameters.croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
         );
       }
+      if (boxParams.end) {
+        let { x1, y1 } = boxParams.start;
+        let { x2, y2 } = boxParams.end;
+        let croppedArea = getBoundingBox(x1, y1, x2, y2, memoryDepthCanvas, depthScaleParams);
+        if (croppedArea) drawBox(depthCanvas, croppedArea);
+      }
       if (Array.isArray(scribbleParams.path) || scribbleParams.path.length) {
         for (let i = 0; i < scribbleParams.path.length; i++) {
           drawScribble(
@@ -242,75 +269,53 @@ class DepthViewer extends Component {
       }
     }
   };
-  drawBoundingBox = event => {
-    let depthCanvas = this.depthImageRef.current;
-    let { initBoundingBox } = this.state;
-    let { memoryDepthCanvas, depthScaleParams, storeParameters, activeDepthTool } = this.props;
-    let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
+  handleMouseDown = event => {
+    let { memoryDepthCanvas, storeParameters, storeBoxParams } = this.props;
+    if (memoryDepthCanvas) {
+      const depthCanvas = this.depthImageRef.current;
+      depthCanvas.style.cursor = "crosshair";
+      let x = event.offsetX;
+      let y = event.offsetY;
+      storeBoxParams({
+        start: { x1: x, y1: y },
+        end: null
+      });
+      storeParameters({
+        croppedArea: null
+      });
+    }
+  };
+  handleMouseMove = event => {
+    let { memoryDepthCanvas, boxParams, storeBoxParams } = this.props;
+    if (event.buttons !== 1 || !boxParams.start) return;
     if (memoryDepthCanvas) {
       let x = event.offsetX;
       let y = event.offsetY;
-      if (initBoundingBox) {
-        let depthCanvasDimension = getDimension(
-          memoryDepthCanvas,
-          ratio,
-          centerShift_x,
-          centerShift_y,
-          translatePos,
-          scale
-        );
-        let [image_x1, image_y1, image_x2, image_y2] = depthCanvasDimension;
-        let new_x = Math.max(Math.min(initBoundingBox.x, x), image_x1);
-        let new_y = Math.max(Math.min(initBoundingBox.y, y), image_y1);
-        let new_w = Math.min(Math.max(initBoundingBox.x, x), image_x2) - new_x;
-        let new_h = Math.min(Math.max(initBoundingBox.y, y), image_y2) - new_y;
-        if (
-          new_x >= image_x1 &&
-          new_x <= image_x2 &&
-          new_y >= image_y1 &&
-          new_y <= image_y2 &&
-          new_x + new_w <= image_x2 &&
-          new_x + new_w >= image_x1 &&
-          new_y + new_h <= image_y2 &&
-          new_y + new_h >= image_y1
-        ) {
-          if (new_w !== 0 && new_h !== 0) {
-            let croppedArea = upScaleBox(
-              [new_x, new_y, new_w, new_h],
-              ratio,
-              centerShift_x,
-              centerShift_y,
-              translatePos,
-              scale
-            );
-            this.setState({ initBoundingBox: null }, () => {
-              depthCanvas.style.cursor = "default";
-              if (activeDepthTool) {
-                storeParameters({
-                  croppedCanvasImage: cropCanvas(memoryDepthCanvas, croppedArea),
-                  croppedArea: croppedArea
-                });
-              }
-            });
-          }
-        }
-      } else {
-        this.setState({ initBoundingBox: { x, y } }, () => {
-          depthCanvas.style.cursor = "crosshair";
-          if (activeDepthTool) {
-            storeParameters({
-              croppedArea: null,
-              histogramParams: {
-                pixelRange: [0, 255],
-                domain: [0, 255],
-                values: [0, 255],
-                update: [0, 255]
-              }
-            });
-          }
+      storeBoxParams({
+        end: { x2: x, y2: y }
+      });
+    }
+  };
+  handleMouseUp = event => {
+    let { memoryDepthCanvas, boxParams, depthScaleParams, storeBoxParams, storeParameters } = this.props;
+    if (memoryDepthCanvas && boxParams.end) {
+      let { x1, y1 } = boxParams.start;
+      let { x2, y2 } = boxParams.end;
+      let croppedArea = getBoundingBox(x1, y1, x2, y2, memoryDepthCanvas, depthScaleParams);
+      if (croppedArea) {
+        const { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
+        storeParameters({
+          croppedCanvasImage: cropCanvas(memoryDepthCanvas, croppedArea),
+          croppedArea: upScaleBox(croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
         });
       }
     }
+    const depthCanvas = this.depthImageRef.current;
+    depthCanvas.style.cursor = "default";
+    storeBoxParams({
+      start: null,
+      end: null
+    });
   };
   render() {
     const { depthImageRef } = this;
@@ -512,6 +517,7 @@ const mapStateToProps = state => ({
   isEffectNew: imageSelectors.isEffectNew(state),
   prevDepthSize: imageSelectors.prevDepthSize(state),
   scribbleParams: imageSelectors.scribbleParams(state),
+  boxParams: imageSelectors.boxParams(state),
   rgbScaleParams: imageSelectors.rgbScaleParams(state),
   depthScaleParams: imageSelectors.depthScaleParams(state),
   isPanActive: imageSelectors.isPanActive(state),
@@ -526,6 +532,7 @@ const mapDispatchToProps = {
   initLayer: imageActions.initLayer,
   addLayer: imageActions.addLayer,
   storeScribbleParams: imageActions.storeScribbleParams,
+  storeBoxParams: imageActions.storeBoxParams,
   storeScaleParams: imageActions.storeScaleParams,
   storeParameters: imageActions.storeParameters,
   addEffect: imageActions.addEffect

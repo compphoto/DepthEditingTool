@@ -20,6 +20,10 @@ const initialState = {
     offset: {},
     path: []
   },
+  boxParams: {
+    start: null,
+    end: null
+  },
   rgbScaleParams: {
     ratio: 1,
     centerShift_x: 0,
@@ -140,6 +144,10 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           offset: {},
           path: []
         },
+        boxParams: {
+          start: null,
+          end: null
+        },
         depthScaleParams: depthScaleParams,
         activeDepthTool: "singleSelection",
         toolsParameters: {
@@ -180,6 +188,14 @@ export const imageReducer = (state = initialState, { type, payload }) => {
         ...state,
         scribbleParams: {
           ...state.scribbleParams,
+          ...payload
+        }
+      };
+    case types.STORE_BOX_PARAMS:
+      return {
+        ...state,
+        boxParams: {
+          ...state.boxParams,
           ...payload
         }
       };
@@ -463,6 +479,10 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           offset: {},
           path: []
         },
+        boxParams: {
+          start: null,
+          end: null
+        },
         parameters: {
           ...state.parameters,
           croppedCanvasImage: null,
@@ -485,6 +505,10 @@ export const imageReducer = (state = initialState, { type, payload }) => {
           pos: { x: 0, y: 0 },
           offset: {},
           path: []
+        },
+        boxParams: {
+          start: null,
+          end: null
         },
         rgbScaleParams: {
           ...state.rgbScaleParams,

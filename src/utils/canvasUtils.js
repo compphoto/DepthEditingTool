@@ -138,6 +138,31 @@ export const getBoundingArea = image => {
   return null;
 };
 
+export const getBoundingBox = (x1, y1, x2, y2, memoryDepthCanvas, depthScaleParams) => {
+  let { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
+  let depthCanvasDimension = getDimension(memoryDepthCanvas, ratio, centerShift_x, centerShift_y, translatePos, scale);
+  let [image_x1, image_y1, image_x2, image_y2] = depthCanvasDimension;
+  let new_x = Math.max(Math.min(x1, x2), image_x1);
+  let new_y = Math.max(Math.min(y1, y2), image_y1);
+  let new_w = Math.min(Math.max(x1, x2), image_x2) - new_x;
+  let new_h = Math.min(Math.max(y1, y2), image_y2) - new_y;
+  if (
+    new_w !== 0 &&
+    new_h !== 0 &&
+    new_x >= image_x1 &&
+    new_x <= image_x2 &&
+    new_y >= image_y1 &&
+    new_y <= image_y2 &&
+    new_x + new_w <= image_x2 &&
+    new_x + new_w >= image_x1 &&
+    new_y + new_h <= image_y2 &&
+    new_y + new_h >= image_y1
+  ) {
+    return [new_x, new_y, new_w, new_h];
+  }
+  return null;
+};
+
 export const drawCanvasImage = (image, context) => {
   context.drawImage(image, 0, 0);
 };

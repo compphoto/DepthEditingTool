@@ -13,6 +13,7 @@ export const selectors = {
   prevRgbSize: state => state.image.prevRgbSize,
   prevDepthSize: state => state.image.prevDepthSize,
   scribbleParams: state => state.image.scribbleParams,
+  boxParams: state => state.image.boxParams,
   rgbScaleParams: state => state.image.rgbScaleParams,
   depthScaleParams: state => state.image.depthScaleParams,
   isPanActive: state => state.image.isPanActive,
