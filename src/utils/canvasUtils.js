@@ -45,7 +45,6 @@ export const cloneCanvas = oldCanvas => {
 export const canvasLike = canvas => {
   if (canvas) {
     const newCanvas = document.createElement("canvas");
-    const context = newCanvas.getContext("2d");
     newCanvas.width = canvas.width;
     newCanvas.height = canvas.height;
     return newCanvas;
@@ -90,7 +89,7 @@ export const upScaleBox = (box, ratio, centerShift_x, centerShift_y, translatePo
   let y = (box[1] - centerShift_y - translatePos.y) / ratio / scale;
   let w = box[2] / ratio / scale;
   let h = box[3] / ratio / scale;
-  return [Math.ceil(x), Math.ceil(y), Math.ceil(w), Math.ceil(h)];
+  return [x, y, w, h];
 };
 
 export const upScaleDimension = (dimension, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
@@ -98,7 +97,7 @@ export const upScaleDimension = (dimension, ratio, centerShift_x, centerShift_y,
   let y1 = (dimension[1] - centerShift_y - translatePos.y) / ratio / scale;
   let x2 = x1 + (dimension[2] - centerShift_x) / ratio / scale;
   let y2 = y1 + (dimension[3] - centerShift_y) / ratio / scale;
-  return [Math.ceil(x1), Math.ceil(y1), Math.ceil(x2), Math.ceil(y2)];
+  return [x1, y1, x2, y2];
 };
 
 export const downScaleBox = (box, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
@@ -106,21 +105,21 @@ export const downScaleBox = (box, ratio, centerShift_x, centerShift_y, translate
   let y = box[1] * ratio * scale + centerShift_y + translatePos.y;
   let w = box[2] * ratio * scale;
   let h = box[3] * ratio * scale;
-  return [Math.ceil(x), Math.ceil(y), Math.ceil(w), Math.ceil(h)];
+  return [x, y, w, h];
 };
 
 export const upScalePoint = (point, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
   let { x, y } = point;
   let new_x = (x - centerShift_x - translatePos.x) / ratio / scale;
   let new_y = (y - centerShift_y - translatePos.y) / ratio / scale;
-  return { x: Math.ceil(new_x), y: Math.ceil(new_y) };
+  return { x: new_x, y: new_y };
 };
 
 export const downScalePoint = (point, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
   let { x, y } = point;
   let new_x = x * ratio * scale + centerShift_x + translatePos.x;
   let new_y = y * ratio * scale + centerShift_y + translatePos.y;
-  return { x: Math.ceil(new_x), y: Math.ceil(new_y) };
+  return { x: new_x, y: new_y };
 };
 
 export const getDimension = (image, ratio, centerShift_x, centerShift_y, translatePos, scale) => {
