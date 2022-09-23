@@ -172,11 +172,15 @@ class DepthViewer extends Component {
       if (isPanActive && activeDepthTool) {
         depthCanvas.removeEventListener("mousedown", this.handleMouseDown);
         depthCanvas.removeEventListener("mouseup", this.handleMouseUp);
+        depthCanvas.removeEventListener("mouseout", this.handleMouseUp);
+        depthCanvas.removeEventListener("mouseover", this.handleMouseUp);
         depthCanvas.removeEventListener("mousemove", this.handleMouseMove);
       }
       if (!isPanActive && activeDepthTool) {
         depthCanvas.addEventListener("mousedown", this.handleMouseDown);
         depthCanvas.addEventListener("mouseup", this.handleMouseUp);
+        depthCanvas.addEventListener("mouseout", this.handleMouseUp);
+        depthCanvas.addEventListener("mouseover", this.handleMouseUp);
         depthCanvas.addEventListener("mousemove", this.handleMouseMove);
       }
     }
@@ -186,15 +190,21 @@ class DepthViewer extends Component {
         if (!isPanActive) {
           depthCanvas.addEventListener("mousedown", this.handleMouseDown);
           depthCanvas.addEventListener("mouseup", this.handleMouseUp);
+          depthCanvas.addEventListener("mouseout", this.handleMouseUp);
+          depthCanvas.addEventListener("mouseover", this.handleMouseUp);
           depthCanvas.addEventListener("mousemove", this.handleMouseMove);
         } else {
           depthCanvas.removeEventListener("mousedown", this.handleMouseDown);
           depthCanvas.removeEventListener("mouseup", this.handleMouseUp);
+          depthCanvas.removeEventListener("mouseout", this.handleMouseUp);
+          depthCanvas.removeEventListener("mouseover", this.handleMouseUp);
           depthCanvas.removeEventListener("mousemove", this.handleMouseMove);
         }
       } else {
         depthCanvas.removeEventListener("mousedown", this.handleMouseDown);
         depthCanvas.removeEventListener("mouseup", this.handleMouseUp);
+        depthCanvas.removeEventListener("mouseout", this.handleMouseUp);
+        depthCanvas.removeEventListener("mouseover", this.handleMouseUp);
         depthCanvas.removeEventListener("mousemove", this.handleMouseMove);
         storeParameters({
           croppedCanvasImage: null,
@@ -214,6 +224,8 @@ class DepthViewer extends Component {
     window.removeEventListener("resize", this.handleResize);
     depthCanvas.removeEventListener("mousedown", this.handleMouseDown);
     depthCanvas.removeEventListener("mouseup", this.handleMouseUp);
+    depthCanvas.removeEventListener("mouseout", this.handleMouseUp);
+    depthCanvas.removeEventListener("mouseover", this.handleMouseUp);
     depthCanvas.removeEventListener("mousemove", this.handleMouseMove);
     URL.revokeObjectURL(objectUrl);
   }
@@ -296,7 +308,7 @@ class DepthViewer extends Component {
       });
     }
   };
-  handleMouseUp = event => {
+  handleMouseUp = () => {
     let { memoryDepthCanvas, boxParams, depthScaleParams, storeBoxParams, storeParameters } = this.props;
     if (memoryDepthCanvas && boxParams.end) {
       let { x1, y1 } = boxParams.start;
