@@ -293,16 +293,16 @@ class RgbViewer extends Component {
     }
   };
   handleMouseUp = () => {
-    let { memoryRgbCanvas, boxParams, rgbScaleParams, storeBoxParams, storeParameters } = this.props;
-    if (memoryRgbCanvas && boxParams.end) {
+    let { memoryDepthCanvas, boxParams, depthScaleParams, storeBoxParams, storeParameters } = this.props;
+    if (memoryDepthCanvas && boxParams.end) {
       let { x1, y1 } = boxParams.start;
       let { x2, y2 } = boxParams.end;
-      let croppedArea = getBoundingBox(x1, y1, x2, y2, memoryRgbCanvas, rgbScaleParams);
+      let croppedArea = getBoundingBox(x1, y1, x2, y2, memoryDepthCanvas, depthScaleParams);
       if (croppedArea) {
-        const { ratio, centerShift_x, centerShift_y, translatePos, scale } = rgbScaleParams;
+        const { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
         croppedArea = upScaleBox(croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale);
         storeParameters({
-          croppedCanvasImage: cropCanvas(memoryRgbCanvas, croppedArea),
+          croppedCanvasImage: cropCanvas(memoryDepthCanvas, croppedArea),
           croppedArea: croppedArea
         });
       }
