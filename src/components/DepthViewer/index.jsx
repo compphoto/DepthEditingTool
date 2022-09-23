@@ -148,12 +148,12 @@ class DepthViewer extends Component {
             downScaleBox(parameters.croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
           );
         }
-        // if (boxParams.end) {
-        //   let { x1, y1 } = boxParams.start;
-        //   let { x2, y2 } = boxParams.end;
-        //   let croppedArea = getBoundingBox(x1, y1, x2, y2, memoryDepthCanvas, depthScaleParams);
-        //   if (croppedArea) drawBox(depthCanvas, croppedArea);
-        // }
+        if (boxParams.end) {
+          let { x1, y1 } = boxParams.start;
+          let { x2, y2 } = boxParams.end;
+          let croppedArea = getBoundingBox(x1, y1, x2, y2, memoryDepthCanvas, depthScaleParams);
+          if (croppedArea) drawBox(depthCanvas, croppedArea);
+        }
         if (Array.isArray(scribbleParams.path) || scribbleParams.path.length) {
           for (let i = 0; i < scribbleParams.path.length; i++) {
             drawScribble(
