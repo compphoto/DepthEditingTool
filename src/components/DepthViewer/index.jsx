@@ -22,7 +22,8 @@ import {
   downScalePoint,
   getScribbleRange,
   boxToDimension,
-  canvasResize
+  canvasResize,
+  downloadCanvas
 } from "utils/canvasUtils";
 import { runDepthOperations, runCachedDepthOperations } from "utils/stackOperations";
 import { SelectionBox } from "config/toolBox";
@@ -316,9 +317,10 @@ class DepthViewer extends Component {
       let croppedArea = getBoundingBox(x1, y1, x2, y2, memoryDepthCanvas, depthScaleParams);
       if (croppedArea) {
         const { ratio, centerShift_x, centerShift_y, translatePos, scale } = depthScaleParams;
+        croppedArea = upScaleBox(croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale);
         storeParameters({
           croppedCanvasImage: cropCanvas(memoryDepthCanvas, croppedArea),
-          croppedArea: upScaleBox(croppedArea, ratio, centerShift_x, centerShift_y, translatePos, scale)
+          croppedArea: croppedArea
         });
       }
     }
