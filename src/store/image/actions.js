@@ -8,6 +8,7 @@ export const imageActions = {
   togglePan: () => ({ type: types.TOGGLE_PAN }),
   selectTool: payload => ({ type: types.SELECT_TOOL, payload: payload }),
   storeScribbleParams: payload => ({ type: types.STORE_SCRIBBLE_PARAMS, payload: payload }),
+  storeBoxParams: payload => ({ type: types.STORE_BOX_PARAMS, payload: payload }),
   storeScaleParams: payload => ({ type: types.STORE_SCALE_PARAMS, payload: payload }),
   storeToolParameters: payload => ({ type: types.STORE_TOOL_PARAMETERS, payload: payload }),
   storeParameters: payload => ({ type: types.STORE_PARAMETERS, payload: payload }),
