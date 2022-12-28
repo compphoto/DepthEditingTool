@@ -64,12 +64,12 @@
     ]
   },
   "devDependencies": {
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-react": "^7.22.0",
-    "netlify-cli": "^10.9.0",
-    "prettier": "^2.4.1"
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.11",
+    "netlify-cli": "^12.5.0",
+    "prettier": "^2.8.1"
   },
   "resolutions": {
     "autoprefixer": "10.4.5"
