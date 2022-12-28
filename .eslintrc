@@ -18,6 +18,7 @@
     "prettier/prettier": ["error", { "endOfLine": "auto" }],
     "no-console": ["error", { "allow": ["warn", "error"] }],
     "react/prop-types": 0,
-    "react/display-name": "off"
+    "react/display-name": "off",
+    "react/no-unknown-property": ["error", { "ignore": ["jsx"] }]
   }
 }
