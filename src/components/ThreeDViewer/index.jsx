@@ -6,12 +6,14 @@ import { Input } from "reactstrap";
 import ThreeDViewerStyle from "./style";
 
 function Camera(props) {
-  let { focalLength, ...prop } = props;
+  let { focalLength, aspectRatio, ...prop } = props;
   const ref = useRef();
   const set = useThree(state => state.set);
   useEffect(() => {
+    // set aspect ratio before focal length
+    ref.current.aspect = aspectRatio;
     ref.current.setFocalLength(focalLength);
-  }, [focalLength]);
+  }, [focalLength, aspectRatio]);
   useEffect(() => {
     void set({ camera: ref.current });
   }, []);
@@ -23,7 +25,7 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
   const [imageDimension, setImageDimension] = useState(1.0);
   const [colorMap, setColorMap] = useState(false);
   const [displacementMap, setDisplacementMap] = useState(false);
-  const [focalLength, setFocalLength] = useState(35);
+  const [focalLength, setFocalLength] = useState(20);
   const [displacementScale, setDisplacementScale] = useState(0.7);
   const [angle, setAngle] = useState({
     hAngle: 0,
@@ -70,7 +72,14 @@ export function ThreeDViewer({ rgbImageCanvas, depthImageCanvas }) {
           F
         </div>
         <Canvas>
-          <Camera fov={75} near={0.1} far={100} position={[0, 0, 2]} focalLength={focalLength} />
+          <Camera
+            fov={75}
+            aspectRatio={1 / imageDimension}
+            near={0.1}
+            far={100}
+            position={[0, 0, 2]}
+            focalLength={focalLength}
+          />
           <Suspense fallback={null}>
             <ambientLight intensity={-1} />
             <group rotation={[angle.vAngle, angle.hAngle, 0]}>
